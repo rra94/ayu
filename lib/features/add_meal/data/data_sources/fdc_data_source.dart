@@ -30,4 +30,24 @@ class FDCDataSource {
       return Future.error(exception);
     }
   }
+
+  /// Search FDC Branded database by UPC/GTIN barcode
+  Future<FDCWordResponseDTO> fetchBarcodeResults(String barcode) async {
+    try {
+      final searchUrl =
+          FDCConst.getFDCBarcodeSearchUrl(barcode, Env.fdcApiKey);
+
+      final response =
+          await http.get(searchUrl).timeout(_timeoutDuration);
+      log.fine('Fetching FDC barcode results from: $searchUrl');
+
+      final wordResponse = FDCWordResponseDTO.fromJson(jsonDecode(response.body));
+      log.fine('FDC barcode response: ${wordResponse.foods.length} results');
+      return wordResponse;
+    } catch (exception, stacktrace) {
+      log.severe('Exception while getting FDC barcode search $exception');
+      Sentry.captureException(exception, stackTrace: stacktrace);
+      return Future.error(exception);
+    }
+  }
 }

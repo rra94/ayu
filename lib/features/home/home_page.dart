@@ -15,6 +15,7 @@ import 'package:opennutritracker/core/db/data_sources/habit_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/gut_health_data_source.dart';
 import 'package:opennutritracker/core/db/entities/gut_health_item_ob.dart';
 import 'package:opennutritracker/core/services/gut_health_service.dart';
+import 'package:opennutritracker/core/services/habit_notification_service.dart';
 import 'package:opennutritracker/core/utils/locator.dart';
 import 'package:opennutritracker/features/water/presentation/water_tracker_widget.dart';
 import 'package:opennutritracker/features/habits/presentation/habits_checklist_widget.dart';
@@ -335,6 +336,17 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           completedHabitIds: completedIds,
           onToggle: (habitId, completed) async {
             await habitDs.toggleHabitLog(habitId, DateTime.now(), completed);
+            setState(() {});
+          },
+          onSetReminder: (habit, reminderMinutes) async {
+            habit.reminderMinutes = reminderMinutes;
+            await habitDs.updateHabit(habit);
+            if (reminderMinutes != null) {
+              await HabitNotificationService.requestPermission();
+              await HabitNotificationService.scheduleHabitReminder(habit);
+            } else {
+              await HabitNotificationService.cancelHabitReminder(habit.id);
+            }
             setState(() {});
           },
         );

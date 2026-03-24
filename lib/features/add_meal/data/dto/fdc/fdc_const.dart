@@ -177,6 +177,19 @@ class FDCConst {
     return Uri.https(_fdcBaseUrl, _fdcFoodSearchPath, queryParameters);
   }
 
+  /// UPC/GTIN barcode search via FDC Branded foods
+  static Uri getFDCBarcodeSearchUrl(String barcode, String apiKey) {
+    final queryParameters = {
+      _fdcQueryTag: barcode,
+      _fdcPageSizeTag: '5',
+      _fdcDataTypeTag: 'Branded',
+      _fdcSortOrderTag: _fdcSortOrderAscValue,
+      _fdcApiKeyTag: apiKey,
+    };
+
+    return Uri.https(_fdcBaseUrl, _fdcFoodSearchPath, queryParameters);
+  }
+
   // Nutriment codes
   static const fdcTotalKcalId = 1008;
   static const fdcKcalAtwaterGeneralId = 957;

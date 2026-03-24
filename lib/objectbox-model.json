@@ -621,7 +621,7 @@
     },
     {
       "id": "9:3446880705750154736",
-      "lastPropertyId": "5:3267316403142564014",
+      "lastPropertyId": "6:4320839372809236579",
       "name": "HabitOB",
       "properties": [
         {
@@ -649,6 +649,11 @@
           "id": "5:3267316403142564014",
           "name": "isActive",
           "type": 1
+        },
+        {
+          "id": "6:4320839372809236579",
+          "name": "reminderMinutes",
+          "type": 6
         }
       ],
       "relations": []

@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:opennutritracker/core/db/entities/habit_ob.dart';
+import 'package:opennutritracker/core/services/habit_notification_service.dart';
 
 class HabitsChecklistWidget extends StatelessWidget {
   final List<HabitOB> habits;
   final Set<int> completedHabitIds;
   final void Function(int habitId, bool completed) onToggle;
+  final void Function(HabitOB habit, int? reminderMinutes)? onSetReminder;
 
   const HabitsChecklistWidget({
     super.key,
     required this.habits,
     required this.completedHabitIds,
     required this.onToggle,
+    this.onSetReminder,
   });
 
   @override
@@ -78,6 +81,7 @@ class HabitsChecklistWidget extends StatelessWidget {
                 itemBuilder: (context, index) {
                   final habit = habits[index];
                   final isCompleted = completedHabitIds.contains(habit.id);
+                  final hasReminder = habit.reminderMinutes != null;
                   return CheckboxListTile(
                     dense: true,
                     visualDensity: VisualDensity.compact,
@@ -90,17 +94,50 @@ class HabitsChecklistWidget extends StatelessWidget {
                             : null,
                         color: isCompleted
                             ? theme.textTheme.bodyMedium?.color
-                                ?.withOpacity(0.5)
+                                ?.withValues(alpha: 0.5)
                             : null,
                       ),
                     ),
-                    subtitle: Text(
-                      habit.category,
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: theme.textTheme.labelSmall?.color
-                            ?.withOpacity(0.6),
-                      ),
+                    subtitle: Row(
+                      children: [
+                        Text(
+                          habit.category,
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: theme.textTheme.labelSmall?.color
+                                ?.withValues(alpha: 0.6),
+                          ),
+                        ),
+                        if (hasReminder) ...[
+                          const SizedBox(width: 8),
+                          Icon(Icons.alarm, size: 12,
+                              color: theme.colorScheme.primary),
+                          const SizedBox(width: 2),
+                          Text(
+                            HabitNotificationService.formatTime(
+                                habit.reminderMinutes!),
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: theme.colorScheme.primary,
+                              fontSize: 10,
+                            ),
+                          ),
+                        ],
+                      ],
                     ),
+                    secondary: onSetReminder != null
+                        ? GestureDetector(
+                            onTap: () => _showReminderPicker(
+                                context, habit),
+                            child: Icon(
+                              hasReminder
+                                  ? Icons.alarm_on
+                                  : Icons.alarm_add,
+                              size: 20,
+                              color: hasReminder
+                                  ? theme.colorScheme.primary
+                                  : theme.colorScheme.onSurfaceVariant,
+                            ),
+                          )
+                        : null,
                     value: isCompleted,
                     onChanged: (value) =>
                         onToggle(habit.id, value ?? false),
@@ -112,5 +149,49 @@ class HabitsChecklistWidget extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _showReminderPicker(BuildContext context, HabitOB habit) async {
+    if (onSetReminder == null) return;
+
+    // If already has reminder, offer to change or remove
+    if (habit.reminderMinutes != null) {
+      final action = await showDialog<String>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: Text('Reminder: ${habit.name}'),
+          content: Text(
+            'Current: ${HabitNotificationService.formatTime(habit.reminderMinutes!)}',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop('remove'),
+              child: const Text('Remove'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop('change'),
+              child: const Text('Change Time'),
+            ),
+          ],
+        ),
+      );
+
+      if (action == 'remove') {
+        onSetReminder!(habit, null);
+        return;
+      }
+      if (action != 'change') return;
+    }
+
+    if (!context.mounted) return;
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: habit.reminderTime ?? const TimeOfDay(hour: 8, minute: 0),
+    );
+
+    if (picked != null) {
+      final minutes = picked.hour * 60 + picked.minute;
+      onSetReminder!(habit, minutes);
+    }
   }
 }
