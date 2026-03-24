@@ -27,6 +27,7 @@ import 'package:opennutritracker/features/stats/presentation/widgets/caffeine_ca
 import 'package:opennutritracker/features/stats/presentation/widgets/inventory_card.dart';
 import 'package:opennutritracker/features/home/presentation/widgets/collapsible_section.dart';
 import 'package:opennutritracker/features/home/presentation/widgets/quick_action_bar.dart';
+import 'package:opennutritracker/features/home/presentation/widgets/today_view_card.dart';
 import 'package:opennutritracker/features/mindfulness/presentation/widgets/mindfulness_timer_widget.dart';
 import 'package:opennutritracker/features/add_meal/presentation/add_meal_type.dart';
 import 'package:opennutritracker/features/home/presentation/bloc/home_bloc.dart';
@@ -153,6 +154,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           totalCarbsGoal: totalCarbsGoal,
           totalFatsGoal: totalFatsGoal,
           totalProteinsGoal: totalProteinsGoal,
+        ),
+        TodayViewCard(
+          caloriesConsumed: totalKcalSupplied,
+          calorieGoal: totalKcalDaily,
         ),
         QuickActionBar(onActionComplete: () => setState(() {})),
 
