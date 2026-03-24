@@ -20,8 +20,9 @@ class ChartsPage extends StatefulWidget {
 
 class _ChartsPageState extends State<ChartsPage> {
   bool _loading = true;
+  int _days = 7; // 7, 30, or 90
 
-  // 7-day data
+  // daily data
   List<double> _dailyCalories = [];
   List<double> _dailyProtein = [];
   List<double> _dailyCarbs = [];
@@ -51,10 +52,12 @@ class _ChartsPageState extends State<ChartsPage> {
     final water = <double>[];
     final labels = <String>[];
 
-    for (int i = 6; i >= 0; i--) {
+    for (int i = _days - 1; i >= 0; i--) {
       final day = now.subtract(Duration(days: i));
       final dayStart = DateTime(day.year, day.month, day.day);
-      labels.add(DateFormat('E').format(dayStart));
+      labels.add(_days <= 7
+          ? DateFormat('E').format(dayStart)
+          : DateFormat('d/M').format(dayStart));
 
       final allIntakes = [
         ...await getIntake.getBreakfastIntakeByDay(dayStart),
@@ -81,7 +84,7 @@ class _ChartsPageState extends State<ChartsPage> {
     }
 
     final weights = await weightDs.getAllRecords();
-    final sleeps = await sleepDs.getRecords(limit: 7);
+    final sleeps = await sleepDs.getRecords(limit: _days);
 
     setState(() {
       _dailyCalories = calories;
@@ -105,9 +108,28 @@ class _ChartsPageState extends State<ChartsPage> {
     return ListView(
       padding: const EdgeInsets.symmetric(vertical: 8),
       children: [
-        _buildChartCard('Calories (7 days)', _buildCalorieChart()),
-        _buildChartCard('Macros (7 days)', _buildMacroChart()),
-        _buildChartCard('Water (7 days)', _buildWaterChart()),
+        // Period selector
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          child: SegmentedButton<int>(
+            segments: const [
+              ButtonSegment(value: 7, label: Text('7d')),
+              ButtonSegment(value: 30, label: Text('30d')),
+              ButtonSegment(value: 90, label: Text('90d')),
+            ],
+            selected: {_days},
+            onSelectionChanged: (values) {
+              setState(() {
+                _days = values.first;
+                _loading = true;
+              });
+              _load();
+            },
+          ),
+        ),
+        _buildChartCard('Calories ($_days days)', _buildCalorieChart()),
+        _buildChartCard('Macros ($_days days)', _buildMacroChart()),
+        _buildChartCard('Water ($_days days)', _buildWaterChart()),
         if (_weights.length > 1)
           _buildChartCard('Weight Trend', _buildWeightChart()),
         if (_sleeps.length > 1)
@@ -149,7 +171,7 @@ class _ChartsPageState extends State<ChartsPage> {
           BarChartRodData(
             toY: _dailyCalories[i],
             color: Theme.of(context).colorScheme.primary,
-            width: 16,
+            width: _days <= 7 ? 16 : _days <= 30 ? 6 : 3,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
           ),
         ],
@@ -175,7 +197,7 @@ class _ChartsPageState extends State<ChartsPage> {
               BarChartRodStackItem(_dailyCarbs[i] + _dailyProtein[i],
                   _dailyCarbs[i] + _dailyProtein[i] + _dailyFat[i], Colors.red),
             ],
-            width: 16,
+            width: _days <= 7 ? 16 : _days <= 30 ? 6 : 3,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
           ),
         ],
@@ -196,7 +218,7 @@ class _ChartsPageState extends State<ChartsPage> {
           BarChartRodData(
             toY: _dailyWater[i],
             color: Colors.blue,
-            width: 16,
+            width: _days <= 7 ? 16 : _days <= 30 ? 6 : 3,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
           ),
         ],
@@ -272,7 +294,7 @@ class _ChartsPageState extends State<ChartsPage> {
             BarChartRodData(
               toY: hours,
               color: hours >= 7 ? Colors.green : Colors.orange,
-              width: 16,
+              width: _days <= 7 ? 16 : _days <= 30 ? 6 : 3,
               borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
             ),
           ],
@@ -339,11 +361,12 @@ class _ChartsPageState extends State<ChartsPage> {
       topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
       bottomTitles: AxisTitles(
         sideTitles: SideTitles(
-          showTitles: true,
+          showTitles: _days <= 14,
+          interval: _days <= 7 ? 1 : (_days / 7).ceilToDouble(),
           getTitlesWidget: (value, _) {
             final i = value.toInt();
             if (i < 0 || i >= _dayLabels.length) return const SizedBox();
-            return Text(_dayLabels[i], style: const TextStyle(fontSize: 10));
+            return Text(_dayLabels[i], style: const TextStyle(fontSize: 8));
           },
         ),
       ),
