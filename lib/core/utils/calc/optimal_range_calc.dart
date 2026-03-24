@@ -94,6 +94,30 @@ class OptimalRangeCalc {
         category: 'Longevity', normalLow: 100, normalHigh: 300, optimalLow: 100, optimalHigh: 180),
     BiomarkerDef(key: 'dhea_s', name: 'DHEA-S', unit: 'ug/dL',
         category: 'Longevity', normalLow: 80, normalHigh: 560, optimalLow: 200, optimalHigh: 400),
+
+    // ── Fitness ──
+    BiomarkerDef(key: 'vo2_max', name: 'VO2 Max', unit: 'mL/kg/min',
+        category: 'Fitness', normalLow: 30, normalHigh: 60, optimalLow: 40, optimalHigh: 55),
+    BiomarkerDef(key: 'resting_hr', name: 'Resting Heart Rate', unit: 'bpm',
+        category: 'Fitness', normalLow: 50, normalHigh: 100, optimalLow: 50, optimalHigh: 65),
+    BiomarkerDef(key: 'grip_strength', name: 'Grip Strength', unit: 'kg',
+        category: 'Fitness', normalLow: 20, normalHigh: 70, optimalLow: 35, optimalHigh: 60),
+
+    // ── Body Measurements ──
+    BiomarkerDef(key: 'waist', name: 'Waist Circumference', unit: 'cm',
+        category: 'Body', normalLow: 60, normalHigh: 102, optimalLow: 60, optimalHigh: 88),
+    BiomarkerDef(key: 'hip', name: 'Hip Circumference', unit: 'cm',
+        category: 'Body', normalLow: 80, normalHigh: 120, optimalLow: 80, optimalHigh: 105),
+    BiomarkerDef(key: 'waist_hip_ratio', name: 'Waist-to-Hip Ratio', unit: '',
+        category: 'Body', normalLow: 0.7, normalHigh: 1.0, optimalLow: 0.7, optimalHigh: 0.85),
+    BiomarkerDef(key: 'bicep', name: 'Bicep', unit: 'cm',
+        category: 'Body', normalLow: 25, normalHigh: 45, optimalLow: 30, optimalHigh: 40),
+    BiomarkerDef(key: 'chest', name: 'Chest', unit: 'cm',
+        category: 'Body', normalLow: 85, normalHigh: 120, optimalLow: 90, optimalHigh: 110),
+    BiomarkerDef(key: 'thigh', name: 'Thigh', unit: 'cm',
+        category: 'Body', normalLow: 45, normalHigh: 70, optimalLow: 50, optimalHigh: 65),
+    BiomarkerDef(key: 'neck', name: 'Neck', unit: 'cm',
+        category: 'Body', normalLow: 30, normalHigh: 45, optimalLow: 33, optimalHigh: 40),
   ];
 
   static BiomarkerDef? getDefinition(String key) {

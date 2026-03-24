@@ -5,7 +5,7 @@
   "entities": [
     {
       "id": "1:6477492202799954719",
-      "lastPropertyId": "12:1159123641096979405",
+      "lastPropertyId": "13:4833683237323829330",
       "name": "ConfigOB",
       "properties": [
         {
@@ -67,6 +67,11 @@
         {
           "id": "12:1159123641096979405",
           "name": "targetWeightKG",
+          "type": 8
+        },
+        {
+          "id": "13:4833683237323829330",
+          "name": "customDeficitKcal",
           "type": 8
         }
       ],

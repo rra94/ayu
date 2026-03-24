@@ -8,6 +8,7 @@ import 'package:opennutritracker/core/utils/locator.dart';
 import 'package:opennutritracker/core/utils/theme_mode_provider.dart';
 import 'package:opennutritracker/core/utils/url_const.dart';
 import 'package:opennutritracker/features/diary/presentation/bloc/calendar_day_bloc.dart';
+import 'package:opennutritracker/features/settings/presentation/widgets/goal_settings_dialog.dart';
 import 'package:opennutritracker/features/diary/presentation/bloc/diary_bloc.dart';
 import 'package:opennutritracker/features/home/presentation/bloc/home_bloc.dart';
 import 'package:opennutritracker/features/profile/presentation/bloc/profile_bloc.dart';
@@ -71,6 +72,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   leading: const Icon(Icons.calculate_outlined),
                   title: Text(S.of(context).settingsCalculationsLabel),
                   onTap: () => _showCalculationsDialog(context),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.flag_outlined),
+                  title: const Text('Weight & Macro Goals'),
+                  subtitle: const Text('Target weight, deficit, macro ratios'),
+                  onTap: () => _showGoalSettingsDialog(context),
                 ),
                 ListTile(
                   leading: const Icon(Icons.brightness_medium_outlined),
@@ -166,6 +173,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _homeBloc.add(LoadItemsEvent());
       _diaryBloc.add(const LoadDiaryYearEvent());
     }
+  }
+
+  void _showGoalSettingsDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => const GoalSettingsDialog(),
+    );
   }
 
   void _showCalculationsDialog(BuildContext context) {

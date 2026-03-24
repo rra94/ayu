@@ -23,6 +23,9 @@ class ConfigOB {
 
   double? targetWeightKG;
 
+  /// Custom daily calorie deficit (negative = cut, positive = bulk). Overrides weight goal preset.
+  double? customDeficitKcal;
+
   ConfigOB({
     this.id = 0,
     this.hasAcceptedDisclaimer = false,
@@ -36,5 +39,6 @@ class ConfigOB {
     this.userFatGoalPct,
     this.hiveMigrationComplete = false,
     this.targetWeightKG,
+    this.customDeficitKcal,
   });
 }
