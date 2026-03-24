@@ -1,29 +1,19 @@
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:opennutritracker/core/domain/entity/tracked_day_entity.dart';
 
 part 'tracked_day_dbo.g.dart';
 
-@HiveType(typeId: 9)
+
 @JsonSerializable()
-class TrackedDayDBO extends HiveObject {
-  @HiveField(0)
+class TrackedDayDBO {
   DateTime day;
-  @HiveField(1)
   double calorieGoal;
-  @HiveField(2)
   double caloriesTracked;
-  @HiveField(3)
   double? carbsGoal;
-  @HiveField(4)
   double? carbsTracked;
-  @HiveField(5)
   double? fatGoal;
-  @HiveField(6)
   double? fatTracked;
-  @HiveField(7)
   double? proteinGoal;
-  @HiveField(8)
   double? proteinTracked;
 
   TrackedDayDBO(

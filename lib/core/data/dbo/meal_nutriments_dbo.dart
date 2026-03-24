@@ -1,79 +1,47 @@
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:opennutritracker/features/add_meal/domain/entity/meal_nutriments_entity.dart';
 
 part 'meal_nutriments_dbo.g.dart';
 
-@HiveType(typeId: 3)
+
 @JsonSerializable()
-class MealNutrimentsDBO extends HiveObject {
-  @HiveField(0)
+class MealNutrimentsDBO {
   final double? energyKcal100;
-  @HiveField(1)
   final double? carbohydrates100;
-  @HiveField(2)
   final double? fat100;
-  @HiveField(3)
   final double? proteins100;
-  @HiveField(4)
   final double? sugars100;
-  @HiveField(5)
   final double? saturatedFat100;
-  @HiveField(6)
   final double? fiber100;
 
   // Micronutrients - Minerals
-  @HiveField(7)
   final double? sodium100;
-  @HiveField(8)
   final double? potassium100;
-  @HiveField(9)
   final double? calcium100;
-  @HiveField(10)
   final double? iron100;
-  @HiveField(11)
   final double? magnesium100;
-  @HiveField(12)
   final double? phosphorus100;
-  @HiveField(13)
   final double? zinc100;
-  @HiveField(14)
   final double? copper100;
-  @HiveField(15)
   final double? manganese100;
-  @HiveField(16)
   final double? selenium100;
 
   // Micronutrients - Vitamins
-  @HiveField(17)
   final double? vitaminA100;
-  @HiveField(18)
   final double? vitaminC100;
-  @HiveField(19)
   final double? vitaminD100;
-  @HiveField(20)
   final double? vitaminE100;
-  @HiveField(21)
   final double? vitaminK100;
-  @HiveField(22)
   final double? thiamine100;
-  @HiveField(23)
   final double? riboflavin100;
-  @HiveField(24)
   final double? niacin100;
-  @HiveField(25)
   final double? pantothenicAcid100;
-  @HiveField(26)
   final double? vitaminB6100;
-  @HiveField(27)
   final double? folate100;
-  @HiveField(28)
   final double? vitaminB12100;
 
   // Other
-  @HiveField(29)
   final double? cholesterol100;
-  @HiveField(30)
   final double? addedSugars100;
 
   MealNutrimentsDBO({

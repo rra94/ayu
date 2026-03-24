@@ -6,7 +6,6 @@ import 'package:opennutritracker/core/db/data_sources/intake_data_source_ob.dart
 import 'package:opennutritracker/core/db/data_sources/tracked_day_data_source_ob.dart';
 import 'package:opennutritracker/core/db/data_sources/user_activity_data_source_ob.dart';
 import 'package:opennutritracker/core/db/data_sources/user_data_source_ob.dart';
-import 'package:opennutritracker/core/db/hive_to_objectbox_migration.dart';
 import 'package:opennutritracker/core/db/objectbox_db_provider.dart';
 import 'package:opennutritracker/core/data/repository/config_repository.dart';
 import 'package:opennutritracker/core/data/repository/intake_repository.dart';
@@ -31,9 +30,7 @@ import 'package:opennutritracker/core/domain/usecase/get_user_activity_usecase.d
 import 'package:opennutritracker/core/domain/usecase/get_user_usecase.dart';
 import 'package:opennutritracker/core/domain/usecase/update_intake_usecase.dart';
 import 'package:opennutritracker/core/utils/env.dart';
-import 'package:opennutritracker/core/utils/hive_db_provider.dart';
 import 'package:opennutritracker/core/utils/ont_image_cache_manager.dart';
-import 'package:opennutritracker/core/utils/secure_app_storage_provider.dart';
 import 'package:opennutritracker/features/activity_detail/presentation/bloc/activity_detail_bloc.dart';
 import 'package:opennutritracker/features/add_activity/presentation/bloc/activities_bloc.dart';
 import 'package:opennutritracker/features/add_activity/presentation/bloc/recent_activities_bloc.dart';
@@ -81,23 +78,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 final locator = GetIt.instance;
 
 Future<void> initLocator() async {
-  // Init secure storage and Hive database (kept for migration)
-  final secureAppStorageProvider = SecureAppStorageProvider();
-  final hiveDBProvider = HiveDBProvider();
-  await hiveDBProvider
-      .initHiveDB(await secureAppStorageProvider.getHiveEncryptionKey());
-
   // Init ObjectBox database
   final objectBoxProvider = ObjectBoxDBProvider();
   await objectBoxProvider.init();
-
-  // Run Hive → ObjectBox migration if needed
-  if (await HiveToObjectBoxMigration.needsMigration(objectBoxProvider)) {
-    await HiveToObjectBoxMigration.migrate(
-      hiveProvider: hiveDBProvider,
-      obProvider: objectBoxProvider,
-    );
-  }
 
   // Backend
   await Supabase.initialize(
