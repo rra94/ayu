@@ -262,10 +262,18 @@ class _AddMealScreenState extends State<AddMealScreen>
   }
 
   void _onSearchSubmit(String inputText) {
+    if (inputText.isEmpty) return;
+
+    // Auto-switch to search tab if on Favorites
+    if (_tabController.index == 0) {
+      _tabController.animateTo(1);
+    }
+
     switch (_tabController.index) {
       case 0:
-        // Favorites tab — no search needed
-        break;
+        // Favorites tab — switch handled above
+        _tabController.animateTo(1);
+        _productsBloc.add(LoadProductsEvent(searchString: inputText));
       case 1:
         _productsBloc.add(LoadProductsEvent(searchString: inputText));
       case 2:
