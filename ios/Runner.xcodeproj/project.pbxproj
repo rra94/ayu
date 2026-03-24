@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 70;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -78,7 +78,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		D351B7B22F72520700D529E9 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+		D351B7B22F72520700D529E9 /* Exceptions for "NutriWidget" folder in "NutriWidgetExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -88,7 +88,18 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		D351B7A12F72520700D529E9 /* NutriWidget */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (D351B7B22F72520700D529E9 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = NutriWidget; sourceTree = "<group>"; };
+		D351B7A12F72520700D529E9 /* NutriWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				D351B7B22F72520700D529E9 /* Exceptions for "NutriWidget" folder in "NutriWidgetExtension" target */,
+			);
+			explicitFileTypes = {
+			};
+			explicitFolders = (
+			);
+			path = NutriWidget;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -193,10 +204,10 @@
 				97C146EB1CF9000F007C117D /* Frameworks */,
 				97C146EC1CF9000F007C117D /* Resources */,
 				9705A1C41CF9048500538489 /* Embed Frameworks */,
+				D351B7B72F72520700D529E9 /* Embed Foundation Extensions */,
 				3B06AD1E1E4923F5004D2608 /* Thin Binary */,
 				37662AF917CA6F2C19F0345E /* [CP] Embed Pods Frameworks */,
 				CFB800FE155ACD1740E06022 /* [CP] Copy Pods Resources */,
-				D351B7B72F72520700D529E9 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
@@ -224,8 +235,6 @@
 				D351B7A12F72520700D529E9 /* NutriWidget */,
 			);
 			name = NutriWidgetExtension;
-			packageProductDependencies = (
-			);
 			productName = NutriWidgetExtension;
 			productReference = D351B79E2F72520700D529E9 /* NutriWidgetExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
@@ -321,13 +330,9 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -373,13 +378,9 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
