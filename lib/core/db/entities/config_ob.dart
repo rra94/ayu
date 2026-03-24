@@ -26,6 +26,9 @@ class ConfigOB {
   /// Custom daily calorie deficit (negative = cut, positive = bulk). Overrides weight goal preset.
   double? customDeficitKcal;
 
+  /// Daily step goal (default 10000)
+  int? dailyStepGoal;
+
   ConfigOB({
     this.id = 0,
     this.hasAcceptedDisclaimer = false,
@@ -40,5 +43,6 @@ class ConfigOB {
     this.hiveMigrationComplete = false,
     this.targetWeightKG,
     this.customDeficitKcal,
+    this.dailyStepGoal,
   });
 }

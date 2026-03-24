@@ -42,7 +42,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(1, 6477492202799954719),
     name: 'ConfigOB',
-    lastPropertyId: const obx_int.IdUid(13, 4833683237323829330),
+    lastPropertyId: const obx_int.IdUid(14, 4565518338337104291),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -121,6 +121,12 @@ final _entities = <obx_int.ModelEntity>[
         id: const obx_int.IdUid(13, 4833683237323829330),
         name: 'customDeficitKcal',
         type: 8,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(14, 4565518338337104291),
+        name: 'dailyStepGoal',
+        type: 6,
         flags: 0,
       ),
     ],
@@ -1440,7 +1446,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
         object.id = id;
       },
       objectToFB: (ConfigOB object, fb.Builder fbb) {
-        fbb.startTable(14);
+        fbb.startTable(15);
         fbb.addInt64(0, object.id);
         fbb.addBool(1, object.hasAcceptedDisclaimer);
         fbb.addBool(2, object.hasAcceptedPolicy);
@@ -1454,6 +1460,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
         fbb.addBool(10, object.hiveMigrationComplete);
         fbb.addFloat64(11, object.targetWeightKG);
         fbb.addFloat64(12, object.customDeficitKcal);
+        fbb.addInt64(13, object.dailyStepGoal);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -1518,6 +1525,11 @@ obx_int.ModelDefinition getObjectBoxModel() {
         );
         final customDeficitKcalParam = const fb.Float64Reader()
             .vTableGetNullable(buffer, rootOffset, 28);
+        final dailyStepGoalParam = const fb.Int64Reader().vTableGetNullable(
+          buffer,
+          rootOffset,
+          30,
+        );
         final object = ConfigOB(
           id: idParam,
           hasAcceptedDisclaimer: hasAcceptedDisclaimerParam,
@@ -1532,6 +1544,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           hiveMigrationComplete: hiveMigrationCompleteParam,
           targetWeightKG: targetWeightKGParam,
           customDeficitKcal: customDeficitKcalParam,
+          dailyStepGoal: dailyStepGoalParam,
         );
 
         return object;
@@ -3300,6 +3313,11 @@ class ConfigOB_ {
   /// See [ConfigOB.customDeficitKcal].
   static final customDeficitKcal = obx.QueryDoubleProperty<ConfigOB>(
     _entities[0].properties[12],
+  );
+
+  /// See [ConfigOB.dailyStepGoal].
+  static final dailyStepGoal = obx.QueryIntegerProperty<ConfigOB>(
+    _entities[0].properties[13],
   );
 }
 

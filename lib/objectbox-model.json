@@ -5,7 +5,7 @@
   "entities": [
     {
       "id": "1:6477492202799954719",
-      "lastPropertyId": "13:4833683237323829330",
+      "lastPropertyId": "14:4565518338337104291",
       "name": "ConfigOB",
       "properties": [
         {
@@ -73,6 +73,11 @@
           "id": "13:4833683237323829330",
           "name": "customDeficitKcal",
           "type": 8
+        },
+        {
+          "id": "14:4565518338337104291",
+          "name": "dailyStepGoal",
+          "type": 6
         }
       ],
       "relations": []

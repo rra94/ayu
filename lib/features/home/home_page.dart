@@ -25,6 +25,7 @@ import 'package:opennutritracker/features/gut_health/presentation/gut_health_pan
 import 'package:opennutritracker/features/supplements/presentation/widgets/supplement_checklist_widget.dart';
 import 'package:opennutritracker/features/fasting/presentation/widgets/fasting_timer_widget.dart';
 import 'package:opennutritracker/features/stats/presentation/widgets/caffeine_card.dart';
+import 'package:opennutritracker/features/stats/presentation/widgets/steps_card.dart';
 import 'package:opennutritracker/features/stats/presentation/widgets/inventory_card.dart';
 import 'package:opennutritracker/features/home/presentation/widgets/collapsible_section.dart';
 import 'package:opennutritracker/features/home/presentation/widgets/quick_action_bar.dart';
@@ -170,6 +171,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           children: [
             _buildWaterTracker(),
             const CaffeineCard(),
+            const StepsCard(),
           ],
         ),
 
