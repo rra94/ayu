@@ -49,9 +49,23 @@ class _MainScreenState extends State<MainScreen> {
       body: _bodyPages[_selectedPageIndex],
       floatingActionButton: _selectedPageIndex == 0
           ? FloatingActionButton(
-              onPressed: () => _onFabPressed(context),
-              tooltip: S.of(context).addLabel,
-              child: const Icon(Icons.add),
+              onPressed: () {
+                // Go directly to scanner — one tap, no bottom sheet
+                final hour = DateTime.now().hour;
+                final intakeType = hour < 11
+                    ? IntakeTypeEntity.breakfast
+                    : hour < 15
+                        ? IntakeTypeEntity.lunch
+                        : hour < 21
+                            ? IntakeTypeEntity.dinner
+                            : IntakeTypeEntity.snack;
+                Navigator.of(context).pushNamed(
+                  NavigationOptions.scannerRoute,
+                  arguments: ScannerScreenArguments(DateTime.now(), intakeType),
+                );
+              },
+              tooltip: 'Scan',
+              child: const Icon(Icons.camera_alt),
             )
           : null,
       bottomNavigationBar: NavigationBar(
