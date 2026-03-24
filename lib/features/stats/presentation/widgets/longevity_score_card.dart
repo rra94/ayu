@@ -53,7 +53,7 @@ class _LongevityScoreCardState extends State<LongevityScoreCard> {
             const SizedBox(height: 12),
             if (_loading)
               const CircularProgressIndicator()
-            else if (_result != null) ...[
+            else if (_result != null && _result!.overallScore > 0) ...[
               // Score ring
               SizedBox(
                 width: 120,
@@ -89,7 +89,16 @@ class _LongevityScoreCardState extends State<LongevityScoreCard> {
               const SizedBox(height: 12),
               // Sub-scores
               ..._result!.subScores.values.map((s) => _buildSubRow(theme, s)),
-            ],
+            ] else
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Text(
+                  'Log meals, water, and sleep to see your score',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
           ],
         ),
       ),

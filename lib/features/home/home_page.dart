@@ -55,10 +55,23 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   // ignore: unused_field (kept for potential future use)
   bool _isDragging = false;
 
+  // Cached futures to prevent jitter on scroll rebuild
+  late Future<double> _waterFuture;
+  late Future<List<dynamic>> _habitsFuture;
+
+  void _refreshCachedFutures() {
+    _waterFuture = locator<WaterDataSource>().getTodayTotal();
+    _habitsFuture = Future.wait([
+      locator<HabitDataSource>().getAllActiveHabits(),
+      locator<HabitDataSource>().getLogsForDate(DateTime.now()),
+    ]);
+  }
+
   @override
   void initState() {
     WidgetsBinding.instance.addObserver(this);
     _homeBloc = locator<HomeBloc>();
+    _refreshCachedFutures();
     super.initState();
   }
 
@@ -406,7 +419,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   Widget _buildWaterTracker() {
     final waterDs = locator<WaterDataSource>();
     return FutureBuilder<double>(
-      future: waterDs.getTodayTotal(),
+      future: _waterFuture,
       builder: (context, snapshot) {
         final currentML = snapshot.data ?? 0;
         return WaterTrackerWidget(
@@ -414,7 +427,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           goalML: 2500,
           onAddWater: (ml) async {
             await waterDs.addWaterRecord(ml, DateTime.now());
-            setState(() {});
+            setState(() { _refreshCachedFutures(); });
           },
         );
       },
@@ -424,10 +437,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   Widget _buildHabitsChecklist() {
     final habitDs = locator<HabitDataSource>();
     return FutureBuilder(
-      future: Future.wait([
-        habitDs.getAllActiveHabits(),
-        habitDs.getLogsForDate(DateTime.now()),
-      ]),
+      future: _habitsFuture,
       builder: (context, snapshot) {
         if (!snapshot.hasData) return const SizedBox();
         final habits = snapshot.data![0] as List;

@@ -70,7 +70,7 @@ class _AddMealScreenState extends State<AddMealScreen>
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text(_mealType.getTypeName(context)),
+          title: Text('Add ${_mealType.getTypeName(context)}'),
           actions: [
             BlocBuilder<AddMealBloc, AddMealState>(
               bloc: locator<AddMealBloc>()..add(InitializeAddMealEvent()),
@@ -264,10 +264,13 @@ class _AddMealScreenState extends State<AddMealScreen>
   void _onSearchSubmit(String inputText) {
     switch (_tabController.index) {
       case 0:
-        _productsBloc.add(LoadProductsEvent(searchString: inputText));
+        // Favorites tab — no search needed
+        break;
       case 1:
-        _foodBloc.add(LoadFoodEvent(searchString: inputText));
+        _productsBloc.add(LoadProductsEvent(searchString: inputText));
       case 2:
+        _foodBloc.add(LoadFoodEvent(searchString: inputText));
+      case 3:
         _recentMealBloc.add(LoadRecentMealEvent(searchString: inputText));
     }
   }
