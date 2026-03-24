@@ -62,10 +62,21 @@ class MicronutrientSummaryScreen extends StatelessWidget {
           _buildNutrientRow(context, 'Folate (B9)', totals['folate'], rdaTargets['folate'], 'mcg', absorption: absorptionMap['Folate']),
           _buildNutrientRow(context, 'Vitamin B12', totals['vitaminB12'], rdaTargets['vitaminB12'], 'mcg', absorption: absorptionMap['Vitamin B12']),
           const SizedBox(height: 16),
-          _buildSectionHeader(context, 'Other'),
+          _buildSectionHeader(context, 'Fat Profile'),
+          _buildNutrientRow(context, 'Total Fat', totals['fat'], rdaTargets['fat'], 'g'),
+          _buildNutrientRow(context, 'Saturated Fat', totals['saturatedFat'], rdaTargets['saturatedFat'], 'g', isLimit: true),
+          _buildNutrientRow(context, 'Trans Fat', totals['transFat'], null, 'g', isLimit: true),
           _buildNutrientRow(context, 'Cholesterol', totals['cholesterol'], rdaTargets['cholesterol'], 'mg', isLimit: true),
-          _buildNutrientRow(context, 'Added Sugars', totals['addedSugars'], rdaTargets['addedSugars'], 'g', isLimit: true),
+          const SizedBox(height: 16),
+          _buildSectionHeader(context, 'Carbohydrate Profile'),
+          _buildNutrientRow(context, 'Total Carbs', totals['carbs'], rdaTargets['carbs'], 'g'),
           _buildNutrientRow(context, S.of(context).fiberLabel, totals['fiber'], rdaTargets['fiber'], 'g'),
+          _buildNutrientRow(context, 'Sugars', totals['sugars'], null, 'g'),
+          _buildNutrientRow(context, 'Added Sugars', totals['addedSugars'], rdaTargets['addedSugars'], 'g', isLimit: true),
+          _buildNutrientRow(context, 'Net Carbs', totals['netCarbs'], null, 'g'),
+          const SizedBox(height: 16),
+          _buildSectionHeader(context, 'Protein Profile'),
+          _buildNutrientRow(context, 'Total Protein', totals['protein'], rdaTargets['protein'], 'g'),
           const SizedBox(height: 24),
           _buildDataCoverageNote(context),
         ],
@@ -234,7 +245,7 @@ class MicronutrientSummaryScreen extends StatelessWidget {
       return hasAny ? total : null;
     }
 
-    return {
+    final result = <String, double?>{
       'sodium': sum((i) => i.meal.nutriments.sodium100),
       'potassium': sum((i) => i.meal.nutriments.potassium100),
       'calcium': sum((i) => i.meal.nutriments.calcium100),
@@ -260,6 +271,22 @@ class MicronutrientSummaryScreen extends StatelessWidget {
       'cholesterol': sum((i) => i.meal.nutriments.cholesterol100),
       'addedSugars': sum((i) => i.meal.nutriments.addedSugars100),
       'fiber': sum((i) => i.meal.nutriments.fiber100),
+      // Macro sub-profiles
+      'fat': sum((i) => i.meal.nutriments.fat100),
+      'saturatedFat': sum((i) => i.meal.nutriments.saturatedFat100),
+      'transFat': null, // OFF doesn't reliably provide trans fat
+      'carbs': sum((i) => i.meal.nutriments.carbohydrates100),
+      'sugars': sum((i) => i.meal.nutriments.sugars100),
+      'protein': sum((i) => i.meal.nutriments.proteins100),
     };
+
+    // Compute net carbs
+    final carbsVal = result['carbs'];
+    final fiberVal = result['fiber'];
+    result['netCarbs'] = carbsVal != null
+        ? carbsVal - (fiberVal ?? 0)
+        : null;
+
+    return result;
   }
 }

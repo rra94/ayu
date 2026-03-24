@@ -31,6 +31,11 @@ class RDACalc {
       'cholesterol': 300, // mg (not an RDA, but daily limit)
       'addedSugars': 25, // g (WHO recommendation)
       'fiber': isMale ? 38 : 25, // g
+      // Macro profiles
+      'fat': 78, // g (based on 2000 kcal, 35%)
+      'saturatedFat': 22, // g (limit, <10% of calories)
+      'carbs': 275, // g (based on 2000 kcal, 55%)
+      'protein': isMale ? 56 : 46, // g
     };
   }
 }
