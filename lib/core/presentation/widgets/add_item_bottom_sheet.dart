@@ -142,6 +142,32 @@ class AddItemBottomSheet extends StatelessWidget {
               _showAddItemScreen(context, AddMealType.snackType);
             },
           ),
+          const Divider(indent: 16, endIndent: 16),
+          ListTile(
+            title: Text(
+              'Scan Receipt',
+              style: Theme.of(context)
+                  .textTheme
+                  .titleLarge
+                  ?.copyWith(color: Theme.of(context).colorScheme.onSurface),
+            ),
+            subtitle: Text(
+              'Photo of grocery receipt → auto-detect food items',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color:
+                      Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
+            ),
+            leading: Container(
+                height: double.infinity,
+                child: Icon(
+                  Icons.receipt_long,
+                  color: Theme.of(context).colorScheme.onSurface,
+                )),
+            onTap: () {
+              Navigator.of(context).pop();
+              Navigator.of(context).pushNamed(NavigationOptions.receiptScannerRoute);
+            },
+          ),
         ],
       ),
     );
