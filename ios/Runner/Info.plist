@@ -4,6 +4,10 @@
 <dict>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
+	<key>NSHealthShareUsageDescription</key>
+	<string>Ayu reads your health data (weight, sleep, heart rate, HRV) to provide longevity insights and track progress.</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>Ayu writes nutrition data to Apple Health to keep your records in sync.</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
