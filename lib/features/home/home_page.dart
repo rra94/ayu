@@ -20,6 +20,9 @@ import 'package:opennutritracker/core/utils/locator.dart';
 import 'package:opennutritracker/features/water/presentation/water_tracker_widget.dart';
 import 'package:opennutritracker/features/habits/presentation/habits_checklist_widget.dart';
 import 'package:opennutritracker/features/gut_health/presentation/gut_health_panel.dart';
+import 'package:opennutritracker/features/supplements/presentation/widgets/supplement_checklist_widget.dart';
+import 'package:opennutritracker/features/fasting/presentation/widgets/fasting_timer_widget.dart';
+import 'package:opennutritracker/features/mindfulness/presentation/widgets/mindfulness_timer_widget.dart';
 import 'package:opennutritracker/features/add_meal/presentation/add_meal_type.dart';
 import 'package:opennutritracker/features/home/presentation/bloc/home_bloc.dart';
 import 'package:opennutritracker/features/home/presentation/widgets/dashboard_widget.dart';
@@ -145,6 +148,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         ),
         _buildWaterTracker(),
         _buildHabitsChecklist(),
+        const SupplementChecklistWidget(),
+        const FastingTimerWidget(),
+        const MindfulnessTimerWidget(),
         _buildMicronutrientButton(context, breakfastIntakeList,
             lunchIntakeList, dinnerIntakeList, snackIntakeList),
         _buildGutHealthAndSummary(

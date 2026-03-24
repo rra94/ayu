@@ -4,8 +4,11 @@ import 'package:opennutritracker/features/stats/presentation/widgets/biomarker_c
 import 'package:opennutritracker/features/stats/presentation/widgets/bristol_stool_card.dart';
 import 'package:opennutritracker/features/stats/presentation/widgets/dexa_card.dart';
 import 'package:opennutritracker/features/stats/presentation/widgets/food_feeling_card.dart';
+import 'package:opennutritracker/features/stats/presentation/widgets/meal_timing_card.dart';
+import 'package:opennutritracker/features/stats/presentation/widgets/streak_card.dart';
 import 'package:opennutritracker/features/stats/presentation/widgets/tdee_card.dart';
 import 'package:opennutritracker/features/stats/presentation/widgets/weight_chart_card.dart';
+import 'package:opennutritracker/features/sleep/presentation/widgets/sleep_card.dart';
 
 class StatsPage extends StatelessWidget {
   const StatsPage({super.key});
@@ -17,6 +20,9 @@ class StatsPage extends StatelessWidget {
       children: const [
         TdeeCard(),
         WeightChartCard(),
+        MealTimingCard(),
+        StreakCard(),
+        SleepCard(),
         BiomarkerCard(),
         BioAgeCard(),
         FoodFeelingCard(),

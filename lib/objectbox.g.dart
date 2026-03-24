@@ -17,12 +17,16 @@ import 'package:objectbox_flutter_libs/objectbox_flutter_libs.dart';
 import 'core/db/entities/biomarker_record_ob.dart';
 import 'core/db/entities/config_ob.dart';
 import 'core/db/entities/dexa_scan_ob.dart';
+import 'core/db/entities/fasting_session_ob.dart';
 import 'core/db/entities/gut_health_item_ob.dart';
 import 'core/db/entities/habit_log_ob.dart';
 import 'core/db/entities/habit_ob.dart';
 import 'core/db/entities/intake_ob.dart';
+import 'core/db/entities/mindfulness_session_ob.dart';
 import 'core/db/entities/physical_activity_ob.dart';
+import 'core/db/entities/sleep_record_ob.dart';
 import 'core/db/entities/stool_log_ob.dart';
+import 'core/db/entities/supplement_ob.dart';
 import 'core/db/entities/symptom_log_ob.dart';
 import 'core/db/entities/tracked_day_ob.dart';
 import 'core/db/entities/user_activity_ob.dart';
@@ -1043,6 +1047,218 @@ final _entities = <obx_int.ModelEntity>[
     relations: <obx_int.ModelRelation>[],
     backlinks: <obx_int.ModelBacklink>[],
   ),
+  obx_int.ModelEntity(
+    id: const obx_int.IdUid(16, 2247926351166455786),
+    name: 'FastingSessionOB',
+    lastPropertyId: const obx_int.IdUid(5, 8965767915561563849),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(1, 574653573437470648),
+        name: 'id',
+        type: 6,
+        flags: 1,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(2, 6146045116836756185),
+        name: 'startTime',
+        type: 10,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 951491199965569009),
+        name: 'endTime',
+        type: 10,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(4, 5222499985869293876),
+        name: 'targetHours',
+        type: 8,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(5, 8965767915561563849),
+        name: 'type',
+        type: 6,
+        flags: 0,
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[],
+    backlinks: <obx_int.ModelBacklink>[],
+  ),
+  obx_int.ModelEntity(
+    id: const obx_int.IdUid(17, 2346511816159630796),
+    name: 'MindfulnessSessionOB',
+    lastPropertyId: const obx_int.IdUid(4, 387004284061673089),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(1, 4741708278793477861),
+        name: 'id',
+        type: 6,
+        flags: 1,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(2, 4771717370335112344),
+        name: 'type',
+        type: 6,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 4095880314721100286),
+        name: 'durationMinutes',
+        type: 6,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(4, 387004284061673089),
+        name: 'dateTime',
+        type: 10,
+        flags: 0,
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[],
+    backlinks: <obx_int.ModelBacklink>[],
+  ),
+  obx_int.ModelEntity(
+    id: const obx_int.IdUid(18, 2992183107648926707),
+    name: 'SleepRecordOB',
+    lastPropertyId: const obx_int.IdUid(6, 7442038126300950605),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(1, 9020550136476983718),
+        name: 'id',
+        type: 6,
+        flags: 1,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(2, 1319764132476342147),
+        name: 'bedTime',
+        type: 10,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 3081932780519821677),
+        name: 'wakeTime',
+        type: 10,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(4, 5489412302073833333),
+        name: 'qualityScore',
+        type: 6,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(5, 3029155134740993332),
+        name: 'notes',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(6, 7442038126300950605),
+        name: 'source',
+        type: 9,
+        flags: 0,
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[],
+    backlinks: <obx_int.ModelBacklink>[],
+  ),
+  obx_int.ModelEntity(
+    id: const obx_int.IdUid(19, 2910029066146441198),
+    name: 'SupplementLogOB',
+    lastPropertyId: const obx_int.IdUid(4, 6830997849336333648),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(1, 2501803558246718268),
+        name: 'id',
+        type: 6,
+        flags: 1,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(2, 1651732256930469796),
+        name: 'supplementId',
+        type: 6,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 3732551627409820874),
+        name: 'taken',
+        type: 1,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(4, 6830997849336333648),
+        name: 'dateTime',
+        type: 10,
+        flags: 0,
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[],
+    backlinks: <obx_int.ModelBacklink>[],
+  ),
+  obx_int.ModelEntity(
+    id: const obx_int.IdUid(20, 2121155969444040118),
+    name: 'SupplementOB',
+    lastPropertyId: const obx_int.IdUid(8, 8150974449903573653),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(1, 2101622098576608774),
+        name: 'id',
+        type: 6,
+        flags: 1,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(2, 8618130588363429731),
+        name: 'name',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 6923898463619480298),
+        name: 'dosage',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(4, 2654758240918964634),
+        name: 'unit',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(5, 2663143608679809213),
+        name: 'category',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(6, 9080309578445766872),
+        name: 'isActive',
+        type: 1,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(7, 4810855290512620969),
+        name: 'sortOrder',
+        type: 6,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(8, 8150974449903573653),
+        name: 'sourceBarcode',
+        type: 9,
+        flags: 0,
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[],
+    backlinks: <obx_int.ModelBacklink>[],
+  ),
 ];
 
 /// Shortcut for [obx.Store.new] that passes [getObjectBoxModel] and for Flutter
@@ -1083,7 +1299,7 @@ Future<obx.Store> openStore({
 obx_int.ModelDefinition getObjectBoxModel() {
   final model = obx_int.ModelInfo(
     entities: _entities,
-    lastEntityId: const obx_int.IdUid(15, 1781774396636105369),
+    lastEntityId: const obx_int.IdUid(20, 2121155969444040118),
     lastIndexId: const obx_int.IdUid(2, 7319863865959781371),
     lastRelationId: const obx_int.IdUid(0, 0),
     lastSequenceId: const obx_int.IdUid(0, 0),
@@ -2439,6 +2655,309 @@ obx_int.ModelDefinition getObjectBoxModel() {
         return object;
       },
     ),
+    FastingSessionOB: obx_int.EntityDefinition<FastingSessionOB>(
+      model: _entities[15],
+      toOneRelations: (FastingSessionOB object) => [],
+      toManyRelations: (FastingSessionOB object) => {},
+      getId: (FastingSessionOB object) => object.id,
+      setId: (FastingSessionOB object, int id) {
+        object.id = id;
+      },
+      objectToFB: (FastingSessionOB object, fb.Builder fbb) {
+        fbb.startTable(6);
+        fbb.addInt64(0, object.id);
+        fbb.addInt64(1, object.startTime.millisecondsSinceEpoch);
+        fbb.addInt64(2, object.endTime?.millisecondsSinceEpoch);
+        fbb.addFloat64(3, object.targetHours);
+        fbb.addInt64(4, object.type);
+        fbb.finish(fbb.endTable());
+        return object.id;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
+        final endTimeValue = const fb.Int64Reader().vTableGetNullable(
+          buffer,
+          rootOffset,
+          8,
+        );
+        final idParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          4,
+          0,
+        );
+        final startTimeParam = DateTime.fromMillisecondsSinceEpoch(
+          const fb.Int64Reader().vTableGet(buffer, rootOffset, 6, 0),
+        );
+        final endTimeParam = endTimeValue == null
+            ? null
+            : DateTime.fromMillisecondsSinceEpoch(endTimeValue);
+        final targetHoursParam = const fb.Float64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          10,
+          0,
+        );
+        final typeParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          12,
+          0,
+        );
+        final object = FastingSessionOB(
+          id: idParam,
+          startTime: startTimeParam,
+          endTime: endTimeParam,
+          targetHours: targetHoursParam,
+          type: typeParam,
+        );
+
+        return object;
+      },
+    ),
+    MindfulnessSessionOB: obx_int.EntityDefinition<MindfulnessSessionOB>(
+      model: _entities[16],
+      toOneRelations: (MindfulnessSessionOB object) => [],
+      toManyRelations: (MindfulnessSessionOB object) => {},
+      getId: (MindfulnessSessionOB object) => object.id,
+      setId: (MindfulnessSessionOB object, int id) {
+        object.id = id;
+      },
+      objectToFB: (MindfulnessSessionOB object, fb.Builder fbb) {
+        fbb.startTable(5);
+        fbb.addInt64(0, object.id);
+        fbb.addInt64(1, object.type);
+        fbb.addInt64(2, object.durationMinutes);
+        fbb.addInt64(3, object.dateTime.millisecondsSinceEpoch);
+        fbb.finish(fbb.endTable());
+        return object.id;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
+        final idParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          4,
+          0,
+        );
+        final typeParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          6,
+          0,
+        );
+        final durationMinutesParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          8,
+          0,
+        );
+        final dateTimeParam = DateTime.fromMillisecondsSinceEpoch(
+          const fb.Int64Reader().vTableGet(buffer, rootOffset, 10, 0),
+        );
+        final object = MindfulnessSessionOB(
+          id: idParam,
+          type: typeParam,
+          durationMinutes: durationMinutesParam,
+          dateTime: dateTimeParam,
+        );
+
+        return object;
+      },
+    ),
+    SleepRecordOB: obx_int.EntityDefinition<SleepRecordOB>(
+      model: _entities[17],
+      toOneRelations: (SleepRecordOB object) => [],
+      toManyRelations: (SleepRecordOB object) => {},
+      getId: (SleepRecordOB object) => object.id,
+      setId: (SleepRecordOB object, int id) {
+        object.id = id;
+      },
+      objectToFB: (SleepRecordOB object, fb.Builder fbb) {
+        final notesOffset = object.notes == null
+            ? null
+            : fbb.writeString(object.notes!);
+        final sourceOffset = fbb.writeString(object.source);
+        fbb.startTable(7);
+        fbb.addInt64(0, object.id);
+        fbb.addInt64(1, object.bedTime.millisecondsSinceEpoch);
+        fbb.addInt64(2, object.wakeTime.millisecondsSinceEpoch);
+        fbb.addInt64(3, object.qualityScore);
+        fbb.addOffset(4, notesOffset);
+        fbb.addOffset(5, sourceOffset);
+        fbb.finish(fbb.endTable());
+        return object.id;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
+        final idParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          4,
+          0,
+        );
+        final bedTimeParam = DateTime.fromMillisecondsSinceEpoch(
+          const fb.Int64Reader().vTableGet(buffer, rootOffset, 6, 0),
+        );
+        final wakeTimeParam = DateTime.fromMillisecondsSinceEpoch(
+          const fb.Int64Reader().vTableGet(buffer, rootOffset, 8, 0),
+        );
+        final qualityScoreParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          10,
+          0,
+        );
+        final notesParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 12);
+        final sourceParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 14, '');
+        final object = SleepRecordOB(
+          id: idParam,
+          bedTime: bedTimeParam,
+          wakeTime: wakeTimeParam,
+          qualityScore: qualityScoreParam,
+          notes: notesParam,
+          source: sourceParam,
+        );
+
+        return object;
+      },
+    ),
+    SupplementLogOB: obx_int.EntityDefinition<SupplementLogOB>(
+      model: _entities[18],
+      toOneRelations: (SupplementLogOB object) => [],
+      toManyRelations: (SupplementLogOB object) => {},
+      getId: (SupplementLogOB object) => object.id,
+      setId: (SupplementLogOB object, int id) {
+        object.id = id;
+      },
+      objectToFB: (SupplementLogOB object, fb.Builder fbb) {
+        fbb.startTable(5);
+        fbb.addInt64(0, object.id);
+        fbb.addInt64(1, object.supplementId);
+        fbb.addBool(2, object.taken);
+        fbb.addInt64(3, object.dateTime.millisecondsSinceEpoch);
+        fbb.finish(fbb.endTable());
+        return object.id;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
+        final idParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          4,
+          0,
+        );
+        final supplementIdParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          6,
+          0,
+        );
+        final takenParam = const fb.BoolReader().vTableGet(
+          buffer,
+          rootOffset,
+          8,
+          false,
+        );
+        final dateTimeParam = DateTime.fromMillisecondsSinceEpoch(
+          const fb.Int64Reader().vTableGet(buffer, rootOffset, 10, 0),
+        );
+        final object = SupplementLogOB(
+          id: idParam,
+          supplementId: supplementIdParam,
+          taken: takenParam,
+          dateTime: dateTimeParam,
+        );
+
+        return object;
+      },
+    ),
+    SupplementOB: obx_int.EntityDefinition<SupplementOB>(
+      model: _entities[19],
+      toOneRelations: (SupplementOB object) => [],
+      toManyRelations: (SupplementOB object) => {},
+      getId: (SupplementOB object) => object.id,
+      setId: (SupplementOB object, int id) {
+        object.id = id;
+      },
+      objectToFB: (SupplementOB object, fb.Builder fbb) {
+        final nameOffset = fbb.writeString(object.name);
+        final dosageOffset = fbb.writeString(object.dosage);
+        final unitOffset = fbb.writeString(object.unit);
+        final categoryOffset = fbb.writeString(object.category);
+        final sourceBarcodeOffset = object.sourceBarcode == null
+            ? null
+            : fbb.writeString(object.sourceBarcode!);
+        fbb.startTable(9);
+        fbb.addInt64(0, object.id);
+        fbb.addOffset(1, nameOffset);
+        fbb.addOffset(2, dosageOffset);
+        fbb.addOffset(3, unitOffset);
+        fbb.addOffset(4, categoryOffset);
+        fbb.addBool(5, object.isActive);
+        fbb.addInt64(6, object.sortOrder);
+        fbb.addOffset(7, sourceBarcodeOffset);
+        fbb.finish(fbb.endTable());
+        return object.id;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
+        final idParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          4,
+          0,
+        );
+        final nameParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 6, '');
+        final dosageParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 8, '');
+        final unitParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 10, '');
+        final categoryParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 12, '');
+        final isActiveParam = const fb.BoolReader().vTableGet(
+          buffer,
+          rootOffset,
+          14,
+          false,
+        );
+        final sortOrderParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          16,
+          0,
+        );
+        final sourceBarcodeParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 18);
+        final object = SupplementOB(
+          id: idParam,
+          name: nameParam,
+          dosage: dosageParam,
+          unit: unitParam,
+          category: categoryParam,
+          isActive: isActiveParam,
+          sortOrder: sortOrderParam,
+          sourceBarcode: sourceBarcodeParam,
+        );
+
+        return object;
+      },
+    ),
   };
 
   return obx_int.ModelDefinition(model, bindings);
@@ -3200,5 +3719,155 @@ class DexaScanOB_ {
   /// See [DexaScanOB.tScore].
   static final tScore = obx.QueryDoubleProperty<DexaScanOB>(
     _entities[14].properties[7],
+  );
+}
+
+/// [FastingSessionOB] entity fields to define ObjectBox queries.
+class FastingSessionOB_ {
+  /// See [FastingSessionOB.id].
+  static final id = obx.QueryIntegerProperty<FastingSessionOB>(
+    _entities[15].properties[0],
+  );
+
+  /// See [FastingSessionOB.startTime].
+  static final startTime = obx.QueryDateProperty<FastingSessionOB>(
+    _entities[15].properties[1],
+  );
+
+  /// See [FastingSessionOB.endTime].
+  static final endTime = obx.QueryDateProperty<FastingSessionOB>(
+    _entities[15].properties[2],
+  );
+
+  /// See [FastingSessionOB.targetHours].
+  static final targetHours = obx.QueryDoubleProperty<FastingSessionOB>(
+    _entities[15].properties[3],
+  );
+
+  /// See [FastingSessionOB.type].
+  static final type = obx.QueryIntegerProperty<FastingSessionOB>(
+    _entities[15].properties[4],
+  );
+}
+
+/// [MindfulnessSessionOB] entity fields to define ObjectBox queries.
+class MindfulnessSessionOB_ {
+  /// See [MindfulnessSessionOB.id].
+  static final id = obx.QueryIntegerProperty<MindfulnessSessionOB>(
+    _entities[16].properties[0],
+  );
+
+  /// See [MindfulnessSessionOB.type].
+  static final type = obx.QueryIntegerProperty<MindfulnessSessionOB>(
+    _entities[16].properties[1],
+  );
+
+  /// See [MindfulnessSessionOB.durationMinutes].
+  static final durationMinutes = obx.QueryIntegerProperty<MindfulnessSessionOB>(
+    _entities[16].properties[2],
+  );
+
+  /// See [MindfulnessSessionOB.dateTime].
+  static final dateTime = obx.QueryDateProperty<MindfulnessSessionOB>(
+    _entities[16].properties[3],
+  );
+}
+
+/// [SleepRecordOB] entity fields to define ObjectBox queries.
+class SleepRecordOB_ {
+  /// See [SleepRecordOB.id].
+  static final id = obx.QueryIntegerProperty<SleepRecordOB>(
+    _entities[17].properties[0],
+  );
+
+  /// See [SleepRecordOB.bedTime].
+  static final bedTime = obx.QueryDateProperty<SleepRecordOB>(
+    _entities[17].properties[1],
+  );
+
+  /// See [SleepRecordOB.wakeTime].
+  static final wakeTime = obx.QueryDateProperty<SleepRecordOB>(
+    _entities[17].properties[2],
+  );
+
+  /// See [SleepRecordOB.qualityScore].
+  static final qualityScore = obx.QueryIntegerProperty<SleepRecordOB>(
+    _entities[17].properties[3],
+  );
+
+  /// See [SleepRecordOB.notes].
+  static final notes = obx.QueryStringProperty<SleepRecordOB>(
+    _entities[17].properties[4],
+  );
+
+  /// See [SleepRecordOB.source].
+  static final source = obx.QueryStringProperty<SleepRecordOB>(
+    _entities[17].properties[5],
+  );
+}
+
+/// [SupplementLogOB] entity fields to define ObjectBox queries.
+class SupplementLogOB_ {
+  /// See [SupplementLogOB.id].
+  static final id = obx.QueryIntegerProperty<SupplementLogOB>(
+    _entities[18].properties[0],
+  );
+
+  /// See [SupplementLogOB.supplementId].
+  static final supplementId = obx.QueryIntegerProperty<SupplementLogOB>(
+    _entities[18].properties[1],
+  );
+
+  /// See [SupplementLogOB.taken].
+  static final taken = obx.QueryBooleanProperty<SupplementLogOB>(
+    _entities[18].properties[2],
+  );
+
+  /// See [SupplementLogOB.dateTime].
+  static final dateTime = obx.QueryDateProperty<SupplementLogOB>(
+    _entities[18].properties[3],
+  );
+}
+
+/// [SupplementOB] entity fields to define ObjectBox queries.
+class SupplementOB_ {
+  /// See [SupplementOB.id].
+  static final id = obx.QueryIntegerProperty<SupplementOB>(
+    _entities[19].properties[0],
+  );
+
+  /// See [SupplementOB.name].
+  static final name = obx.QueryStringProperty<SupplementOB>(
+    _entities[19].properties[1],
+  );
+
+  /// See [SupplementOB.dosage].
+  static final dosage = obx.QueryStringProperty<SupplementOB>(
+    _entities[19].properties[2],
+  );
+
+  /// See [SupplementOB.unit].
+  static final unit = obx.QueryStringProperty<SupplementOB>(
+    _entities[19].properties[3],
+  );
+
+  /// See [SupplementOB.category].
+  static final category = obx.QueryStringProperty<SupplementOB>(
+    _entities[19].properties[4],
+  );
+
+  /// See [SupplementOB.isActive].
+  static final isActive = obx.QueryBooleanProperty<SupplementOB>(
+    _entities[19].properties[5],
+  );
+
+  /// See [SupplementOB.sortOrder].
+  static final sortOrder = obx.QueryIntegerProperty<SupplementOB>(
+    _entities[19].properties[6],
+  );
+
+  /// See [SupplementOB.sourceBarcode].
+  static final sourceBarcode = obx.QueryStringProperty<SupplementOB>(
+    _entities[19].properties[7],
   );
 }

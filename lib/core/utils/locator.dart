@@ -64,6 +64,10 @@ import 'package:opennutritracker/core/db/data_sources/habit_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/gut_health_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/biomarker_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/dexa_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/fasting_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/mindfulness_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/sleep_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/supplement_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/stool_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/symptom_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/weight_data_source.dart';
@@ -232,6 +236,15 @@ Future<void> initLocator() async {
       () => BiomarkerDataSource(objectBoxProvider.biomarkerBox));
   locator.registerLazySingleton<DexaDataSource>(
       () => DexaDataSource(objectBoxProvider.dexaScanBox));
+  locator.registerLazySingleton<SupplementDataSource>(
+      () => SupplementDataSource(
+          objectBoxProvider.supplementBox, objectBoxProvider.supplementLogBox));
+  locator.registerLazySingleton<FastingDataSource>(
+      () => FastingDataSource(objectBoxProvider.fastingSessionBox));
+  locator.registerLazySingleton<SleepDataSource>(
+      () => SleepDataSource(objectBoxProvider.sleepRecordBox));
+  locator.registerLazySingleton<MindfulnessDataSource>(
+      () => MindfulnessDataSource(objectBoxProvider.mindfulnessSessionBox));
 
   // Store (for direct box access where needed)
   locator.registerLazySingleton<Store>(() => objectBoxProvider.store);
