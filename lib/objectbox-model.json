@@ -1051,9 +1051,38 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "21:6917020969235109846",
+      "lastPropertyId": "4:6561509438136183880",
+      "name": "CaffeineLogOB",
+      "properties": [
+        {
+          "id": "1:6175988685367396053",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:7815166798274666762",
+          "name": "amountMg",
+          "type": 8
+        },
+        {
+          "id": "3:2074777167307909676",
+          "name": "source",
+          "type": 9
+        },
+        {
+          "id": "4:6561509438136183880",
+          "name": "dateTime",
+          "type": 10
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "20:2121155969444040118",
+  "lastEntityId": "21:6917020969235109846",
   "lastIndexId": "2:7319863865959781371",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",

@@ -1,0 +1,40 @@
+import 'package:opennutritracker/core/db/entities/caffeine_log_ob.dart';
+import 'package:opennutritracker/objectbox.g.dart';
+
+class CaffeineDataSource {
+  final Box<CaffeineLogOB> _box;
+
+  CaffeineDataSource(this._box);
+
+  Future<void> addLog(CaffeineLogOB log) async {
+    _box.put(log);
+  }
+
+  Future<CaffeineLogOB?> getLastCaffeine() async {
+    final query = _box.query()
+      ..order(CaffeineLogOB_.dateTime, flags: Order.descending);
+    final built = query.build();
+    final result = built.findFirst();
+    built.close();
+    return result;
+  }
+
+  Future<double> getTodayTotal() async {
+    final now = DateTime.now();
+    final start = DateTime(now.year, now.month, now.day);
+    final end = start.add(const Duration(days: 1));
+    final query = _box
+        .query(CaffeineLogOB_.dateTime.betweenDate(start, end))
+        .build();
+    final results = query.find();
+    query.close();
+    return results.fold<double>(0, (sum, l) => sum + l.amountMg);
+  }
+
+  /// Hours since last caffeine intake
+  Future<double?> hoursSinceLastCaffeine() async {
+    final last = await getLastCaffeine();
+    if (last == null) return null;
+    return DateTime.now().difference(last.dateTime).inMinutes / 60.0;
+  }
+}

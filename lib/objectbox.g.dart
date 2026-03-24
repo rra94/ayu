@@ -15,6 +15,7 @@ import 'package:objectbox/objectbox.dart' as obx;
 import 'package:objectbox_flutter_libs/objectbox_flutter_libs.dart';
 
 import 'core/db/entities/biomarker_record_ob.dart';
+import 'core/db/entities/caffeine_log_ob.dart';
 import 'core/db/entities/config_ob.dart';
 import 'core/db/entities/dexa_scan_ob.dart';
 import 'core/db/entities/fasting_session_ob.dart';
@@ -1277,6 +1278,40 @@ final _entities = <obx_int.ModelEntity>[
     relations: <obx_int.ModelRelation>[],
     backlinks: <obx_int.ModelBacklink>[],
   ),
+  obx_int.ModelEntity(
+    id: const obx_int.IdUid(21, 6917020969235109846),
+    name: 'CaffeineLogOB',
+    lastPropertyId: const obx_int.IdUid(4, 6561509438136183880),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(1, 6175988685367396053),
+        name: 'id',
+        type: 6,
+        flags: 1,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(2, 7815166798274666762),
+        name: 'amountMg',
+        type: 8,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 2074777167307909676),
+        name: 'source',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(4, 6561509438136183880),
+        name: 'dateTime',
+        type: 10,
+        flags: 0,
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[],
+    backlinks: <obx_int.ModelBacklink>[],
+  ),
 ];
 
 /// Shortcut for [obx.Store.new] that passes [getObjectBoxModel] and for Flutter
@@ -1317,7 +1352,7 @@ Future<obx.Store> openStore({
 obx_int.ModelDefinition getObjectBoxModel() {
   final model = obx_int.ModelInfo(
     entities: _entities,
-    lastEntityId: const obx_int.IdUid(20, 2121155969444040118),
+    lastEntityId: const obx_int.IdUid(21, 6917020969235109846),
     lastIndexId: const obx_int.IdUid(2, 7319863865959781371),
     lastRelationId: const obx_int.IdUid(0, 0),
     lastSequenceId: const obx_int.IdUid(0, 0),
@@ -2995,6 +3030,55 @@ obx_int.ModelDefinition getObjectBoxModel() {
         return object;
       },
     ),
+    CaffeineLogOB: obx_int.EntityDefinition<CaffeineLogOB>(
+      model: _entities[20],
+      toOneRelations: (CaffeineLogOB object) => [],
+      toManyRelations: (CaffeineLogOB object) => {},
+      getId: (CaffeineLogOB object) => object.id,
+      setId: (CaffeineLogOB object, int id) {
+        object.id = id;
+      },
+      objectToFB: (CaffeineLogOB object, fb.Builder fbb) {
+        final sourceOffset = fbb.writeString(object.source);
+        fbb.startTable(5);
+        fbb.addInt64(0, object.id);
+        fbb.addFloat64(1, object.amountMg);
+        fbb.addOffset(2, sourceOffset);
+        fbb.addInt64(3, object.dateTime.millisecondsSinceEpoch);
+        fbb.finish(fbb.endTable());
+        return object.id;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
+        final idParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          4,
+          0,
+        );
+        final amountMgParam = const fb.Float64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          6,
+          0,
+        );
+        final sourceParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 8, '');
+        final dateTimeParam = DateTime.fromMillisecondsSinceEpoch(
+          const fb.Int64Reader().vTableGet(buffer, rootOffset, 10, 0),
+        );
+        final object = CaffeineLogOB(
+          id: idParam,
+          amountMg: amountMgParam,
+          source: sourceParam,
+          dateTime: dateTimeParam,
+        );
+
+        return object;
+      },
+    ),
   };
 
   return obx_int.ModelDefinition(model, bindings);
@@ -3921,5 +4005,28 @@ class SupplementOB_ {
   /// See [SupplementOB.sourceBarcode].
   static final sourceBarcode = obx.QueryStringProperty<SupplementOB>(
     _entities[19].properties[7],
+  );
+}
+
+/// [CaffeineLogOB] entity fields to define ObjectBox queries.
+class CaffeineLogOB_ {
+  /// See [CaffeineLogOB.id].
+  static final id = obx.QueryIntegerProperty<CaffeineLogOB>(
+    _entities[20].properties[0],
+  );
+
+  /// See [CaffeineLogOB.amountMg].
+  static final amountMg = obx.QueryDoubleProperty<CaffeineLogOB>(
+    _entities[20].properties[1],
+  );
+
+  /// See [CaffeineLogOB.source].
+  static final source = obx.QueryStringProperty<CaffeineLogOB>(
+    _entities[20].properties[2],
+  );
+
+  /// See [CaffeineLogOB.dateTime].
+  static final dateTime = obx.QueryDateProperty<CaffeineLogOB>(
+    _entities[20].properties[3],
   );
 }
