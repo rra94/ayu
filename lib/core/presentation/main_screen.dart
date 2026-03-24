@@ -6,6 +6,8 @@ import 'package:opennutritracker/features/home/home_page.dart';
 import 'package:opennutritracker/core/presentation/widgets/main_appbar.dart';
 import 'package:opennutritracker/features/profile/profile_page.dart';
 import 'package:opennutritracker/features/stats/stats_page.dart';
+import 'package:opennutritracker/core/domain/entity/intake_type_entity.dart';
+import 'package:opennutritracker/features/scanner/scanner_screen.dart';
 import 'package:opennutritracker/features/stats/charts_page.dart';
 import 'package:opennutritracker/core/utils/navigation_options.dart';
 import 'package:opennutritracker/generated/l10n.dart';
@@ -46,24 +48,10 @@ class _MainScreenState extends State<MainScreen> {
       appBar: _appbarPages[_selectedPageIndex],
       body: _bodyPages[_selectedPageIndex],
       floatingActionButton: _selectedPageIndex == 0
-          ? Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                FloatingActionButton.small(
-                  heroTag: 'scan',
-                  onPressed: () => Navigator.of(context)
-                      .pushNamed(NavigationOptions.scannerRoute),
-                  tooltip: 'Scan barcode',
-                  child: const Icon(Icons.qr_code_scanner),
-                ),
-                const SizedBox(height: 8),
-                FloatingActionButton(
-                  heroTag: 'add',
-                  onPressed: () => _onFabPressed(context),
-                  tooltip: S.of(context).addLabel,
-                  child: const Icon(Icons.add),
-                ),
-              ],
+          ? FloatingActionButton(
+              onPressed: () => _onFabPressed(context),
+              tooltip: S.of(context).addLabel,
+              child: const Icon(Icons.add),
             )
           : null,
       bottomNavigationBar: NavigationBar(
