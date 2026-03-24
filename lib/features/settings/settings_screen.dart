@@ -8,6 +8,7 @@ import 'package:opennutritracker/core/utils/locator.dart';
 import 'package:opennutritracker/core/utils/theme_mode_provider.dart';
 import 'package:opennutritracker/core/utils/url_const.dart';
 import 'package:opennutritracker/features/diary/presentation/bloc/calendar_day_bloc.dart';
+import 'package:opennutritracker/features/profile/profile_page.dart';
 import 'package:opennutritracker/features/settings/presentation/widgets/goal_settings_dialog.dart';
 import 'package:opennutritracker/features/diary/presentation/bloc/diary_bloc.dart';
 import 'package:opennutritracker/features/home/presentation/bloc/home_bloc.dart';
@@ -62,6 +63,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
             return ListView(
               children: [
                 const SizedBox(height: 16.0),
+                ListTile(
+                  leading: const Icon(Icons.account_circle_outlined),
+                  title: Text(S.of(context).profileLabel),
+                  subtitle: const Text('Weight, height, age, activity level'),
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const ProfilePage()),
+                  ),
+                ),
+                const Divider(),
                 ListTile(
                   leading: const Icon(Icons.ac_unit_outlined),
                   title: Text(S.of(context).settingsUnitsLabel),

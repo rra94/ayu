@@ -30,15 +30,12 @@ class _MainScreenState extends State<MainScreen> {
       const DiaryPage(),
       const ChartsPage(),
       const StatsPage(),
-      const ProfilePage(),
     ];
     _appbarPages = [
       const HomeAppbar(),
       MainAppbar(title: S.of(context).diaryLabel, iconData: Icons.book),
       MainAppbar(title: 'Charts', iconData: Icons.show_chart),
       MainAppbar(title: 'Stats', iconData: Icons.bar_chart),
-      MainAppbar(
-          title: S.of(context).profileLabel, iconData: Icons.account_circle)
     ];
     super.didChangeDependencies();
   }
@@ -93,11 +90,6 @@ class _MainScreenState extends State<MainScreen> {
                   ? const Icon(Icons.bar_chart)
                   : const Icon(Icons.bar_chart_outlined),
               label: 'Stats'),
-          NavigationDestination(
-              icon: _selectedPageIndex == 4
-                  ? const Icon(Icons.account_circle)
-                  : const Icon(Icons.account_circle_outlined),
-              label: S.of(context).profileLabel)
         ],
       ),
     );
