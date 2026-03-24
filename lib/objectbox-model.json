@@ -626,7 +626,7 @@
     },
     {
       "id": "9:3446880705750154736",
-      "lastPropertyId": "6:4320839372809236579",
+      "lastPropertyId": "8:6065818025679882694",
       "name": "HabitOB",
       "properties": [
         {
@@ -658,6 +658,16 @@
         {
           "id": "6:4320839372809236579",
           "name": "reminderMinutes",
+          "type": 6
+        },
+        {
+          "id": "7:3074007044692856263",
+          "name": "frequency",
+          "type": 6
+        },
+        {
+          "id": "8:6065818025679882694",
+          "name": "frequencyDay",
           "type": 6
         }
       ],

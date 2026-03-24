@@ -120,6 +120,8 @@ class HabitDataSource {
       'wellness': [
         'Meditation',
         'Cold exposure',
+        'Hot water (AM)',
+        'Sunlight (10 min)',
       ],
       'exercise': [
         'Morning workout',
@@ -131,10 +133,13 @@ class HabitDataSource {
     final habits = <HabitOB>[];
     for (final entry in defaults.entries) {
       for (final name in entry.value) {
+        final isWeekly = name == 'Hair oiling';
         habits.add(HabitOB(
           name: name,
           category: entry.key,
           sortOrder: order++,
+          frequency: isWeekly ? 1 : 0,
+          frequencyDay: isWeekly ? 7 : null, // Sunday default for hair oiling
         ));
       }
     }

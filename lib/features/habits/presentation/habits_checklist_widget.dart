@@ -19,8 +19,10 @@ class HabitsChecklistWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final completedCount = completedHabitIds.length;
-    final totalCount = habits.length;
+    final dueToday = habits.where((h) => h.isDueToday).toList();
+    final completedCount = completedHabitIds.intersection(
+        dueToday.map((h) => h.id).toSet()).length;
+    final totalCount = dueToday.length;
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -77,9 +79,9 @@ class HabitsChecklistWidget extends StatelessWidget {
               child: ListView.builder(
                 shrinkWrap: true,
                 physics: const ClampingScrollPhysics(),
-                itemCount: habits.length,
+                itemCount: dueToday.length,
                 itemBuilder: (context, index) {
-                  final habit = habits[index];
+                  final habit = dueToday[index];
                   final isCompleted = completedHabitIds.contains(habit.id);
                   final hasReminder = habit.reminderMinutes != null;
                   return CheckboxListTile(
@@ -107,6 +109,16 @@ class HabitsChecklistWidget extends StatelessWidget {
                                 ?.withValues(alpha: 0.6),
                           ),
                         ),
+                        if (!habit.isDaily) ...[
+                          const SizedBox(width: 6),
+                          Text(
+                            habit.frequencyLabel,
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              fontSize: 9,
+                              color: theme.colorScheme.secondary,
+                            ),
+                          ),
+                        ],
                         if (hasReminder) ...[
                           const SizedBox(width: 8),
                           Icon(Icons.alarm, size: 12,
