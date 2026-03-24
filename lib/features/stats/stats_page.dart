@@ -7,6 +7,7 @@ import 'package:opennutritracker/features/stats/presentation/widgets/dexa_card.d
 import 'package:opennutritracker/features/stats/presentation/widgets/food_feeling_card.dart';
 import 'package:opennutritracker/features/stats/presentation/widgets/glycemic_card.dart';
 import 'package:opennutritracker/features/stats/presentation/widgets/longevity_insights_card.dart';
+import 'package:opennutritracker/features/stats/presentation/widgets/longevity_score_card.dart';
 import 'package:opennutritracker/features/stats/presentation/widgets/meal_timing_card.dart';
 import 'package:opennutritracker/features/stats/presentation/widgets/nutrient_intelligence_card.dart';
 import 'package:opennutritracker/features/stats/presentation/widgets/streak_card.dart';
@@ -23,6 +24,7 @@ class StatsPage extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.symmetric(vertical: 8),
       children: const [
+        LongevityScoreCard(),
         HealthKitSyncCard(),
         WeeklyReviewCard(),
         TdeeCard(),

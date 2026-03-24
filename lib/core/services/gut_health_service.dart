@@ -5,6 +5,19 @@ class GutHealthService {
   /// Thresholds for auto-flagging
   static const double _highSugarThreshold = 15.0; // g per 100g
   static const double _lowFiberThreshold = 1.0; // g per 100g
+  static const int _upfAdditiveThreshold = 5; // 5+ additives = likely UPF
+
+  /// Keywords in product names that strongly indicate ultra-processed food
+  static const _upfKeywords = [
+    'chips', 'doritos', 'cheetos', 'pringles', 'oreo', 'cookie',
+    'candy', 'gummy', 'soda', 'pop tart', 'hot pocket', 'pizza roll',
+    'instant noodle', 'ramen', 'cup noodle', 'frozen dinner',
+    'chicken nugget', 'fish stick', 'corn dog', 'tater tot',
+    'slim jim', 'beef jerky', 'protein bar', 'energy bar',
+    'cereal', 'frosted', 'fruit snack', 'fruit roll',
+    'margarine', 'cool whip', 'coffee creamer', 'nesquik',
+    'ice cream', 'popsicle', 'frozen yogurt',
+  ];
 
   /// OFF additive tag → gut health category + display name.
   /// Keys are lowercase OFF tags (e.g. "en:e407").
@@ -152,9 +165,43 @@ class GutHealthService {
           ));
         }
       }
+
+      // ── Ultra-processed food detection ──
+
+      final isUpf = _isUltraProcessed(meal.name, tags);
+      if (isUpf) {
+        flagged.add(GutHealthItemOB(
+          name: '$name — Ultra-Processed',
+          category: 'ultra_processed',
+          dateTime: intake.dateTime,
+          isAutoFlagged: true,
+          sourceIntakeId: intake.id,
+        ));
+      }
     }
 
     return flagged;
+  }
+
+  /// Detect ultra-processed food using NOVA-inspired heuristics:
+  /// 1. 5+ additives from OFF tags
+  /// 2. Product name matches known UPF keywords
+  /// 3. Combination of high sugar + low fiber + multiple additives
+  static bool _isUltraProcessed(String? name, List<String>? additivesTags) {
+    // High additive count = strong UPF signal
+    if (additivesTags != null && additivesTags.length >= _upfAdditiveThreshold) {
+      return true;
+    }
+
+    // Name-based detection
+    if (name != null) {
+      final lower = name.toLowerCase();
+      if (_upfKeywords.any((kw) => lower.contains(kw))) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   static String _categoryPluralLabel(String category) {
