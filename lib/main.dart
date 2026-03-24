@@ -64,12 +64,12 @@ void runAppWithChangeNotifiers(
         bool userInitialized, AppThemeEntity savedAppTheme) =>
     runApp(ChangeNotifierProvider(
         create: (_) => ThemeModeProvider(appTheme: savedAppTheme),
-        child: OpenNutriTrackerApp(userInitialized: userInitialized)));
+        child: AyuApp(userInitialized: userInitialized)));
 
-class OpenNutriTrackerApp extends StatelessWidget {
+class AyuApp extends StatelessWidget {
   final bool userInitialized;
 
-  const OpenNutriTrackerApp({super.key, required this.userInitialized});
+  const AyuApp({super.key, required this.userInitialized});
 
   @override
   Widget build(BuildContext context) {

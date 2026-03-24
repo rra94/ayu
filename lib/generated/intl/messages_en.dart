@@ -50,10 +50,10 @@ class MessageLookup extends MessageLookupByLibrary {
         "allItemsLabel": MessageLookupByLibrary.simpleMessage("All"),
         "alphaVersionName": MessageLookupByLibrary.simpleMessage("[Alpha]"),
         "appDescription": MessageLookupByLibrary.simpleMessage(
-            "OpenNutriTracker is a free and open-source calorie and nutrient tracker that respects your privacy."),
+            "Ayu is a free and open-source calorie and nutrient tracker that respects your privacy."),
         "appLicenseLabel":
             MessageLookupByLibrary.simpleMessage("GPL-3.0 license"),
-        "appTitle": MessageLookupByLibrary.simpleMessage("OpenNutriTracker"),
+        "appTitle": MessageLookupByLibrary.simpleMessage("Ayu"),
         "appVersionName": m0,
         "baseQuantityLabel":
             MessageLookupByLibrary.simpleMessage("Base quantity (g/ml)"),
@@ -118,7 +118,7 @@ class MessageLookup extends MessageLookupByLibrary {
             "e.g. soup, chicken, wine ..."),
         "dinnerLabel": MessageLookupByLibrary.simpleMessage("Dinner"),
         "disclaimerText": MessageLookupByLibrary.simpleMessage(
-            "OpenNutriTracker is not a medical application. All data provided is not validated and should be used with caution. Please maintain a healthy lifestyle and consult a professional if you have any problems. Use during illness, pregnancy or lactation is not recommended."),
+            "Ayu is not a medical application. All data provided is not validated and should be used with caution. Please maintain a healthy lifestyle and consult a professional if you have any problems. Use during illness, pregnancy or lactation is not recommended."),
         "editItemDialogTitle":
             MessageLookupByLibrary.simpleMessage("Edit item"),
         "editMealLabel": MessageLookupByLibrary.simpleMessage("Edit meal"),

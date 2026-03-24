@@ -51,10 +51,10 @@ class MessageLookup extends MessageLookupByLibrary {
         "allItemsLabel": MessageLookupByLibrary.simpleMessage("Alle"),
         "alphaVersionName": MessageLookupByLibrary.simpleMessage("[Alpha]"),
         "appDescription": MessageLookupByLibrary.simpleMessage(
-            "OpenNutriTracker ist ein kostenloser und  quelloffener Kalorien- und Nährstofftracker, der Ihre Privatsphäre respektiert."),
+            "Ayu ist ein kostenloser und  quelloffener Kalorien- und Nährstofftracker, der Ihre Privatsphäre respektiert."),
         "appLicenseLabel":
             MessageLookupByLibrary.simpleMessage("GPL-3.0 Lizenz"),
-        "appTitle": MessageLookupByLibrary.simpleMessage("OpenNutriTracker"),
+        "appTitle": MessageLookupByLibrary.simpleMessage("Ayu"),
         "appVersionName": m0,
         "betaVersionName": MessageLookupByLibrary.simpleMessage("[Beta]"),
         "bmiInfo": MessageLookupByLibrary.simpleMessage(
@@ -119,7 +119,7 @@ class MessageLookup extends MessageLookupByLibrary {
             "z. B. Suppe, Hähnchen, Wein ..."),
         "dinnerLabel": MessageLookupByLibrary.simpleMessage("Abendessen"),
         "disclaimerText": MessageLookupByLibrary.simpleMessage(
-            "OpenNutriTracker ist keine medizinische Anwendung. Alle bereitgestellten Daten sind nicht validiert und sollten mit Vorsicht verwendet werden. Bitte pflegen Sie einen gesunden Lebensstil und konsultieren Sie einen Fachmann, wenn Sie Probleme haben. Die Verwendung während einer Krankheit, Schwangerschaft oder Stillzeit wird nicht empfohlen.\n\n\nDie Anwendung befindet sich noch in der Entwicklung. Fehler, Bugs und Abstürze können auftreten."),
+            "Ayu ist keine medizinische Anwendung. Alle bereitgestellten Daten sind nicht validiert und sollten mit Vorsicht verwendet werden. Bitte pflegen Sie einen gesunden Lebensstil und konsultieren Sie einen Fachmann, wenn Sie Probleme haben. Die Verwendung während einer Krankheit, Schwangerschaft oder Stillzeit wird nicht empfohlen.\n\n\nDie Anwendung befindet sich noch in der Entwicklung. Fehler, Bugs und Abstürze können auftreten."),
         "editItemDialogTitle":
             MessageLookupByLibrary.simpleMessage("Eintrag aktualisieren"),
         "editMealLabel":
