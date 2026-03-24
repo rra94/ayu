@@ -65,6 +65,18 @@ Built on top of [OpenNutriTracker](https://github.com/simonoppowa/OpenNutriTrack
 - Weekly review service with automated wins/improvements detection
 - Smart notifications for missing entries (meals, water, supplements, sleep)
 
+### Smart Nutrition (M8)
+- **Bioavailability engine** — estimates real absorption for 10+ nutrients based on meal context
+  - Iron: 2–35% depending on heme vs non-heme, vitamin C, calcium, phytates
+  - Calcium: 5–40% (kale 49% bioavailable vs spinach 5% due to oxalates)
+  - Fat-soluble vitamins (A, D, E, K): 10–90% based on dietary fat in meal
+  - Shows enhancers/inhibitors detected in your meals
+- **Food recommendations** — suggests specific foods to fill micronutrient gaps
+  - Shows both raw content AND bioavailable amount (e.g., "Spinach: 3.6mg iron → 0.18mg absorbed")
+  - Gender/age-aware RDA targets, ranked by lowest %RDA
+  - Absorption tips (e.g., "Pair with vitamin C to boost iron 2-6x")
+- Research-backed: WHO/FAO 2001, Hurrell & Egli 2010, Weaver 1999, Schuchardt 2017
+
 ## Tech Stack
 
 ```
@@ -84,6 +96,8 @@ home_widget (WidgetKit bridge)
 - [Open Food Facts](https://world.openfoodfacts.org/) — barcode + product search
 - [USDA FDC](https://fdc.nal.usda.gov/) — branded food fallback for barcodes
 - [University of Sydney GI Database](https://glycemicindex.com/) — glycemic index values
+- WHO/FAO mineral bioavailability data (2001) — absorption rate calculations
+- Peer-reviewed nutrient interaction research — enhancer/inhibitor rules
 
 ## Privacy
 
@@ -112,6 +126,7 @@ Ayu is not a medical application. All data provided is not validated and should 
 - Longevity protocols informed by research from Peter Attia, Bryan Johnson (Blueprint), Andrew Huberman
 - Biomarker optimal ranges from [Longevity Coach](https://github.com/longevitycoach) methodology
 - Biological age calculation based on [Levine 2018](https://pubmed.ncbi.nlm.nih.gov/29676998/)
+- Bioavailability data from [Hurrell & Egli 2010](https://pubmed.ncbi.nlm.nih.gov/20200264/), [Weaver 1999](https://pubmed.ncbi.nlm.nih.gov/10193899/), [Schuchardt & Hahn 2017](https://pubmed.ncbi.nlm.nih.gov/28587022/)
 
 ## License
 
