@@ -25,6 +25,8 @@ import 'package:opennutritracker/features/supplements/presentation/widgets/suppl
 import 'package:opennutritracker/features/fasting/presentation/widgets/fasting_timer_widget.dart';
 import 'package:opennutritracker/features/stats/presentation/widgets/caffeine_card.dart';
 import 'package:opennutritracker/features/stats/presentation/widgets/inventory_card.dart';
+import 'package:opennutritracker/features/home/presentation/widgets/collapsible_section.dart';
+import 'package:opennutritracker/features/home/presentation/widgets/quick_action_bar.dart';
 import 'package:opennutritracker/features/mindfulness/presentation/widgets/mindfulness_timer_widget.dart';
 import 'package:opennutritracker/features/add_meal/presentation/add_meal_type.dart';
 import 'package:opennutritracker/features/home/presentation/bloc/home_bloc.dart';
@@ -136,6 +138,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     if (showDisclaimerDialog) {
       _showDisclaimerDialog(context);
     }
+    final hour = DateTime.now().hour;
+
     return Stack(children: [
       ListView(children: [
         DashboardWidget(
@@ -150,72 +154,134 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           totalFatsGoal: totalFatsGoal,
           totalProteinsGoal: totalProteinsGoal,
         ),
-        _buildWaterTracker(),
-        const CaffeineCard(),
-        _buildHabitsChecklist(),
-        const SupplementChecklistWidget(),
-        const FastingTimerWidget(),
-        const MindfulnessTimerWidget(),
-        const InventoryCard(),
-        _buildMicronutrientButton(context, breakfastIntakeList,
-            lunchIntakeList, dinnerIntakeList, snackIntakeList),
-        _buildGutHealthAndSummary(
-            breakfastIntakeList, lunchIntakeList,
-            dinnerIntakeList, snackIntakeList,
-            totalKcalDaily, totalKcalSupplied,
-            totalCarbsGoal, totalCarbsIntake,
-            totalFatsGoal, totalFatsIntake,
-            totalProteinsGoal, totalProteinsIntake),
-        ActivityVerticalList(
-          day: DateTime.now(),
-          title: S.of(context).activityLabel,
-          userActivityList: userActivities,
-          onItemLongPressedCallback: onActivityItemLongPressed,
+        QuickActionBar(onActionComplete: () => setState(() {})),
+
+        // ── Tracking ──
+        CollapsibleSection(
+          title: 'Tracking',
+          icon: Icons.track_changes,
+          storageKey: 'home_tracking',
+          children: [
+            _buildWaterTracker(),
+            const CaffeineCard(),
+          ],
         ),
-        IntakeVerticalList(
-          day: DateTime.now(),
-          title: S.of(context).breakfastLabel,
-          listIcon: IntakeTypeEntity.breakfast.getIconData(),
-          addMealType: AddMealType.breakfastType,
-          intakeList: breakfastIntakeList,
-          onDeleteIntakeCallback: onDeleteIntake,
-          onItemDragCallback: onIntakeItemDrag,
-          onItemTappedCallback: onIntakeItemTapped,
-          usesImperialUnits: usesImperialUnits,
+
+        // ── Habits & Supplements ──
+        CollapsibleSection(
+          title: 'Habits & Supplements',
+          icon: Icons.checklist,
+          storageKey: 'home_habits',
+          children: [
+            _buildHabitsChecklist(),
+            const SupplementChecklistWidget(),
+            const InventoryCard(),
+          ],
         ),
-        IntakeVerticalList(
-          day: DateTime.now(),
-          title: S.of(context).lunchLabel,
-          listIcon: IntakeTypeEntity.lunch.getIconData(),
-          addMealType: AddMealType.lunchType,
-          intakeList: lunchIntakeList,
-          onDeleteIntakeCallback: onDeleteIntake,
-          onItemDragCallback: onIntakeItemDrag,
-          onItemTappedCallback: onIntakeItemTapped,
-          usesImperialUnits: usesImperialUnits,
+
+        // ── Timers ──
+        CollapsibleSection(
+          title: 'Timers',
+          icon: Icons.timer_outlined,
+          storageKey: 'home_timers',
+          initiallyExpanded: false,
+          children: [
+            const FastingTimerWidget(),
+            const MindfulnessTimerWidget(),
+          ],
         ),
-        IntakeVerticalList(
-          day: DateTime.now(),
-          title: S.of(context).dinnerLabel,
-          listIcon: IntakeTypeEntity.dinner.getIconData(),
-          addMealType: AddMealType.dinnerType,
-          intakeList: dinnerIntakeList,
-          onDeleteIntakeCallback: onDeleteIntake,
-          onItemDragCallback: onIntakeItemDrag,
-          onItemTappedCallback: onIntakeItemTapped,
-          usesImperialUnits: usesImperialUnits,
+
+        // ── Health ──
+        CollapsibleSection(
+          title: 'Health',
+          icon: Icons.favorite_outline,
+          storageKey: 'home_health',
+          children: [
+            _buildMicronutrientButton(context, breakfastIntakeList,
+                lunchIntakeList, dinnerIntakeList, snackIntakeList),
+            _buildGutHealthAndSummary(
+                breakfastIntakeList, lunchIntakeList,
+                dinnerIntakeList, snackIntakeList,
+                totalKcalDaily, totalKcalSupplied,
+                totalCarbsGoal, totalCarbsIntake,
+                totalFatsGoal, totalFatsIntake,
+                totalProteinsGoal, totalProteinsIntake),
+          ],
         ),
-        IntakeVerticalList(
-          day: DateTime.now(),
-          title: S.of(context).snackLabel,
-          listIcon: IntakeTypeEntity.snack.getIconData(),
-          addMealType: AddMealType.snackType,
-          intakeList: snackIntakeList,
-          onDeleteIntakeCallback: onDeleteIntake,
-          onItemDragCallback: onIntakeItemDrag,
-          onItemTappedCallback: onIntakeItemTapped,
-          usesImperialUnits: usesImperialUnits,
+
+        // ── Food (hide empty, show current time slot) ──
+        CollapsibleSection(
+          title: 'Food',
+          icon: Icons.restaurant,
+          storageKey: 'home_food',
+          children: [
+            if (breakfastIntakeList.isNotEmpty || hour < 11)
+              IntakeVerticalList(
+                day: DateTime.now(),
+                title: S.of(context).breakfastLabel,
+                listIcon: IntakeTypeEntity.breakfast.getIconData(),
+                addMealType: AddMealType.breakfastType,
+                intakeList: breakfastIntakeList,
+                onDeleteIntakeCallback: onDeleteIntake,
+                onItemDragCallback: onIntakeItemDrag,
+                onItemTappedCallback: onIntakeItemTapped,
+                usesImperialUnits: usesImperialUnits,
+              ),
+            if (lunchIntakeList.isNotEmpty || (hour >= 11 && hour < 15))
+              IntakeVerticalList(
+                day: DateTime.now(),
+                title: S.of(context).lunchLabel,
+                listIcon: IntakeTypeEntity.lunch.getIconData(),
+                addMealType: AddMealType.lunchType,
+                intakeList: lunchIntakeList,
+                onDeleteIntakeCallback: onDeleteIntake,
+                onItemDragCallback: onIntakeItemDrag,
+                onItemTappedCallback: onIntakeItemTapped,
+                usesImperialUnits: usesImperialUnits,
+              ),
+            if (dinnerIntakeList.isNotEmpty || (hour >= 15 && hour < 21))
+              IntakeVerticalList(
+                day: DateTime.now(),
+                title: S.of(context).dinnerLabel,
+                listIcon: IntakeTypeEntity.dinner.getIconData(),
+                addMealType: AddMealType.dinnerType,
+                intakeList: dinnerIntakeList,
+                onDeleteIntakeCallback: onDeleteIntake,
+                onItemDragCallback: onIntakeItemDrag,
+                onItemTappedCallback: onIntakeItemTapped,
+                usesImperialUnits: usesImperialUnits,
+              ),
+            if (snackIntakeList.isNotEmpty)
+              IntakeVerticalList(
+                day: DateTime.now(),
+                title: S.of(context).snackLabel,
+                listIcon: IntakeTypeEntity.snack.getIconData(),
+                addMealType: AddMealType.snackType,
+                intakeList: snackIntakeList,
+                onDeleteIntakeCallback: onDeleteIntake,
+                onItemDragCallback: onIntakeItemDrag,
+                onItemTappedCallback: onIntakeItemTapped,
+                usesImperialUnits: usesImperialUnits,
+              ),
+          ],
         ),
+
+        // ── Activity ──
+        CollapsibleSection(
+          title: 'Activity',
+          icon: Icons.directions_run,
+          storageKey: 'home_activity',
+          initiallyExpanded: false,
+          children: [
+            ActivityVerticalList(
+              day: DateTime.now(),
+              title: S.of(context).activityLabel,
+              userActivityList: userActivities,
+              onItemLongPressedCallback: onActivityItemLongPressed,
+            ),
+          ],
+        ),
+
         const SizedBox(height: 48.0)
       ]),
     ]);
