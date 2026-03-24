@@ -89,7 +89,7 @@ class _TodayViewCardState extends State<TodayViewCard> {
               value: calPct,
               label: '${widget.caloriesConsumed.round()}',
               subtitle: 'kcal',
-              color: calPct > 1 ? Colors.red : theme.colorScheme.primary,
+              color: calPct > 1 ? Colors.red : theme.colorScheme.secondary,
             ),
             _MiniGauge(
               value: _waterPct,

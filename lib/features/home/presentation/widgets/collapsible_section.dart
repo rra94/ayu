@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:opennutritracker/core/styles/color_schemes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CollapsibleSection extends StatefulWidget {
@@ -50,6 +51,9 @@ class _CollapsibleSectionState extends State<CollapsibleSection> {
 
     if (widget.children.isEmpty) return const SizedBox();
 
+    final isLight = theme.brightness == Brightness.light;
+    final gold = isLight ? ayuGoldMuted : ayuGoldLight;
+
     return Column(
       children: [
         InkWell(
@@ -58,17 +62,25 @@ class _CollapsibleSectionState extends State<CollapsibleSection> {
             _saveState(_expanded);
           },
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             child: Row(
               children: [
-                Icon(widget.icon, size: 18,
-                    color: theme.colorScheme.onSurfaceVariant),
+                Container(
+                  width: 3,
+                  height: 20,
+                  decoration: BoxDecoration(
+                    color: gold.withValues(alpha: _expanded ? 1.0 : 0.3),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Icon(widget.icon, size: 18, color: gold),
                 const SizedBox(width: 8),
                 Text(
                   widget.title,
                   style: theme.textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: theme.colorScheme.onSurfaceVariant,
+                    color: theme.colorScheme.onSurface,
                   ),
                 ),
                 const Spacer(),

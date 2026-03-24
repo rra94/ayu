@@ -1,15 +1,22 @@
 import 'package:flutter/material.dart';
 
-/// Ayu color scheme — navy + gold/amber longevity theme
-/// Derived from logo: dark navy #0D1B2A, gold #D4A843
+/// Ayu "Lotus" theme — navy depth + gold warmth
+/// Logo: gold lotus on dark navy #0D1B2A, accent gold #D4A843
+
+// ── Brand colors ──
+const ayuNavy = Color(0xFF1B3A5C);
+const ayuNavyDark = Color(0xFF0D1B2A);
+const ayuGold = Color(0xFFD4A843);
+const ayuGoldLight = Color(0xFFE8C46C);
+const ayuGoldMuted = Color(0xFFBF8A30);
 
 const lightColorScheme = ColorScheme(
   brightness: Brightness.light,
-  primary: Color(0xFF1B3A5C),
+  primary: ayuNavy,
   onPrimary: Color(0xFFFFFFFF),
   primaryContainer: Color(0xFFD4E3F5),
   onPrimaryContainer: Color(0xFF0A1929),
-  secondary: Color(0xFFBF8A30),
+  secondary: ayuGoldMuted,
   onSecondary: Color(0xFFFFFFFF),
   secondaryContainer: Color(0xFFFFF0D4),
   onSecondaryContainer: Color(0xFF3D2800),
@@ -21,17 +28,17 @@ const lightColorScheme = ColorScheme(
   errorContainer: Color(0xFFFFDAD6),
   onError: Color(0xFFFFFFFF),
   onErrorContainer: Color(0xFF410002),
-  surface: Color(0xFFFAFBFD),
+  surface: Color(0xFFF8F9FC),
   onSurface: Color(0xFF1A1C1E),
-  surfaceContainerHighest: Color(0xFFE0E2E8),
+  surfaceContainerHighest: Color(0xFFECEEF4),
   onSurfaceVariant: Color(0xFF44474E),
   outline: Color(0xFF74777F),
   onInverseSurface: Color(0xFFF1F0F4),
   inverseSurface: Color(0xFF2F3033),
   inversePrimary: Color(0xFFA8C8F0),
   shadow: Color(0xFF000000),
-  surfaceTint: Color(0xFF1B3A5C),
-  outlineVariant: Color(0xFFC4C6CF),
+  surfaceTint: ayuNavy,
+  outlineVariant: Color(0xFFD0D2DA),
   scrim: Color(0xFF000000),
 );
 
@@ -39,9 +46,9 @@ const darkColorScheme = ColorScheme(
   brightness: Brightness.dark,
   primary: Color(0xFFA8C8F0),
   onPrimary: Color(0xFF0A2240),
-  primaryContainer: Color(0xFF1B3A5C),
+  primaryContainer: ayuNavy,
   onPrimaryContainer: Color(0xFFD4E3F5),
-  secondary: Color(0xFFE8C46C),
+  secondary: ayuGoldLight,
   onSecondary: Color(0xFF3D2800),
   secondaryContainer: Color(0xFF5A3F10),
   onSecondaryContainer: Color(0xFFFFF0D4),
@@ -53,14 +60,14 @@ const darkColorScheme = ColorScheme(
   errorContainer: Color(0xFF93000A),
   onError: Color(0xFF690005),
   onErrorContainer: Color(0xFFFFDAD6),
-  surface: Color(0xFF0D1B2A),
+  surface: ayuNavyDark,
   onSurface: Color(0xFFE3E2E6),
-  surfaceContainerHighest: Color(0xFF1E2D3D),
+  surfaceContainerHighest: Color(0xFF142438),
   onSurfaceVariant: Color(0xFFC4C6CF),
   outline: Color(0xFF8E9099),
   onInverseSurface: Color(0xFF1A1C1E),
   inverseSurface: Color(0xFFE3E2E6),
-  inversePrimary: Color(0xFF1B3A5C),
+  inversePrimary: ayuNavy,
   shadow: Color(0xFF000000),
   surfaceTint: Color(0xFFA8C8F0),
   outlineVariant: Color(0xFF44474E),
