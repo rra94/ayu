@@ -127,4 +127,39 @@ class MealEntityFixtures {
     }
     return intakes;
   }
+
+  /// Create an IntakeEntity with additives tags for gut health testing
+  static IntakeEntity createIntakeWithAdditives({
+    required String name,
+    required List<String> additives,
+  }) {
+    return IntakeEntity(
+      id: 'additive-test-${DateTime.now().microsecondsSinceEpoch}',
+      unit: 'serving',
+      amount: 1.0,
+      type: IntakeTypeEntity.snack,
+      dateTime: DateTime.now(),
+      meal: MealEntity(
+        code: 'test',
+        name: name,
+        url: null,
+        mealQuantity: '100',
+        mealUnit: 'g',
+        servingQuantity: null,
+        servingUnit: null,
+        servingSize: null,
+        source: MealSourceEntity.custom,
+        additivesTags: additives,
+        nutriments: MealNutrimentsEntity(
+          energyKcal100: 200,
+          carbohydrates100: 25,
+          fat100: 10,
+          proteins100: 5,
+          sugars100: 10,
+          saturatedFat100: 3,
+          fiber100: 1,
+        ),
+      ),
+    );
+  }
 }
