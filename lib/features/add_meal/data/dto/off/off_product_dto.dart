@@ -31,6 +31,9 @@ class OFFProductDTO {
 
   final OFFProductNutrimentsDTO nutriments;
 
+  final List<dynamic>? additives_tags;
+  final String? ingredients_text;
+
   String? getLocaleName(SupportedLanguage supportedLanguage) {
     String? localeName;
     switch (supportedLanguage) {
@@ -67,7 +70,9 @@ class OFFProductDTO {
       required this.product_quantity,
       required this.serving_quantity,
       required this.serving_size,
-      required this.nutriments});
+      required this.nutriments,
+      this.additives_tags,
+      this.ingredients_text});
 
   factory OFFProductDTO.fromJson(Map<String, dynamic> json) =>
       _$OFFProductDTOFromJson(json);

@@ -147,6 +147,8 @@ IntakeOB _intakeDBOToOB(IntakeDBO dbo) {
     vitaminB12100: dbo.meal.nutriments.vitaminB12100,
     cholesterol100: dbo.meal.nutriments.cholesterol100,
     addedSugars100: dbo.meal.nutriments.addedSugars100,
+    additivesTags: dbo.meal.additivesTags,
+    ingredientsText: dbo.meal.ingredientsText,
   );
 }
 
@@ -170,6 +172,8 @@ IntakeDBO _intakeOBToDBO(IntakeOB ob) {
       servingUnit: ob.servingUnit,
       servingSize: ob.servingSize,
       source: MealSourceDBO.values[ob.mealSource],
+      additivesTags: ob.additivesTags,
+      ingredientsText: ob.ingredientsText,
       nutriments: MealNutrimentsDBO(
         energyKcal100: ob.energyKcal100,
         carbohydrates100: ob.carbohydrates100,

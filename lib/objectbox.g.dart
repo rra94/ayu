@@ -107,7 +107,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(2, 222820024314402058),
     name: 'IntakeOB',
-    lastPropertyId: const obx_int.IdUid(49, 8262917921999380575),
+    lastPropertyId: const obx_int.IdUid(51, 2380785250413604025),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -403,6 +403,18 @@ final _entities = <obx_int.ModelEntity>[
         id: const obx_int.IdUid(49, 8262917921999380575),
         name: 'addedSugars100',
         type: 8,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(50, 7470205969616379032),
+        name: 'additivesTags',
+        type: 30,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(51, 2380785250413604025),
+        name: 'ingredientsText',
+        type: 9,
         flags: 0,
       ),
     ],
@@ -998,7 +1010,17 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final servingSizeOffset = object.servingSize == null
             ? null
             : fbb.writeString(object.servingSize!);
-        fbb.startTable(50);
+        final additivesTagsOffset = object.additivesTags == null
+            ? null
+            : fbb.writeList(
+                object.additivesTags!
+                    .map(fbb.writeString)
+                    .toList(growable: false),
+              );
+        final ingredientsTextOffset = object.ingredientsText == null
+            ? null
+            : fbb.writeString(object.ingredientsText!);
+        fbb.startTable(52);
         fbb.addInt64(0, object.id);
         fbb.addOffset(1, intakeIdOffset);
         fbb.addOffset(2, unitOffset);
@@ -1048,6 +1070,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
         fbb.addFloat64(46, object.vitaminB12100);
         fbb.addFloat64(47, object.cholesterol100);
         fbb.addFloat64(48, object.addedSugars100);
+        fbb.addOffset(49, additivesTagsOffset);
+        fbb.addOffset(50, ingredientsTextOffset);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -1271,6 +1295,13 @@ obx_int.ModelDefinition getObjectBoxModel() {
           rootOffset,
           100,
         );
+        final additivesTagsParam = const fb.ListReader<String>(
+          fb.StringReader(asciiOptimization: true),
+          lazy: false,
+        ).vTableGetNullable(buffer, rootOffset, 102);
+        final ingredientsTextParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 104);
         final object = IntakeOB(
           id: idParam,
           intakeId: intakeIdParam,
@@ -1321,6 +1352,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
           vitaminB12100: vitaminB12100Param,
           cholesterol100: cholesterol100Param,
           addedSugars100: addedSugars100Param,
+          additivesTags: additivesTagsParam,
+          ingredientsText: ingredientsTextParam,
         );
 
         return object;
@@ -2189,6 +2222,16 @@ class IntakeOB_ {
   /// See [IntakeOB.addedSugars100].
   static final addedSugars100 = obx.QueryDoubleProperty<IntakeOB>(
     _entities[1].properties[48],
+  );
+
+  /// See [IntakeOB.additivesTags].
+  static final additivesTags = obx.QueryStringVectorProperty<IntakeOB>(
+    _entities[1].properties[49],
+  );
+
+  /// See [IntakeOB.ingredientsText].
+  static final ingredientsText = obx.QueryStringProperty<IntakeOB>(
+    _entities[1].properties[50],
   );
 }
 

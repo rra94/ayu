@@ -76,6 +76,10 @@ class IntakeOB {
   double? cholesterol100;
   double? addedSugars100;
 
+  // Gut health fields
+  List<String>? additivesTags;
+  String? ingredientsText;
+
   IntakeOB({
     this.id = 0,
     required this.intakeId,
@@ -126,5 +130,7 @@ class IntakeOB {
     this.vitaminB12100,
     this.cholesterol100,
     this.addedSugars100,
+    this.additivesTags,
+    this.ingredientsText,
   });
 }

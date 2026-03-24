@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:opennutritracker/core/db/data_sources/gut_health_data_source.dart';
+import 'package:opennutritracker/core/db/entities/gut_health_item_ob.dart';
 import 'package:opennutritracker/core/domain/entity/intake_entity.dart';
 import 'package:opennutritracker/core/domain/entity/tracked_day_entity.dart';
 import 'package:opennutritracker/core/domain/entity/user_activity_entity.dart';
 import 'package:opennutritracker/core/domain/usecase/get_user_usecase.dart';
 import 'package:opennutritracker/core/presentation/widgets/activity_vertial_list.dart';
+import 'package:opennutritracker/core/presentation/widgets/daily_summary_card.dart';
+import 'package:opennutritracker/core/services/gut_health_service.dart';
 import 'package:opennutritracker/core/utils/locator.dart';
+import 'package:opennutritracker/features/gut_health/presentation/gut_health_panel.dart';
 import 'package:opennutritracker/features/nutrition/presentation/micronutrient_summary_screen.dart';
 import 'package:opennutritracker/core/presentation/widgets/copy_or_delete_dialog.dart';
 import 'package:opennutritracker/core/presentation/widgets/copy_dialog.dart';
@@ -118,6 +123,7 @@ class DayInfoWidget extends StatelessWidget {
                 : const SizedBox(),
             const SizedBox(height: 8.0),
             _buildMicronutrientButton(context),
+            _buildGutHealthPanel(),
             ActivityVerticalList(
                 day: selectedDay,
                 title: S.of(context).activityLabel,
@@ -186,6 +192,50 @@ class DayInfoWidget extends StatelessWidget {
           ],
         )
       ],
+    );
+  }
+
+  Widget _buildGutHealthPanel() {
+    final allIntakes = [
+      ...breakfastIntake,
+      ...lunchIntake,
+      ...dinnerIntake,
+      ...snackIntake,
+    ];
+    final trackedDay = trackedDayEntity;
+    final gutService = locator<GutHealthService>();
+    final autoFlagged = gutService.flagFromIntakes(allIntakes);
+    final gutDs = locator<GutHealthDataSource>();
+    return FutureBuilder<List<GutHealthItemOB>>(
+      future: gutDs.getManualItemsByDate(selectedDay),
+      builder: (context, snapshot) {
+        final manualItems = snapshot.data ?? [];
+        final allItems = [...autoFlagged, ...manualItems];
+        return Column(
+          children: [
+            if (allItems.isNotEmpty)
+              GutHealthPanel(
+                items: allItems,
+                onAddManualItem: (_) {},
+                onDeleteItem: (_) {},
+                readOnly: true,
+              ),
+            if (trackedDay != null)
+              DailySummaryCard(
+                calorieGoal: trackedDay.calorieGoal,
+                caloriesTracked: trackedDay.caloriesTracked,
+                carbsGoal: trackedDay.carbsGoal,
+                carbsTracked: trackedDay.carbsTracked,
+                fatGoal: trackedDay.fatGoal,
+                fatTracked: trackedDay.fatTracked,
+                proteinGoal: trackedDay.proteinGoal,
+                proteinTracked: trackedDay.proteinTracked,
+                gutHealthItems: allItems,
+                hasIntakes: allIntakes.isNotEmpty,
+              ),
+          ],
+        );
+      },
     );
   }
 

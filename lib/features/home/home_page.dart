@@ -23,6 +23,7 @@ import 'package:opennutritracker/features/add_meal/presentation/add_meal_type.da
 import 'package:opennutritracker/features/home/presentation/bloc/home_bloc.dart';
 import 'package:opennutritracker/features/home/presentation/widgets/dashboard_widget.dart';
 import 'package:opennutritracker/features/home/presentation/widgets/intake_vertical_list.dart';
+import 'package:opennutritracker/core/presentation/widgets/daily_summary_card.dart';
 import 'package:opennutritracker/features/nutrition/presentation/micronutrient_summary_screen.dart';
 import 'package:opennutritracker/generated/l10n.dart';
 
@@ -145,8 +146,13 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         _buildHabitsChecklist(),
         _buildMicronutrientButton(context, breakfastIntakeList,
             lunchIntakeList, dinnerIntakeList, snackIntakeList),
-        _buildGutHealthPanel(breakfastIntakeList, lunchIntakeList,
-            dinnerIntakeList, snackIntakeList),
+        _buildGutHealthAndSummary(
+            breakfastIntakeList, lunchIntakeList,
+            dinnerIntakeList, snackIntakeList,
+            totalKcalDaily, totalKcalSupplied,
+            totalCarbsGoal, totalCarbsIntake,
+            totalFatsGoal, totalFatsIntake,
+            totalProteinsGoal, totalProteinsIntake),
         ActivityVerticalList(
           day: DateTime.now(),
           title: S.of(context).activityLabel,
@@ -336,11 +342,19 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     );
   }
 
-  Widget _buildGutHealthPanel(
+  Widget _buildGutHealthAndSummary(
       List<IntakeEntity> breakfast,
       List<IntakeEntity> lunch,
       List<IntakeEntity> dinner,
-      List<IntakeEntity> snack) {
+      List<IntakeEntity> snack,
+      double calorieGoal,
+      double caloriesTracked,
+      double carbsGoal,
+      double carbsTracked,
+      double fatGoal,
+      double fatTracked,
+      double proteinGoal,
+      double proteinTracked) {
     final allIntakes = [...breakfast, ...lunch, ...dinner, ...snack];
     final gutService = locator<GutHealthService>();
     final autoFlagged = gutService.flagFromIntakes(allIntakes);
@@ -350,16 +364,32 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       builder: (context, snapshot) {
         final manualItems = snapshot.data ?? [];
         final allItems = [...autoFlagged, ...manualItems];
-        return GutHealthPanel(
-          items: allItems,
-          onAddManualItem: (item) async {
-            await gutDs.addItem(item);
-            setState(() {});
-          },
-          onDeleteItem: (id) async {
-            await gutDs.deleteItem(id);
-            setState(() {});
-          },
+        return Column(
+          children: [
+            GutHealthPanel(
+              items: allItems,
+              onAddManualItem: (item) async {
+                await gutDs.addItem(item);
+                setState(() {});
+              },
+              onDeleteItem: (id) async {
+                await gutDs.deleteItem(id);
+                setState(() {});
+              },
+            ),
+            DailySummaryCard(
+              calorieGoal: calorieGoal,
+              caloriesTracked: caloriesTracked,
+              carbsGoal: carbsGoal,
+              carbsTracked: carbsTracked,
+              fatGoal: fatGoal,
+              fatTracked: fatTracked,
+              proteinGoal: proteinGoal,
+              proteinTracked: proteinTracked,
+              gutHealthItems: allItems,
+              hasIntakes: allIntakes.isNotEmpty,
+            ),
+          ],
         );
       },
     );

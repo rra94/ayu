@@ -38,6 +38,9 @@ class MealEntity extends Equatable {
 
   get hasServingValues => servingQuantity != null && servingUnit != null;
 
+  final List<String>? additivesTags;
+  final String? ingredientsText;
+
   final MealSourceEntity source;
 
   final MealNutrimentsEntity nutriments;
@@ -58,6 +61,8 @@ class MealEntity extends Equatable {
       required this.servingQuantity,
       required this.servingUnit,
       required this.servingSize,
+      this.additivesTags,
+      this.ingredientsText,
       required this.nutriments,
       required this.source});
 
@@ -85,6 +90,8 @@ class MealEntity extends Equatable {
       servingQuantity: mealDBO.servingQuantity,
       servingUnit: mealDBO.servingUnit,
       servingSize: mealDBO.servingSize,
+      additivesTags: mealDBO.additivesTags,
+      ingredientsText: mealDBO.ingredientsText,
       nutriments:
           MealNutrimentsEntity.fromMealNutrimentsDBO(mealDBO.nutriments),
       source: MealSourceEntity.fromMealSourceDBO(mealDBO.source));
@@ -103,6 +110,8 @@ class MealEntity extends Equatable {
         servingQuantity: _tryQuantityCast(offProduct.serving_quantity),
         servingUnit: _tryGetUnit(offProduct.quantity),
         servingSize: offProduct.serving_size,
+        additivesTags: offProduct.additives_tags?.cast<String>(),
+        ingredientsText: offProduct.ingredients_text,
         nutriments:
             MealNutrimentsEntity.fromOffNutriments(offProduct.nutriments),
         source: MealSourceEntity.off);
@@ -180,7 +189,7 @@ class MealEntity extends Equatable {
   }
 
   @override
-  List<Object?> get props => [code, name];
+  List<Object?> get props => [code, name, additivesTags, ingredientsText];
 }
 
 enum MealSourceEntity {

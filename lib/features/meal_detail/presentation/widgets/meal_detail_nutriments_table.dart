@@ -26,7 +26,7 @@ class MealDetailNutrimentsTable extends StatelessWidget {
             ?.copyWith(fontWeight: FontWeight.bold) ??
         const TextStyle();
 
-    final headerText = usesImperialUnits && servingQuantity != null
+    final headerText = servingQuantity != null
         ? "${S.of(context).perServingLabel} (${servingQuantity!.roundToPrecision(1)}${servingUnit ?? 'g/ml'})"
         : S.of(context).per100gmlLabel;
 
@@ -247,7 +247,7 @@ class MealDetailNutrimentsTable extends StatelessWidget {
   }
 
   double _adjustValueForServing(double value) {
-    if (!usesImperialUnits || servingQuantity == null) {
+    if (servingQuantity == null) {
       return value;
     }
     // Calculate per serving value based on 100g reference

@@ -11,12 +11,14 @@ class GutHealthPanel extends StatelessWidget {
   final List<GutHealthItemOB> items;
   final void Function(GutHealthItemOB item) onAddManualItem;
   final void Function(int id) onDeleteItem;
+  final bool readOnly;
 
   const GutHealthPanel({
     super.key,
     required this.items,
     required this.onAddManualItem,
     required this.onDeleteItem,
+    this.readOnly = false,
   });
 
   @override
@@ -66,11 +68,12 @@ class GutHealthPanel extends StatelessWidget {
                   ),
                 ],
                 const Spacer(),
-                TextButton.icon(
-                  onPressed: () => _showLogItemDialog(context),
-                  icon: const Icon(Icons.add, size: 18),
-                  label: const Text('Log'),
-                ),
+                if (!readOnly)
+                  TextButton.icon(
+                    onPressed: () => _showLogItemDialog(context),
+                    icon: const Icon(Icons.add, size: 18),
+                    label: const Text('Log'),
+                  ),
               ],
             ),
 
@@ -132,8 +135,8 @@ class GutHealthPanel extends StatelessWidget {
                     visualDensity: VisualDensity.compact,
                     materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     backgroundColor: _chipColor(item.category, theme),
-                    deleteIcon: const Icon(Icons.close, size: 14),
-                    onDeleted: () => onDeleteItem(item.id),
+                    deleteIcon: readOnly ? null : const Icon(Icons.close, size: 14),
+                    onDeleted: readOnly ? null : () => onDeleteItem(item.id),
                   )).toList(),
                 ),
               ],

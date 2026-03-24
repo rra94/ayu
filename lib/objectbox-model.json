@@ -69,7 +69,7 @@
     },
     {
       "id": "2:222820024314402058",
-      "lastPropertyId": "49:8262917921999380575",
+      "lastPropertyId": "51:2380785250413604025",
       "name": "IntakeOB",
       "properties": [
         {
@@ -319,6 +319,16 @@
           "id": "49:8262917921999380575",
           "name": "addedSugars100",
           "type": 8
+        },
+        {
+          "id": "50:7470205969616379032",
+          "name": "additivesTags",
+          "type": 30
+        },
+        {
+          "id": "51:2380785250413604025",
+          "name": "ingredientsText",
+          "type": 9
         }
       ],
       "relations": []
