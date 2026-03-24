@@ -292,9 +292,8 @@ class _EditMealScreenState extends State<EditMealScreen> {
           _fatTextController.text,
           _proteinTextController.text);
 
-      Navigator.of(context).pushNamedAndRemoveUntil(
+      Navigator.of(context).pushReplacementNamed(
           NavigationOptions.mealDetailRoute,
-          ModalRoute.withName(NavigationOptions.addMealRoute),
           arguments: MealDetailScreenArguments(
               newMealEntity, _intakeTypeEntity, _day, usesImperialUnits));
     } catch (exception, stacktrace) {
