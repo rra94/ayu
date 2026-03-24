@@ -1,5 +1,6 @@
 import UIKit
 import Flutter
+import Vision
 
 @main
 @objc class AppDelegate: FlutterAppDelegate {
@@ -22,7 +23,7 @@ import Flutter
           result(FlutterError(code: "INVALID_ARGS", message: "Missing imagePath", details: nil))
           return
         }
-        VisionOCR.recognizeText(from: imagePath) { text in
+        self.recognizeText(from: imagePath) { text in
           DispatchQueue.main.async {
             result(text)
           }
@@ -34,6 +35,34 @@ import Flutter
 
     try! setExcludeFromiCloudBackup(isExcluded: true)
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+  }
+
+  private func recognizeText(from imagePath: String, completion: @escaping (String?) -> Void) {
+    guard let image = UIImage(contentsOfFile: imagePath),
+          let cgImage = image.cgImage else {
+      completion(nil)
+      return
+    }
+
+    let request = VNRecognizeTextRequest { (request, error) in
+      guard error == nil,
+            let observations = request.results as? [VNRecognizedTextObservation] else {
+        completion(nil)
+        return
+      }
+      let text = observations.compactMap { $0.topCandidates(1).first?.string }.joined(separator: "\n")
+      completion(text)
+    }
+    request.recognitionLevel = .accurate
+    request.usesLanguageCorrection = true
+
+    DispatchQueue.global(qos: .userInitiated).async {
+      do {
+        try VNImageRequestHandler(cgImage: cgImage, options: [:]).perform([request])
+      } catch {
+        completion(nil)
+      }
+    }
   }
 }
 
