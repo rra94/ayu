@@ -124,70 +124,70 @@ class DayInfoWidget extends StatelessWidget {
             const SizedBox(height: 8.0),
             _buildMicronutrientButton(context),
             _buildGutHealthPanel(),
-            ActivityVerticalList(
+            // Food — only show categories with items
+            if (breakfastIntake.isNotEmpty)
+              IntakeVerticalList(
                 day: selectedDay,
-                title: S.of(context).activityLabel,
-                userActivityList: userActivities,
-                onItemLongPressedCallback: onActivityItemLongPressed),
-            IntakeVerticalList(
-              day: selectedDay,
-              title: S.of(context).breakfastLabel,
-              listIcon: Icons.bakery_dining_outlined,
-              addMealType: AddMealType.breakfastType,
-              intakeList: breakfastIntake,
-              onDeleteIntakeCallback: onDeleteIntake,
-              onItemLongPressedCallback: onIntakeItemLongPressed,
-              onCopyIntakeCallback:
-                  DateUtils.isSameDay(selectedDay, DateTime.now())
-                      ? null
-                      : onCopyIntake,
-              usesImperialUnits: usesImperialUnits,
-              trackedDayEntity: trackedDay,
-            ),
-            IntakeVerticalList(
-              day: selectedDay,
-              title: S.of(context).lunchLabel,
-              listIcon: Icons.lunch_dining_outlined,
-              addMealType: AddMealType.lunchType,
-              intakeList: lunchIntake,
-              onDeleteIntakeCallback: onDeleteIntake,
-              onItemLongPressedCallback: onIntakeItemLongPressed,
-              usesImperialUnits: usesImperialUnits,
-              onCopyIntakeCallback:
-                  DateUtils.isSameDay(selectedDay, DateTime.now())
-                      ? null
-                      : onCopyIntake,
-              trackedDayEntity: trackedDay,
-            ),
-            IntakeVerticalList(
-              day: selectedDay,
-              title: S.of(context).dinnerLabel,
-              listIcon: Icons.dinner_dining_outlined,
-              addMealType: AddMealType.dinnerType,
-              intakeList: dinnerIntake,
-              onDeleteIntakeCallback: onDeleteIntake,
-              onItemLongPressedCallback: onIntakeItemLongPressed,
-              onCopyIntakeCallback:
-                  DateUtils.isSameDay(selectedDay, DateTime.now())
-                      ? null
-                      : onCopyIntake,
-              usesImperialUnits: usesImperialUnits,
-            ),
-            IntakeVerticalList(
-              day: selectedDay,
-              title: S.of(context).snackLabel,
-              listIcon: CustomIcons.food_apple_outline,
-              addMealType: AddMealType.snackType,
-              intakeList: snackIntake,
-              onDeleteIntakeCallback: onDeleteIntake,
-              onItemLongPressedCallback: onIntakeItemLongPressed,
-              usesImperialUnits: usesImperialUnits,
-              onCopyIntakeCallback:
-                  DateUtils.isSameDay(selectedDay, DateTime.now())
-                      ? null
-                      : onCopyIntake,
-              trackedDayEntity: trackedDay,
-            ),
+                title: S.of(context).breakfastLabel,
+                listIcon: Icons.bakery_dining_outlined,
+                addMealType: AddMealType.breakfastType,
+                intakeList: breakfastIntake,
+                onDeleteIntakeCallback: onDeleteIntake,
+                onItemLongPressedCallback: onIntakeItemLongPressed,
+                onCopyIntakeCallback:
+                    DateUtils.isSameDay(selectedDay, DateTime.now())
+                        ? null
+                        : onCopyIntake,
+                usesImperialUnits: usesImperialUnits,
+                trackedDayEntity: trackedDay,
+              ),
+            if (lunchIntake.isNotEmpty)
+              IntakeVerticalList(
+                day: selectedDay,
+                title: S.of(context).lunchLabel,
+                listIcon: Icons.lunch_dining_outlined,
+                addMealType: AddMealType.lunchType,
+                intakeList: lunchIntake,
+                onDeleteIntakeCallback: onDeleteIntake,
+                onItemLongPressedCallback: onIntakeItemLongPressed,
+                usesImperialUnits: usesImperialUnits,
+                onCopyIntakeCallback:
+                    DateUtils.isSameDay(selectedDay, DateTime.now())
+                        ? null
+                        : onCopyIntake,
+                trackedDayEntity: trackedDay,
+              ),
+            if (dinnerIntake.isNotEmpty)
+              IntakeVerticalList(
+                day: selectedDay,
+                title: S.of(context).dinnerLabel,
+                listIcon: Icons.dinner_dining_outlined,
+                addMealType: AddMealType.dinnerType,
+                intakeList: dinnerIntake,
+                onDeleteIntakeCallback: onDeleteIntake,
+                onItemLongPressedCallback: onIntakeItemLongPressed,
+                onCopyIntakeCallback:
+                    DateUtils.isSameDay(selectedDay, DateTime.now())
+                        ? null
+                        : onCopyIntake,
+                usesImperialUnits: usesImperialUnits,
+              ),
+            if (snackIntake.isNotEmpty)
+              IntakeVerticalList(
+                day: selectedDay,
+                title: S.of(context).snackLabel,
+                listIcon: CustomIcons.food_apple_outline,
+                addMealType: AddMealType.snackType,
+                intakeList: snackIntake,
+                onDeleteIntakeCallback: onDeleteIntake,
+                onItemLongPressedCallback: onIntakeItemLongPressed,
+                usesImperialUnits: usesImperialUnits,
+                onCopyIntakeCallback:
+                    DateUtils.isSameDay(selectedDay, DateTime.now())
+                        ? null
+                        : onCopyIntake,
+                trackedDayEntity: trackedDay,
+              ),
             const SizedBox(height: 16.0)
           ],
         )
