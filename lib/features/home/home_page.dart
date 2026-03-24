@@ -28,6 +28,7 @@ import 'package:opennutritracker/features/stats/presentation/widgets/steps_card.
 import 'package:opennutritracker/features/stats/presentation/widgets/inventory_card.dart';
 import 'package:opennutritracker/features/stats/presentation/widgets/grocery_card.dart';
 import 'package:opennutritracker/features/home/presentation/widgets/agent_suggestions_widget.dart';
+import 'package:opennutritracker/features/stats/presentation/widgets/mood_energy_card.dart';
 import 'package:opennutritracker/features/home/presentation/widgets/collapsible_section.dart';
 import 'package:opennutritracker/features/home/presentation/widgets/quick_action_bar.dart';
 import 'package:opennutritracker/features/home/presentation/widgets/today_view_card.dart';
@@ -223,6 +224,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           icon: Icons.favorite_outline,
           storageKey: 'home_health',
           children: [
+            const MoodEnergyCard(),
             _buildMicronutrientButton(context, breakfastIntakeList,
                 lunchIntakeList, dinnerIntakeList, snackIntakeList),
             _buildGutHealthAndSummary(
