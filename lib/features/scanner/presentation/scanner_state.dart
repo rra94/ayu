@@ -19,15 +19,17 @@ class ScannerLoadedState extends ScannerState {
   final MealEntity product;
   final bool usesImperialUnits;
   final List<AllergenAlert> allergenAlerts;
+  final bool isSupplement;
 
   const ScannerLoadedState({
     required this.product,
     this.usesImperialUnits = false,
     this.allergenAlerts = const [],
+    this.isSupplement = false,
   });
 
   @override
-  List<Object?> get props => [product, allergenAlerts];
+  List<Object?> get props => [product, allergenAlerts, isSupplement];
 }
 
 class ScannerFailedState extends ScannerState {

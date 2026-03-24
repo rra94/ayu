@@ -6,6 +6,9 @@ import 'package:opennutritracker/core/domain/entity/intake_type_entity.dart';
 import 'package:opennutritracker/core/presentation/widgets/error_dialog.dart';
 import 'package:opennutritracker/core/utils/locator.dart';
 import 'package:opennutritracker/core/utils/navigation_options.dart';
+import 'package:opennutritracker/features/add_meal/domain/entity/meal_entity.dart';
+import 'package:opennutritracker/features/add_meal/domain/entity/meal_nutriments_entity.dart';
+import 'package:opennutritracker/features/edit_meal/presentation/edit_meal_screen.dart';
 import 'package:opennutritracker/features/meal_detail/meal_detail_screen.dart';
 import 'package:opennutritracker/features/scanner/presentation/scanner_bloc.dart';
 import 'package:opennutritracker/generated/l10n.dart';
@@ -53,30 +56,54 @@ class _ScannerScreenState extends State<ScannerScreen> {
               appBar: AppBar(),
               body: const Center(child: CircularProgressIndicator()));
         } else if (state is ScannerLoadedState) {
-          // Show allergen warning if any, then navigate
           Future.microtask(() {
-            if (context.mounted) {
-              if (state.allergenAlerts.isNotEmpty) {
-                _showAllergenWarning(context, state);
-              } else {
-                Navigator.of(context).pushReplacementNamed(
-                    NavigationOptions.mealDetailRoute,
-                    arguments: MealDetailScreenArguments(state.product,
-                        _intakeTypeEntity, _day, state.usesImperialUnits));
-              }
+            if (!context.mounted) return;
+
+            // Supplements: skip meal detail, show confirmation
+            if (state.isSupplement) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(
+                  '${state.product.name ?? "Supplement"} added to your stack!',
+                )),
+              );
+              Navigator.of(context).pop();
+              return;
+            }
+
+            // Food: show allergen warning or go to meal detail
+            if (state.allergenAlerts.isNotEmpty) {
+              _showAllergenWarning(context, state);
+            } else {
+              Navigator.of(context).pushReplacementNamed(
+                  NavigationOptions.mealDetailRoute,
+                  arguments: MealDetailScreenArguments(state.product,
+                      _intakeTypeEntity, _day, state.usesImperialUnits));
             }
           });
         } else if (state is ScannerFailedState) {
           return Scaffold(
               appBar: AppBar(),
               body: Center(
-                child: ErrorDialog(
-                  errorText: state.type == ScannerFailedStateType.offline
-                      ? 'No internet connection. Check your network and try again.'
-                      : state.type == ScannerFailedStateType.productNotFound
-                          ? S.of(context).errorProductNotFound
-                          : S.of(context).errorFetchingProductData,
-                  onRefreshPressed: _onRefreshButtonPressed,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ErrorDialog(
+                      errorText: state.type == ScannerFailedStateType.offline
+                          ? 'No internet connection. Check your network and try again.'
+                          : state.type == ScannerFailedStateType.productNotFound
+                              ? S.of(context).errorProductNotFound
+                              : S.of(context).errorFetchingProductData,
+                      onRefreshPressed: _onRefreshButtonPressed,
+                    ),
+                    if (state.type == ScannerFailedStateType.productNotFound) ...[
+                      const SizedBox(height: 16),
+                      FilledButton.icon(
+                        onPressed: () => _createCustomFood(context),
+                        icon: const Icon(Icons.edit),
+                        label: const Text('Create Custom Entry'),
+                      ),
+                    ],
+                  ],
                 ),
               ));
         }
@@ -140,6 +167,30 @@ class _ScannerScreenState extends State<ScannerScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(S.of(context).errorFetchingProductData)));
     }
+  }
+
+  void _createCustomFood(BuildContext context) {
+    // Navigate to edit meal screen with empty template for custom entry
+    Navigator.of(context).pushNamed(
+      NavigationOptions.editMealRoute,
+      arguments: EditMealScreenArguments(
+        _day,
+        MealEntity(
+          code: _scannedBarcode,
+          name: '',
+          url: null,
+          mealQuantity: '100',
+          mealUnit: 'g',
+          servingQuantity: null,
+          servingUnit: null,
+          servingSize: null,
+          source: MealSourceEntity.custom,
+          nutriments: MealNutrimentsEntity.empty(),
+        ),
+        _intakeTypeEntity,
+        false,
+      ),
+    );
   }
 
   void _showAllergenWarning(BuildContext context, ScannerLoadedState state) {

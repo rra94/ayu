@@ -27,8 +27,11 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
             await _searchProductUseCase.searchProductByBarcode(event.barcode);
         final config = await _getConfigUsecase.getConfig();
 
-        // Auto-detect and add supplements to stack
-        await SupplementDetector.autoAddIfSupplement(result);
+        // Auto-detect supplements
+        final isSupplement = SupplementDetector.isSupplement(result);
+        if (isSupplement) {
+          await SupplementDetector.autoAddIfSupplement(result);
+        }
 
         // Check for allergens
         final allergenAlerts = AllergenService.checkMeal(result);
@@ -36,7 +39,8 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
         emit(ScannerLoadedState(
             product: result,
             usesImperialUnits: config.usesImperialUnits,
-            allergenAlerts: allergenAlerts));
+            allergenAlerts: allergenAlerts,
+            isSupplement: isSupplement));
       } catch (exception) {
         if (exception == ProductNotFoundException) {
           emit(
