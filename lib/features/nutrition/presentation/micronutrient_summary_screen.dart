@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:opennutritracker/core/domain/entity/intake_entity.dart';
+import 'package:opennutritracker/core/services/bioavailability_service.dart';
 import 'package:opennutritracker/core/utils/calc/rda_calc.dart';
 import 'package:opennutritracker/generated/l10n.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
@@ -21,6 +22,13 @@ class MicronutrientSummaryScreen extends StatelessWidget {
     final rdaTargets = RDACalc.getDailyTargets(gender: gender, age: age);
     final totals = _computeDailyTotals(allIntakes);
 
+    // Compute absorption data
+    final absorptionResults = BioavailabilityService.computeAll(allIntakes);
+    final absorptionMap = <String, BioavailabilityResult>{};
+    for (final a in absorptionResults) {
+      absorptionMap[a.nutrient] = a;
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Micronutrient Tracker'),
@@ -30,20 +38,20 @@ class MicronutrientSummaryScreen extends StatelessWidget {
         children: [
           _buildSectionHeader(context, 'Minerals'),
           _buildNutrientRow(context, 'Sodium', totals['sodium'], rdaTargets['sodium'], 'mg', isLimit: true),
-          _buildNutrientRow(context, 'Potassium', totals['potassium'], rdaTargets['potassium'], 'mg'),
-          _buildNutrientRow(context, 'Calcium', totals['calcium'], rdaTargets['calcium'], 'mg'),
-          _buildNutrientRow(context, 'Iron', totals['iron'], rdaTargets['iron'], 'mg'),
-          _buildNutrientRow(context, 'Magnesium', totals['magnesium'], rdaTargets['magnesium'], 'mg'),
+          _buildNutrientRow(context, 'Potassium', totals['potassium'], rdaTargets['potassium'], 'mg', absorption: absorptionMap['Potassium']),
+          _buildNutrientRow(context, 'Calcium', totals['calcium'], rdaTargets['calcium'], 'mg', absorption: absorptionMap['Calcium']),
+          _buildNutrientRow(context, 'Iron', totals['iron'], rdaTargets['iron'], 'mg', absorption: absorptionMap['Iron']),
+          _buildNutrientRow(context, 'Magnesium', totals['magnesium'], rdaTargets['magnesium'], 'mg', absorption: absorptionMap['Magnesium']),
           _buildNutrientRow(context, 'Phosphorus', totals['phosphorus'], rdaTargets['phosphorus'], 'mg'),
-          _buildNutrientRow(context, 'Zinc', totals['zinc'], rdaTargets['zinc'], 'mg'),
+          _buildNutrientRow(context, 'Zinc', totals['zinc'], rdaTargets['zinc'], 'mg', absorption: absorptionMap['Zinc']),
           _buildNutrientRow(context, 'Copper', totals['copper'], rdaTargets['copper'], 'mg'),
           _buildNutrientRow(context, 'Manganese', totals['manganese'], rdaTargets['manganese'], 'mg'),
           _buildNutrientRow(context, 'Selenium', totals['selenium'], rdaTargets['selenium'], 'mcg'),
           const SizedBox(height: 16),
           _buildSectionHeader(context, 'Vitamins'),
-          _buildNutrientRow(context, 'Vitamin A', totals['vitaminA'], rdaTargets['vitaminA'], 'mcg'),
-          _buildNutrientRow(context, 'Vitamin C', totals['vitaminC'], rdaTargets['vitaminC'], 'mg'),
-          _buildNutrientRow(context, 'Vitamin D', totals['vitaminD'], rdaTargets['vitaminD'], 'mcg'),
+          _buildNutrientRow(context, 'Vitamin A', totals['vitaminA'], rdaTargets['vitaminA'], 'mcg', absorption: absorptionMap['Vitamin A']),
+          _buildNutrientRow(context, 'Vitamin C', totals['vitaminC'], rdaTargets['vitaminC'], 'mg', absorption: absorptionMap['Vitamin C']),
+          _buildNutrientRow(context, 'Vitamin D', totals['vitaminD'], rdaTargets['vitaminD'], 'mcg', absorption: absorptionMap['Vitamin D']),
           _buildNutrientRow(context, 'Vitamin E', totals['vitaminE'], rdaTargets['vitaminE'], 'mg'),
           _buildNutrientRow(context, 'Vitamin K', totals['vitaminK'], rdaTargets['vitaminK'], 'mcg'),
           _buildNutrientRow(context, 'Thiamine (B1)', totals['thiamine'], rdaTargets['thiamine'], 'mg'),
@@ -51,8 +59,8 @@ class MicronutrientSummaryScreen extends StatelessWidget {
           _buildNutrientRow(context, 'Niacin (B3)', totals['niacin'], rdaTargets['niacin'], 'mg'),
           _buildNutrientRow(context, 'Pantothenic Acid (B5)', totals['pantothenicAcid'], rdaTargets['pantothenicAcid'], 'mg'),
           _buildNutrientRow(context, 'Vitamin B6', totals['vitaminB6'], rdaTargets['vitaminB6'], 'mg'),
-          _buildNutrientRow(context, 'Folate (B9)', totals['folate'], rdaTargets['folate'], 'mcg'),
-          _buildNutrientRow(context, 'Vitamin B12', totals['vitaminB12'], rdaTargets['vitaminB12'], 'mcg'),
+          _buildNutrientRow(context, 'Folate (B9)', totals['folate'], rdaTargets['folate'], 'mcg', absorption: absorptionMap['Folate']),
+          _buildNutrientRow(context, 'Vitamin B12', totals['vitaminB12'], rdaTargets['vitaminB12'], 'mcg', absorption: absorptionMap['Vitamin B12']),
           const SizedBox(height: 16),
           _buildSectionHeader(context, 'Other'),
           _buildNutrientRow(context, 'Cholesterol', totals['cholesterol'], rdaTargets['cholesterol'], 'mg', isLimit: true),
@@ -84,7 +92,9 @@ class MicronutrientSummaryScreen extends StatelessWidget {
     double? target,
     String unit, {
     bool isLimit = false,
+    BioavailabilityResult? absorption,
   }) {
+    final theme = Theme.of(context);
     final hasData = current != null && current > 0;
     final rdaPercent = (hasData && target != null && target > 0)
         ? (current / target).clamp(0.0, 2.0)
@@ -95,10 +105,8 @@ class MicronutrientSummaryScreen extends StatelessWidget {
     if (!hasData) {
       barColor = Colors.grey.shade300;
     } else if (isLimit) {
-      // For limits (sodium, cholesterol, added sugar): green if under, red if over
       barColor = rdaPercent <= 1.0 ? Colors.green : Colors.red;
     } else {
-      // For targets: red if low, yellow if partial, green if met
       if (rdaPercent >= 0.9) {
         barColor = Colors.green;
       } else if (rdaPercent >= 0.5) {
@@ -114,14 +122,15 @@ class MicronutrientSummaryScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(name, style: Theme.of(context).textTheme.bodyMedium),
+              Expanded(
+                child: Text(name, style: theme.textTheme.bodyMedium),
+              ),
               Text(
                 hasData
                     ? '${current.toStringAsFixed(current < 1 ? 2 : 1)} / ${target?.toStringAsFixed(target < 1 ? 2 : 0) ?? '—'} $unit ($displayPercent%)'
                     : '— / ${target?.toStringAsFixed(target < 1 ? 2 : 0) ?? '—'} $unit',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                style: theme.textTheme.bodySmall?.copyWith(
                       color: hasData ? null : Colors.grey,
                     ),
               ),
@@ -132,10 +141,46 @@ class MicronutrientSummaryScreen extends StatelessWidget {
             padding: EdgeInsets.zero,
             lineHeight: 8,
             percent: rdaPercent.clamp(0.0, 1.0),
-            backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+            backgroundColor: theme.colorScheme.surfaceContainerHighest,
             progressColor: barColor,
             barRadius: const Radius.circular(4),
           ),
+          if (absorption != null && hasData) ...[
+            const SizedBox(height: 2),
+            Row(
+              children: [
+                Icon(Icons.arrow_downward, size: 10,
+                    color: theme.colorScheme.onSurfaceVariant),
+                const SizedBox(width: 4),
+                Text(
+                  'Absorbed: ~${absorption.absorbedMg.toStringAsFixed(1)}$unit (${absorption.absorptionPct.round()}%)',
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    fontSize: 10,
+                    color: absorption.absorptionPct >= 50
+                        ? Colors.green
+                        : absorption.absorptionPct >= 25
+                            ? Colors.orange
+                            : Colors.red,
+                  ),
+                ),
+                if (absorption.tip != null) ...[
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      absorption.tip!,
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        fontSize: 9,
+                        fontStyle: FontStyle.italic,
+                        color: theme.colorScheme.primary,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ],
         ],
       ),
     );
