@@ -68,7 +68,7 @@ Built on top of [OpenNutriTracker](https://github.com/simonoppowa/OpenNutriTrack
 ## Tech Stack
 
 ```
-Flutter (iOS-first)
+Flutter (iOS only — Android deprecated)
 ObjectBox (local DB)
 BLoC (state management)
 fl_chart (charts)
@@ -76,6 +76,8 @@ health (HealthKit)
 flutter_local_notifications
 home_widget (WidgetKit bridge)
 ```
+
+> **Note:** Android support is deprecated. Ayu is developed and tested exclusively for iOS.
 
 ## Data Sources
 
