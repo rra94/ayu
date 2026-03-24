@@ -1,6 +1,8 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:logging/logging.dart';
+import 'package:opennutritracker/core/db/data_sources/biomarker_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/fasting_data_source.dart';
+import 'package:opennutritracker/core/utils/calc/optimal_range_calc.dart';
 import 'package:opennutritracker/core/db/data_sources/sleep_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/supplement_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/water_data_source.dart';
@@ -226,6 +228,30 @@ class SmartNotificationService {
             notificationId: _sleepReminderId,
             title: 'Log last night\'s sleep',
             body: 'How did you sleep? Tap to log bedtime and quality.',
+          ));
+        }
+      } catch (_) {}
+    }
+
+    // Check stale biomarkers (once per day, after 10am)
+    if (hour >= 10) {
+      try {
+        final bioDs = locator<BiomarkerDataSource>();
+        final latest = await bioDs.getLatestByType();
+        int staleCount = 0;
+        for (final entry in latest.entries) {
+          final def = OptimalRangeCalc.getDefinition(entry.key);
+          if (def != null) {
+            final daysSince = now.difference(entry.value.dateTime).inDays;
+            if (daysSince > def.refreshDays) staleCount++;
+          }
+        }
+        if (staleCount > 0) {
+          missing.add(_MissingEntry(
+            type: 'biomarkers',
+            notificationId: 90006,
+            title: '$staleCount biomarkers need updating',
+            body: 'Some measurements are outdated. Tap to refresh.',
           ));
         }
       } catch (_) {}

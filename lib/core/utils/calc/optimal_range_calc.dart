@@ -10,6 +10,9 @@ class BiomarkerDef {
   final double optimalLow;
   final double optimalHigh;
 
+  /// Recommended re-test interval in days (e.g., 90 for blood work, 30 for measurements)
+  final int refreshDays;
+
   const BiomarkerDef({
     required this.key,
     required this.name,
@@ -19,6 +22,7 @@ class BiomarkerDef {
     required this.normalHigh,
     required this.optimalLow,
     required this.optimalHigh,
+    this.refreshDays = 90,
   });
 
   /// 0=red (out of normal), 1=yellow (normal not optimal), 2=green (optimal)
@@ -117,7 +121,25 @@ class OptimalRangeCalc {
     BiomarkerDef(key: 'thigh', name: 'Thigh', unit: 'cm',
         category: 'Body', normalLow: 45, normalHigh: 70, optimalLow: 50, optimalHigh: 65),
     BiomarkerDef(key: 'neck', name: 'Neck', unit: 'cm',
-        category: 'Body', normalLow: 30, normalHigh: 45, optimalLow: 33, optimalHigh: 40),
+        category: 'Body', normalLow: 30, normalHigh: 45, optimalLow: 33, optimalHigh: 40, refreshDays: 30),
+
+    // ── Cosmetic / Wellness (1-5 self-assessment scale) ──
+    BiomarkerDef(key: 'hair_health', name: 'Hair Health', unit: '/5',
+        category: 'Wellness', normalLow: 1, normalHigh: 5, optimalLow: 4, optimalHigh: 5, refreshDays: 30),
+    BiomarkerDef(key: 'hair_norwood', name: 'Hair Loss (Norwood Scale)', unit: 'stage',
+        category: 'Wellness', normalLow: 1, normalHigh: 7, optimalLow: 1, optimalHigh: 2, refreshDays: 90),
+    BiomarkerDef(key: 'skin_health', name: 'Skin Clarity', unit: '/5',
+        category: 'Wellness', normalLow: 1, normalHigh: 5, optimalLow: 4, optimalHigh: 5, refreshDays: 30),
+    BiomarkerDef(key: 'teeth_health', name: 'Teeth / Gum Health', unit: '/5',
+        category: 'Wellness', normalLow: 1, normalHigh: 5, optimalLow: 4, optimalHigh: 5, refreshDays: 30),
+    BiomarkerDef(key: 'nail_health', name: 'Nail Health', unit: '/5',
+        category: 'Wellness', normalLow: 1, normalHigh: 5, optimalLow: 4, optimalHigh: 5, refreshDays: 30),
+    BiomarkerDef(key: 'energy_level', name: 'Daily Energy Level', unit: '/5',
+        category: 'Wellness', normalLow: 1, normalHigh: 5, optimalLow: 4, optimalHigh: 5, refreshDays: 7),
+    BiomarkerDef(key: 'sleep_quality_avg', name: 'Sleep Quality (avg)', unit: '/5',
+        category: 'Wellness', normalLow: 1, normalHigh: 5, optimalLow: 4, optimalHigh: 5, refreshDays: 7),
+    BiomarkerDef(key: 'stress_level', name: 'Stress Level', unit: '/10',
+        category: 'Wellness', normalLow: 1, normalHigh: 10, optimalLow: 1, optimalHigh: 3, refreshDays: 7),
   ];
 
   static BiomarkerDef? getDefinition(String key) {

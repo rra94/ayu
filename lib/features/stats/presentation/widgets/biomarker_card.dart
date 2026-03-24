@@ -85,12 +85,61 @@ class _BiomarkerCardState extends State<BiomarkerCard> {
               )
             else ...[
               const SizedBox(height: 8),
+              ..._buildStaleAlerts(theme),
               ..._buildCategoryGroups(theme),
             ],
           ],
         ),
       ),
     );
+  }
+
+  List<Widget> _buildStaleAlerts(ThemeData theme) {
+    final stale = <String>[];
+    final now = DateTime.now();
+
+    for (final entry in _latestValues.entries) {
+      final def = OptimalRangeCalc.getDefinition(entry.key);
+      if (def == null) continue;
+      final daysSince = now.difference(entry.value.dateTime).inDays;
+      if (daysSince > def.refreshDays) {
+        stale.add('${def.name} (${daysSince}d ago — refresh every ${def.refreshDays}d)');
+      }
+    }
+
+    if (stale.isEmpty) return [];
+
+    return [
+      Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: Colors.orange.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.update, size: 16, color: Colors.orange),
+                const SizedBox(width: 6),
+                Text('Stale biomarkers — time to re-check:',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                        fontWeight: FontWeight.w600, color: Colors.orange)),
+              ],
+            ),
+            const SizedBox(height: 4),
+            ...stale.take(3).map((s) => Text(s,
+                style: theme.textTheme.labelSmall?.copyWith(fontSize: 10))),
+            if (stale.length > 3)
+              Text('+${stale.length - 3} more',
+                  style: theme.textTheme.labelSmall?.copyWith(fontSize: 9)),
+          ],
+        ),
+      ),
+      const SizedBox(height: 8),
+    ];
   }
 
   List<Widget> _buildCategoryGroups(ThemeData theme) {
