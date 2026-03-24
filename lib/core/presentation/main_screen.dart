@@ -7,6 +7,8 @@ import 'package:opennutritracker/core/presentation/widgets/main_appbar.dart';
 import 'package:opennutritracker/features/profile/profile_page.dart';
 import 'package:opennutritracker/features/stats/stats_page.dart';
 import 'package:opennutritracker/core/domain/entity/intake_type_entity.dart';
+import 'package:opennutritracker/features/add_meal/presentation/add_meal_screen.dart';
+import 'package:opennutritracker/features/add_meal/presentation/add_meal_type.dart';
 import 'package:opennutritracker/features/scanner/scanner_screen.dart';
 import 'package:opennutritracker/features/stats/charts_page.dart';
 import 'package:opennutritracker/core/utils/navigation_options.dart';
@@ -48,24 +50,49 @@ class _MainScreenState extends State<MainScreen> {
       appBar: _appbarPages[_selectedPageIndex],
       body: _bodyPages[_selectedPageIndex],
       floatingActionButton: _selectedPageIndex == 0
-          ? FloatingActionButton(
-              onPressed: () {
-                // Go directly to scanner — one tap, no bottom sheet
-                final hour = DateTime.now().hour;
-                final intakeType = hour < 11
-                    ? IntakeTypeEntity.breakfast
-                    : hour < 15
-                        ? IntakeTypeEntity.lunch
-                        : hour < 21
-                            ? IntakeTypeEntity.dinner
-                            : IntakeTypeEntity.snack;
-                Navigator.of(context).pushNamed(
-                  NavigationOptions.scannerRoute,
-                  arguments: ScannerScreenArguments(DateTime.now(), intakeType),
-                );
-              },
-              tooltip: 'Scan',
-              child: const Icon(Icons.camera_alt),
+          ? Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                FloatingActionButton.small(
+                  heroTag: 'search',
+                  onPressed: () {
+                    final hour = DateTime.now().hour;
+                    final mealType = hour < 11
+                        ? AddMealType.breakfastType
+                        : hour < 15
+                            ? AddMealType.lunchType
+                            : hour < 21
+                                ? AddMealType.dinnerType
+                                : AddMealType.snackType;
+                    Navigator.of(context).pushNamed(
+                      NavigationOptions.addMealRoute,
+                      arguments: AddMealScreenArguments(mealType, DateTime.now()),
+                    );
+                  },
+                  tooltip: 'Search food',
+                  child: const Icon(Icons.search, size: 20),
+                ),
+                const SizedBox(height: 8),
+                FloatingActionButton(
+                  heroTag: 'scan',
+                  onPressed: () {
+                    final hour = DateTime.now().hour;
+                    final intakeType = hour < 11
+                        ? IntakeTypeEntity.breakfast
+                        : hour < 15
+                            ? IntakeTypeEntity.lunch
+                            : hour < 21
+                                ? IntakeTypeEntity.dinner
+                                : IntakeTypeEntity.snack;
+                    Navigator.of(context).pushNamed(
+                      NavigationOptions.scannerRoute,
+                      arguments: ScannerScreenArguments(DateTime.now(), intakeType),
+                    );
+                  },
+                  tooltip: 'Scan',
+                  child: const Icon(Icons.camera_alt),
+                ),
+              ],
             )
           : null,
       bottomNavigationBar: NavigationBar(
