@@ -62,7 +62,7 @@ class MicronutrientSummaryScreen extends StatelessWidget {
           _buildNutrientRow(context, 'Folate (B9)', totals['folate'], rdaTargets['folate'], 'mcg', absorption: absorptionMap['Folate']),
           _buildNutrientRow(context, 'Vitamin B12', totals['vitaminB12'], rdaTargets['vitaminB12'], 'mcg', absorption: absorptionMap['Vitamin B12']),
           const SizedBox(height: 16),
-          _buildSectionHeader(context, 'Fat Profile'),
+          _buildSectionHeader(context, 'Lipid Profile'),
           _buildNutrientRow(context, 'Total Fat', totals['fat'], rdaTargets['fat'], 'g'),
           _buildNutrientRow(context, 'Saturated Fat', totals['saturatedFat'], rdaTargets['saturatedFat'], 'g', isLimit: true),
           _buildNutrientRow(context, 'Trans Fat', totals['transFat'], null, 'g', isLimit: true),
