@@ -11,25 +11,25 @@ part of 'env.dart';
 // generated_from: .env
 final class _Env {
   static const List<int> _enviedkeyfdcApiKey = <int>[
-    1435392959,
-    3153311819,
-    3848533808,
-    1797318854,
-    3302591279,
-    397604641,
-    2630377488,
-    2400717345,
+    81647908,
+    37200340,
+    438016531,
+    2281722585,
+    2798633284,
+    1287742176,
+    107069905,
+    945393800,
   ];
 
   static const List<int> _envieddatafdcApiKey = <int>[
-    1435392998,
-    3153311748,
-    3848533861,
-    1797318804,
-    3302591344,
-    397604714,
-    2630377557,
-    2400717432,
+    81647997,
+    37200283,
+    438016582,
+    2281722507,
+    2798633243,
+    1287742123,
+    107069844,
+    945393873,
   ];
 
   static final String fdcApiKey = String.fromCharCodes(List<int>.generate(
@@ -39,23 +39,23 @@ final class _Env {
   ).map((int i) => _envieddatafdcApiKey[i] ^ _enviedkeyfdcApiKey[i]));
 
   static const List<int> _enviedkeysentryDns = <int>[
-    2079775551,
-    2721570565,
-    2003002695,
-    409563868,
-    2489680223,
-    3305109345,
-    1954819836,
+    1990637242,
+    2315032099,
+    3763545528,
+    1717135917,
+    1503522561,
+    2176181079,
+    2550457538,
   ];
 
   static const List<int> _envieddatasentryDns = <int>[
-    2079775611,
-    2721570635,
-    2003002644,
-    409563779,
-    2489680138,
-    3305109299,
-    1954819760,
+    1990637310,
+    2315032173,
+    3763545579,
+    1717135986,
+    1503522644,
+    2176180997,
+    2550457486,
   ];
 
   static final String sentryDns = String.fromCharCodes(List<int>.generate(
@@ -65,31 +65,31 @@ final class _Env {
   ).map((int i) => _envieddatasentryDns[i] ^ _enviedkeysentryDns[i]));
 
   static const List<int> _enviedkeysupabaseProjectUrl = <int>[
-    242895924,
-    4262688904,
-    3473967018,
-    1122785203,
-    3433462148,
-    523307604,
-    2215673935,
-    3338104538,
-    2052225889,
-    336022369,
-    2919829443,
+    3825977195,
+    2937684663,
+    2209334631,
+    249442132,
+    2089826450,
+    3238587527,
+    2610162604,
+    158691055,
+    2829054263,
+    2507664094,
+    1360204335,
   ];
 
   static const List<int> _envieddatasupabaseProjectUrl = <int>[
-    242895972,
-    4262688986,
-    3473967077,
-    1122785273,
-    3433462209,
-    523307543,
-    2215673883,
-    3338104453,
-    2052225844,
-    336022323,
-    2919829391,
+    3825977147,
+    2937684709,
+    2209334568,
+    249442078,
+    2089826519,
+    3238587588,
+    2610162680,
+    158690992,
+    2829054306,
+    2507664012,
+    1360204387,
   ];
 
   static final String supabaseProjectUrl = String.fromCharCodes(
@@ -101,25 +101,25 @@ final class _Env {
           _envieddatasupabaseProjectUrl[i] ^ _enviedkeysupabaseProjectUrl[i]));
 
   static const List<int> _enviedkeysupabaseProjectAnonKey = <int>[
-    185656447,
-    2235068077,
-    3062247044,
-    616006227,
-    1985165508,
-    1059860885,
-    4070880076,
-    34856670,
+    682165654,
+    2711833779,
+    2692732861,
+    613957857,
+    3629675573,
+    1139281120,
+    1240850505,
+    495308724,
   ];
 
   static const List<int> _envieddatasupabaseProjectAnonKey = <int>[
-    185656382,
-    2235068131,
-    3062247115,
-    616006173,
-    1985165467,
-    1059860958,
-    4070880009,
-    34856583,
+    682165719,
+    2711833853,
+    2692732914,
+    613957807,
+    3629675626,
+    1139281067,
+    1240850444,
+    495308781,
   ];
 
   static final String supabaseProjectAnonKey = String.fromCharCodes(
