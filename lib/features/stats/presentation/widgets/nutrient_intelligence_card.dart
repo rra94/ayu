@@ -151,11 +151,12 @@ class _NutrientIntelligenceCardState extends State<NutrientIntelligenceCard> {
           Row(
             children: [
               SizedBox(
-                width: 80,
+                width: 70,
                 child: Text(a.nutrient,
                     style: theme.textTheme.bodySmall
-                        ?.copyWith(fontWeight: FontWeight.w500)),
+                        ?.copyWith(fontWeight: FontWeight.w500, fontSize: 11)),
               ),
+              const SizedBox(width: 4),
               Expanded(
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(4),
@@ -167,9 +168,9 @@ class _NutrientIntelligenceCardState extends State<NutrientIntelligenceCard> {
                   ),
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 6),
               Text(
-                '${a.absorbedMg.toStringAsFixed(1)}/${a.consumedMg.toStringAsFixed(1)} (${a.absorptionPct.round()}%)',
+                '${a.absorptionPct.round()}%',
                 style: theme.textTheme.labelSmall?.copyWith(
                   fontWeight: FontWeight.w600,
                   color: color,
@@ -177,9 +178,17 @@ class _NutrientIntelligenceCardState extends State<NutrientIntelligenceCard> {
               ),
             ],
           ),
+          Padding(
+            padding: const EdgeInsets.only(left: 74),
+            child: Text(
+              '${a.absorbedMg.toStringAsFixed(1)} of ${a.consumedMg.toStringAsFixed(1)} absorbed',
+              style: theme.textTheme.labelSmall?.copyWith(fontSize: 9,
+                  color: theme.colorScheme.onSurfaceVariant),
+            ),
+          ),
           if (a.tip != null)
             Padding(
-              padding: const EdgeInsets.only(left: 80, top: 2),
+              padding: const EdgeInsets.only(left: 74, top: 2),
               child: Text(
                 a.tip!,
                 style: theme.textTheme.labelSmall?.copyWith(
@@ -191,7 +200,7 @@ class _NutrientIntelligenceCardState extends State<NutrientIntelligenceCard> {
             ),
           if (a.enhancers.isNotEmpty || a.inhibitors.isNotEmpty)
             Padding(
-              padding: const EdgeInsets.only(left: 80, top: 1),
+              padding: const EdgeInsets.only(left: 74, top: 1),
               child: Wrap(
                 spacing: 4,
                 children: [
@@ -219,10 +228,12 @@ class _NutrientIntelligenceCardState extends State<NutrientIntelligenceCard> {
             children: [
               Icon(Icons.warning_amber, size: 14, color: Colors.orange),
               const SizedBox(width: 4),
-              Text(
-                '${gap.nutrient}: ${gap.consumed.toStringAsFixed(0)}/${gap.rda.toStringAsFixed(0)}${gap.unit} (${gap.pctRda.round()}%)',
-                style: theme.textTheme.bodySmall
-                    ?.copyWith(fontWeight: FontWeight.w600),
+              Expanded(
+                child: Text(
+                  '${gap.nutrient}: ${gap.consumed.toStringAsFixed(0)}/${gap.rda.toStringAsFixed(0)}${gap.unit} (${gap.pctRda.round()}%)',
+                  style: theme.textTheme.bodySmall
+                      ?.copyWith(fontWeight: FontWeight.w600),
+                ),
               ),
             ],
           ),
@@ -231,11 +242,14 @@ class _NutrientIntelligenceCardState extends State<NutrientIntelligenceCard> {
                 padding: const EdgeInsets.only(left: 20, top: 1),
                 child: Row(
                   children: [
-                    Text('${s.food} (${s.amount})',
-                        style: theme.textTheme.labelSmall),
-                    const Spacer(),
+                    Expanded(
+                      child: Text('${s.food} (${s.amount})',
+                          style: theme.textTheme.labelSmall,
+                          overflow: TextOverflow.ellipsis),
+                    ),
+                    const SizedBox(width: 4),
                     Text(
-                      '${s.nutrientMg.toStringAsFixed(0)}${gap.unit} → ${s.bioavailableMg.toStringAsFixed(1)} absorbed',
+                      '${s.bioavailableMg.toStringAsFixed(1)} absorbed',
                       style: theme.textTheme.labelSmall?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                         fontSize: 9,
