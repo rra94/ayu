@@ -1,9 +1,13 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:logging/logging.dart';
+import 'package:opennutritracker/core/db/data_sources/fasting_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/sleep_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/supplement_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/water_data_source.dart';
+import 'package:opennutritracker/core/db/entities/fasting_session_ob.dart';
 import 'package:opennutritracker/core/domain/usecase/get_intake_usecase.dart';
+import 'package:opennutritracker/core/services/daily_summary_service.dart';
+import 'package:opennutritracker/core/services/longevity_score_service.dart';
 import 'package:opennutritracker/core/utils/locator.dart';
 import 'package:timezone/timezone.dart' as tz;
 
@@ -25,6 +29,14 @@ class SmartNotificationService {
   static Future<void> checkAndNotify() async {
     final now = DateTime.now();
     final hour = now.hour;
+
+    // Auto-start fast if last meal was 2+ hours ago (runs anytime)
+    await _autoStartFast();
+
+    // Daily summary at 9 PM+
+    if (hour >= 21) {
+      await sendDailySummaryIfNeeded();
+    }
 
     // Don't notify before 8 AM or after 10 PM
     if (hour < 8 || hour > 22) return;
@@ -129,6 +141,7 @@ class SmartNotificationService {
     await scheduleEveningCheckIn();
     await scheduleLunchReminder();
     await scheduleSupplementReminder();
+    await scheduleDailySummary();
     _log.info('All smart notifications scheduled');
   }
 
@@ -238,6 +251,116 @@ class SmartNotificationService {
       body: body,
       notificationDetails: const NotificationDetails(iOS: iosDetails),
     );
+  }
+
+  // ── Auto-start fast ──
+
+  /// If last meal was 2+ hours ago and no active fast, silently start 16:8.
+  static Future<void> _autoStartFast() async {
+    try {
+      final fastingDs = locator<FastingDataSource>();
+
+      // Skip if already fasting
+      final active = await fastingDs.getActiveSession();
+      if (active != null) return;
+
+      // Find last meal time today
+      final getIntake = locator<GetIntakeUsecase>();
+      final now = DateTime.now();
+      final allToday = [
+        ...await getIntake.getBreakfastIntakeByDay(now),
+        ...await getIntake.getLunchIntakeByDay(now),
+        ...await getIntake.getDinnerIntakeByDay(now),
+        ...await getIntake.getSnackIntakeByDay(now),
+      ];
+
+      if (allToday.isEmpty) return;
+
+      // Find latest meal time
+      final lastMealTime = allToday
+          .map((i) => i.dateTime)
+          .reduce((a, b) => a.isAfter(b) ? a : b);
+
+      final hoursSinceLastMeal =
+          now.difference(lastMealTime).inMinutes / 60.0;
+
+      // Auto-start if 2+ hours since last meal and it's after 7 PM
+      if (hoursSinceLastMeal >= 2.0 && now.hour >= 19) {
+        await fastingDs.saveSession(FastingSessionOB(
+          startTime: lastMealTime, // fast started when eating stopped
+          targetHours: 16,
+          type: 0, // 16:8
+        ));
+        _log.info('Auto-started 16:8 fast (last meal ${hoursSinceLastMeal.toStringAsFixed(1)}h ago)');
+      }
+    } catch (e) {
+      _log.fine('Auto-fast check failed: $e');
+    }
+  }
+
+  // ── Daily summary notification ──
+
+  static const _dailySummaryId = 90010;
+
+  /// Send a daily summary notification at 9 PM with today's score.
+  /// Call from scheduleAll() as a daily scheduled notification,
+  /// or call directly when app is foregrounded after 9 PM.
+  static Future<void> sendDailySummaryIfNeeded() async {
+    final now = DateTime.now();
+    if (now.hour < 21) return; // Only after 9 PM
+
+    try {
+      final service = locator<DailySummaryService>();
+      final summary = await service.buildSummary(now);
+      final score = LongevityScoreService.compute(summary);
+
+      final parts = <String>[];
+      if (summary.totalCalories != null) {
+        parts.add('${summary.totalCalories!.round()} kcal');
+      }
+      if (summary.waterMl != null) {
+        parts.add('${(summary.waterMl! / 1000).toStringAsFixed(1)}L water');
+      }
+      if (summary.sleepDurationHours != null) {
+        parts.add('${summary.sleepDurationHours!.toStringAsFixed(1)}h sleep');
+      }
+      parts.add('Score: ${score.grade}');
+
+      await _sendNotification(
+        id: _dailySummaryId,
+        title: 'Daily Summary',
+        body: parts.join(' · '),
+      );
+    } catch (e) {
+      _log.fine('Daily summary notification failed: $e');
+    }
+  }
+
+  /// Schedule the 9 PM daily summary as a recurring notification.
+  static Future<void> scheduleDailySummary() async {
+    final now = tz.TZDateTime.now(tz.local);
+    var scheduledDate = tz.TZDateTime(
+      tz.local, now.year, now.month, now.day, 21, 0,
+    );
+    if (scheduledDate.isBefore(now)) {
+      scheduledDate = scheduledDate.add(const Duration(days: 1));
+    }
+
+    const iosDetails = DarwinNotificationDetails(
+      presentAlert: true,
+      presentSound: true,
+    );
+
+    await _plugin.zonedSchedule(
+      id: _dailySummaryId,
+      title: 'Daily Summary',
+      body: 'Tap to see how your day went',
+      scheduledDate: scheduledDate,
+      notificationDetails: const NotificationDetails(iOS: iosDetails),
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+      matchDateTimeComponents: DateTimeComponents.time,
+    );
+    _log.info('Scheduled daily summary notification at 9 PM');
   }
 }
 
