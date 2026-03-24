@@ -43,6 +43,13 @@ class _HealthKitSyncCardState extends State<HealthKitSyncCard> {
     });
   }
 
+  Future<void> _reconnect() async {
+    // Re-request permissions to allow user to grant additional data types
+    final granted = await HealthKitService.requestPermissions();
+    setState(() => _hasPermission = granted);
+    if (granted) _sync();
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -68,11 +75,17 @@ class _HealthKitSyncCardState extends State<HealthKitSyncCard> {
                     height: 20,
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
-                else
+                else ...[
+                  if (_hasPermission)
+                    TextButton(
+                      onPressed: _reconnect,
+                      child: const Text('Reconnect'),
+                    ),
                   TextButton(
                     onPressed: _sync,
                     child: Text(_hasPermission ? 'Sync' : 'Connect'),
                   ),
+                ],
               ],
             ),
             if (_lastResult != null) ...[
