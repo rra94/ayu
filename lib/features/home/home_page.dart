@@ -28,6 +28,7 @@ import 'package:opennutritracker/features/stats/presentation/widgets/caffeine_ca
 import 'package:opennutritracker/features/stats/presentation/widgets/steps_card.dart';
 import 'package:opennutritracker/features/stats/presentation/widgets/inventory_card.dart';
 import 'package:opennutritracker/features/stats/presentation/widgets/grocery_card.dart';
+import 'package:opennutritracker/features/home/presentation/widgets/agent_suggestions_widget.dart';
 import 'package:opennutritracker/features/home/presentation/widgets/collapsible_section.dart';
 import 'package:opennutritracker/features/home/presentation/widgets/quick_action_bar.dart';
 import 'package:opennutritracker/features/home/presentation/widgets/today_view_card.dart';
@@ -163,6 +164,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           calorieGoal: totalKcalDaily,
         ),
         QuickActionBar(onActionComplete: () => setState(() {})),
+
+        // ── Agent suggestions (dismissible, non-invasive) ──
+        const AgentSuggestionsWidget(),
 
         // ── Tracking ──
         CollapsibleSection(
