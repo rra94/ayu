@@ -8,6 +8,7 @@ import 'package:opennutritracker/features/stats/presentation/widgets/food_feelin
 import 'package:opennutritracker/features/stats/presentation/widgets/glycemic_card.dart';
 import 'package:opennutritracker/features/stats/presentation/widgets/longevity_insights_card.dart';
 import 'package:opennutritracker/features/stats/presentation/widgets/meal_timing_card.dart';
+import 'package:opennutritracker/features/stats/presentation/widgets/nutrient_intelligence_card.dart';
 import 'package:opennutritracker/features/stats/presentation/widgets/streak_card.dart';
 import 'package:opennutritracker/features/stats/presentation/widgets/tdee_card.dart';
 import 'package:opennutritracker/features/stats/presentation/widgets/weekly_review_card.dart';
@@ -26,6 +27,7 @@ class StatsPage extends StatelessWidget {
         WeeklyReviewCard(),
         TdeeCard(),
         WeightChartCard(),
+        NutrientIntelligenceCard(),
         GlycemicCard(),
         MealTimingCard(),
         StreakCard(),
