@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:opennutritracker/core/db/data_sources/habit_data_source.dart';
 import 'package:opennutritracker/core/db/entities/habit_ob.dart';
 import 'package:opennutritracker/core/services/habit_notification_service.dart';
+import 'package:opennutritracker/core/utils/locator.dart';
 
 class HabitsChecklistWidget extends StatelessWidget {
   final List<HabitOB> habits;
@@ -65,9 +67,7 @@ class HabitsChecklistWidget extends StatelessWidget {
                 ),
                 const Spacer(),
                 TextButton(
-                  onPressed: () {
-                    // Placeholder for manage action
-                  },
+                  onPressed: () => _showManageDialog(context),
                   child: const Text('Manage'),
                 ),
               ],
@@ -156,6 +156,108 @@ class HabitsChecklistWidget extends StatelessWidget {
                   );
                 },
               ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showManageDialog(BuildContext context) {
+    final nameCtrl = TextEditingController();
+    String category = 'custom';
+    int frequency = 0;
+    final categories = ['skincare', 'dental', 'grooming', 'wellness', 'exercise', 'custom'];
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          title: const Text('Manage Habits'),
+          content: SizedBox(
+            width: double.maxFinite,
+            height: 400,
+            child: Column(
+              children: [
+                // Add new habit
+                TextField(
+                  controller: nameCtrl,
+                  decoration: const InputDecoration(
+                    labelText: 'New habit name',
+                    hintText: 'e.g. Journal, Read 30 min',
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: DropdownButton<String>(
+                        value: category,
+                        isExpanded: true,
+                        items: categories.map((c) =>
+                            DropdownMenuItem(value: c, child: Text(c))).toList(),
+                        onChanged: (v) => setDialogState(() => category = v ?? category),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    DropdownButton<int>(
+                      value: frequency,
+                      items: const [
+                        DropdownMenuItem(value: 0, child: Text('Daily')),
+                        DropdownMenuItem(value: 1, child: Text('Weekly')),
+                      ],
+                      onChanged: (v) => setDialogState(() => frequency = v ?? 0),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                FilledButton(
+                  onPressed: () async {
+                    if (nameCtrl.text.isNotEmpty) {
+                      final ds = locator<HabitDataSource>();
+                      await ds.addHabit(HabitOB(
+                        name: nameCtrl.text,
+                        category: category,
+                        frequency: frequency,
+                      ));
+                      nameCtrl.clear();
+                      setDialogState(() {});
+                    }
+                  },
+                  child: const Text('Add Habit'),
+                ),
+                const Divider(),
+                // Existing habits — tap to delete
+                Expanded(
+                  child: FutureBuilder<List<HabitOB>>(
+                    future: locator<HabitDataSource>().getAllActiveHabits(),
+                    builder: (ctx, snap) {
+                      if (!snap.hasData) return const SizedBox();
+                      return ListView(
+                        children: snap.data!.map((h) => ListTile(
+                          dense: true,
+                          title: Text(h.name, style: const TextStyle(fontSize: 13)),
+                          subtitle: Text('${h.category} · ${h.frequencyLabel}',
+                              style: const TextStyle(fontSize: 10)),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.delete_outline, size: 18),
+                            onPressed: () async {
+                              await locator<HabitDataSource>().deleteHabit(h.id);
+                              setDialogState(() {});
+                            },
+                          ),
+                        )).toList(),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: const Text('Done'),
             ),
           ],
         ),
