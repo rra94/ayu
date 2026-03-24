@@ -5,6 +5,7 @@ import 'package:opennutritracker/core/presentation/widgets/home_appbar.dart';
 import 'package:opennutritracker/features/home/home_page.dart';
 import 'package:opennutritracker/core/presentation/widgets/main_appbar.dart';
 import 'package:opennutritracker/features/profile/profile_page.dart';
+import 'package:opennutritracker/features/stats/stats_page.dart';
 import 'package:opennutritracker/generated/l10n.dart';
 
 class MainScreen extends StatefulWidget {
@@ -25,11 +26,13 @@ class _MainScreenState extends State<MainScreen> {
     _bodyPages = [
       const HomePage(),
       const DiaryPage(),
+      const StatsPage(),
       const ProfilePage(),
     ];
     _appbarPages = [
       const HomeAppbar(),
       MainAppbar(title: S.of(context).diaryLabel, iconData: Icons.book),
+      MainAppbar(title: 'Stats', iconData: Icons.bar_chart),
       MainAppbar(
           title: S.of(context).profileLabel, iconData: Icons.account_circle)
     ];
@@ -64,6 +67,11 @@ class _MainScreenState extends State<MainScreen> {
               label: S.of(context).diaryLabel),
           NavigationDestination(
               icon: _selectedPageIndex == 2
+                  ? const Icon(Icons.bar_chart)
+                  : const Icon(Icons.bar_chart_outlined),
+              label: 'Stats'),
+          NavigationDestination(
+              icon: _selectedPageIndex == 3
                   ? const Icon(Icons.account_circle)
                   : const Icon(Icons.account_circle_outlined),
               label: S.of(context).profileLabel)

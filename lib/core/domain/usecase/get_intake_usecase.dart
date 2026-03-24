@@ -36,6 +36,10 @@ class GetIntakeUsecase {
   Future<List<IntakeEntity>> getTodaySnackIntake() async =>
       await getSnackIntakeByDay(DateTime.now());
 
+  Future<List<IntakeEntity>> getAllIntakes() async {
+    return _intakeRepository.getAllIntakes();
+  }
+
   Future<List<IntakeEntity>> getRecentIntake() async {
     return _intakeRepository.getRecentIntake();
   }

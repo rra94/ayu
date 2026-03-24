@@ -14,16 +14,21 @@ import 'package:objectbox/internal.dart'
 import 'package:objectbox/objectbox.dart' as obx;
 import 'package:objectbox_flutter_libs/objectbox_flutter_libs.dart';
 
+import 'core/db/entities/biomarker_record_ob.dart';
 import 'core/db/entities/config_ob.dart';
+import 'core/db/entities/dexa_scan_ob.dart';
 import 'core/db/entities/gut_health_item_ob.dart';
 import 'core/db/entities/habit_log_ob.dart';
 import 'core/db/entities/habit_ob.dart';
 import 'core/db/entities/intake_ob.dart';
 import 'core/db/entities/physical_activity_ob.dart';
+import 'core/db/entities/stool_log_ob.dart';
+import 'core/db/entities/symptom_log_ob.dart';
 import 'core/db/entities/tracked_day_ob.dart';
 import 'core/db/entities/user_activity_ob.dart';
 import 'core/db/entities/user_ob.dart';
 import 'core/db/entities/water_record_ob.dart';
+import 'core/db/entities/weight_record_ob.dart';
 
 export 'package:objectbox/objectbox.dart'; // so that callers only have to import this file
 
@@ -31,7 +36,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(1, 6477492202799954719),
     name: 'ConfigOB',
-    lastPropertyId: const obx_int.IdUid(11, 1547450199447428793),
+    lastPropertyId: const obx_int.IdUid(12, 1159123641096979405),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -98,6 +103,12 @@ final _entities = <obx_int.ModelEntity>[
         id: const obx_int.IdUid(11, 1547450199447428793),
         name: 'hiveMigrationComplete',
         type: 1,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(12, 1159123641096979405),
+        name: 'targetWeightKG',
+        type: 8,
         flags: 0,
       ),
     ],
@@ -820,6 +831,212 @@ final _entities = <obx_int.ModelEntity>[
     relations: <obx_int.ModelRelation>[],
     backlinks: <obx_int.ModelBacklink>[],
   ),
+  obx_int.ModelEntity(
+    id: const obx_int.IdUid(11, 5538860049560825163),
+    name: 'WeightRecordOB',
+    lastPropertyId: const obx_int.IdUid(3, 896787463902377656),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(1, 4429405453386792156),
+        name: 'id',
+        type: 6,
+        flags: 1,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(2, 6705470113916040982),
+        name: 'weightKG',
+        type: 8,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 896787463902377656),
+        name: 'dateTime',
+        type: 10,
+        flags: 0,
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[],
+    backlinks: <obx_int.ModelBacklink>[],
+  ),
+  obx_int.ModelEntity(
+    id: const obx_int.IdUid(12, 4420710930980106944),
+    name: 'StoolLogOB',
+    lastPropertyId: const obx_int.IdUid(4, 1183281187575080314),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(1, 8278386601570190806),
+        name: 'id',
+        type: 6,
+        flags: 1,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(2, 1440122297551028151),
+        name: 'type',
+        type: 6,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 6471414013196193241),
+        name: 'dateTime',
+        type: 10,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(4, 1183281187575080314),
+        name: 'notes',
+        type: 9,
+        flags: 0,
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[],
+    backlinks: <obx_int.ModelBacklink>[],
+  ),
+  obx_int.ModelEntity(
+    id: const obx_int.IdUid(13, 982607073446383719),
+    name: 'SymptomLogOB',
+    lastPropertyId: const obx_int.IdUid(5, 9008183605618040204),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(1, 3152687350290846821),
+        name: 'id',
+        type: 6,
+        flags: 1,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(2, 7228128909076205063),
+        name: 'symptom',
+        type: 6,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 4378226166795625323),
+        name: 'severity',
+        type: 6,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(4, 821579706350880651),
+        name: 'dateTime',
+        type: 10,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(5, 9008183605618040204),
+        name: 'notes',
+        type: 9,
+        flags: 0,
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[],
+    backlinks: <obx_int.ModelBacklink>[],
+  ),
+  obx_int.ModelEntity(
+    id: const obx_int.IdUid(14, 1034035110825751383),
+    name: 'BiomarkerRecordOB',
+    lastPropertyId: const obx_int.IdUid(6, 4387178617261170057),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(1, 6763726702024422674),
+        name: 'id',
+        type: 6,
+        flags: 1,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(2, 2493638220060392753),
+        name: 'type',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 1535579681657601768),
+        name: 'value',
+        type: 8,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(4, 6100382431439389365),
+        name: 'unit',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(5, 8837958407090471998),
+        name: 'dateTime',
+        type: 10,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(6, 4387178617261170057),
+        name: 'source',
+        type: 6,
+        flags: 0,
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[],
+    backlinks: <obx_int.ModelBacklink>[],
+  ),
+  obx_int.ModelEntity(
+    id: const obx_int.IdUid(15, 1781774396636105369),
+    name: 'DexaScanOB',
+    lastPropertyId: const obx_int.IdUid(8, 1182332487767697968),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(1, 3033203686372988373),
+        name: 'id',
+        type: 6,
+        flags: 1,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(2, 3980876848470724272),
+        name: 'scanDate',
+        type: 10,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 896041955866674216),
+        name: 'totalBodyFatPercent',
+        type: 8,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(4, 8090251611330965577),
+        name: 'leanMassKG',
+        type: 8,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(5, 1115534957770209102),
+        name: 'fatMassKG',
+        type: 8,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(6, 884374273444776209),
+        name: 'boneMineralDensity',
+        type: 8,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(7, 2121348649363414868),
+        name: 'visceralFatArea',
+        type: 8,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(8, 1182332487767697968),
+        name: 'tScore',
+        type: 8,
+        flags: 0,
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[],
+    backlinks: <obx_int.ModelBacklink>[],
+  ),
 ];
 
 /// Shortcut for [obx.Store.new] that passes [getObjectBoxModel] and for Flutter
@@ -860,7 +1077,7 @@ Future<obx.Store> openStore({
 obx_int.ModelDefinition getObjectBoxModel() {
   final model = obx_int.ModelInfo(
     entities: _entities,
-    lastEntityId: const obx_int.IdUid(10, 789815896546770560),
+    lastEntityId: const obx_int.IdUid(15, 1781774396636105369),
     lastIndexId: const obx_int.IdUid(2, 7319863865959781371),
     lastRelationId: const obx_int.IdUid(0, 0),
     lastSequenceId: const obx_int.IdUid(0, 0),
@@ -883,7 +1100,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
         object.id = id;
       },
       objectToFB: (ConfigOB object, fb.Builder fbb) {
-        fbb.startTable(12);
+        fbb.startTable(13);
         fbb.addInt64(0, object.id);
         fbb.addBool(1, object.hasAcceptedDisclaimer);
         fbb.addBool(2, object.hasAcceptedPolicy);
@@ -895,6 +1112,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
         fbb.addFloat64(8, object.userProteinGoalPct);
         fbb.addFloat64(9, object.userFatGoalPct);
         fbb.addBool(10, object.hiveMigrationComplete);
+        fbb.addFloat64(11, object.targetWeightKG);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -952,6 +1170,11 @@ obx_int.ModelDefinition getObjectBoxModel() {
           24,
           false,
         );
+        final targetWeightKGParam = const fb.Float64Reader().vTableGetNullable(
+          buffer,
+          rootOffset,
+          26,
+        );
         final object = ConfigOB(
           id: idParam,
           hasAcceptedDisclaimer: hasAcceptedDisclaimerParam,
@@ -964,6 +1187,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           userProteinGoalPct: userProteinGoalPctParam,
           userFatGoalPct: userFatGoalPctParam,
           hiveMigrationComplete: hiveMigrationCompleteParam,
+          targetWeightKG: targetWeightKGParam,
         );
 
         return object;
@@ -1915,6 +2139,293 @@ obx_int.ModelDefinition getObjectBoxModel() {
         return object;
       },
     ),
+    WeightRecordOB: obx_int.EntityDefinition<WeightRecordOB>(
+      model: _entities[10],
+      toOneRelations: (WeightRecordOB object) => [],
+      toManyRelations: (WeightRecordOB object) => {},
+      getId: (WeightRecordOB object) => object.id,
+      setId: (WeightRecordOB object, int id) {
+        object.id = id;
+      },
+      objectToFB: (WeightRecordOB object, fb.Builder fbb) {
+        fbb.startTable(4);
+        fbb.addInt64(0, object.id);
+        fbb.addFloat64(1, object.weightKG);
+        fbb.addInt64(2, object.dateTime.millisecondsSinceEpoch);
+        fbb.finish(fbb.endTable());
+        return object.id;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
+        final idParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          4,
+          0,
+        );
+        final weightKGParam = const fb.Float64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          6,
+          0,
+        );
+        final dateTimeParam = DateTime.fromMillisecondsSinceEpoch(
+          const fb.Int64Reader().vTableGet(buffer, rootOffset, 8, 0),
+        );
+        final object = WeightRecordOB(
+          id: idParam,
+          weightKG: weightKGParam,
+          dateTime: dateTimeParam,
+        );
+
+        return object;
+      },
+    ),
+    StoolLogOB: obx_int.EntityDefinition<StoolLogOB>(
+      model: _entities[11],
+      toOneRelations: (StoolLogOB object) => [],
+      toManyRelations: (StoolLogOB object) => {},
+      getId: (StoolLogOB object) => object.id,
+      setId: (StoolLogOB object, int id) {
+        object.id = id;
+      },
+      objectToFB: (StoolLogOB object, fb.Builder fbb) {
+        final notesOffset = object.notes == null
+            ? null
+            : fbb.writeString(object.notes!);
+        fbb.startTable(5);
+        fbb.addInt64(0, object.id);
+        fbb.addInt64(1, object.type);
+        fbb.addInt64(2, object.dateTime.millisecondsSinceEpoch);
+        fbb.addOffset(3, notesOffset);
+        fbb.finish(fbb.endTable());
+        return object.id;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
+        final idParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          4,
+          0,
+        );
+        final typeParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          6,
+          0,
+        );
+        final dateTimeParam = DateTime.fromMillisecondsSinceEpoch(
+          const fb.Int64Reader().vTableGet(buffer, rootOffset, 8, 0),
+        );
+        final notesParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 10);
+        final object = StoolLogOB(
+          id: idParam,
+          type: typeParam,
+          dateTime: dateTimeParam,
+          notes: notesParam,
+        );
+
+        return object;
+      },
+    ),
+    SymptomLogOB: obx_int.EntityDefinition<SymptomLogOB>(
+      model: _entities[12],
+      toOneRelations: (SymptomLogOB object) => [],
+      toManyRelations: (SymptomLogOB object) => {},
+      getId: (SymptomLogOB object) => object.id,
+      setId: (SymptomLogOB object, int id) {
+        object.id = id;
+      },
+      objectToFB: (SymptomLogOB object, fb.Builder fbb) {
+        final notesOffset = object.notes == null
+            ? null
+            : fbb.writeString(object.notes!);
+        fbb.startTable(6);
+        fbb.addInt64(0, object.id);
+        fbb.addInt64(1, object.symptom);
+        fbb.addInt64(2, object.severity);
+        fbb.addInt64(3, object.dateTime.millisecondsSinceEpoch);
+        fbb.addOffset(4, notesOffset);
+        fbb.finish(fbb.endTable());
+        return object.id;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
+        final idParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          4,
+          0,
+        );
+        final symptomParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          6,
+          0,
+        );
+        final severityParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          8,
+          0,
+        );
+        final dateTimeParam = DateTime.fromMillisecondsSinceEpoch(
+          const fb.Int64Reader().vTableGet(buffer, rootOffset, 10, 0),
+        );
+        final notesParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 12);
+        final object = SymptomLogOB(
+          id: idParam,
+          symptom: symptomParam,
+          severity: severityParam,
+          dateTime: dateTimeParam,
+          notes: notesParam,
+        );
+
+        return object;
+      },
+    ),
+    BiomarkerRecordOB: obx_int.EntityDefinition<BiomarkerRecordOB>(
+      model: _entities[13],
+      toOneRelations: (BiomarkerRecordOB object) => [],
+      toManyRelations: (BiomarkerRecordOB object) => {},
+      getId: (BiomarkerRecordOB object) => object.id,
+      setId: (BiomarkerRecordOB object, int id) {
+        object.id = id;
+      },
+      objectToFB: (BiomarkerRecordOB object, fb.Builder fbb) {
+        final typeOffset = fbb.writeString(object.type);
+        final unitOffset = fbb.writeString(object.unit);
+        fbb.startTable(7);
+        fbb.addInt64(0, object.id);
+        fbb.addOffset(1, typeOffset);
+        fbb.addFloat64(2, object.value);
+        fbb.addOffset(3, unitOffset);
+        fbb.addInt64(4, object.dateTime.millisecondsSinceEpoch);
+        fbb.addInt64(5, object.source);
+        fbb.finish(fbb.endTable());
+        return object.id;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
+        final idParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          4,
+          0,
+        );
+        final typeParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 6, '');
+        final valueParam = const fb.Float64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          8,
+          0,
+        );
+        final unitParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 10, '');
+        final dateTimeParam = DateTime.fromMillisecondsSinceEpoch(
+          const fb.Int64Reader().vTableGet(buffer, rootOffset, 12, 0),
+        );
+        final sourceParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          14,
+          0,
+        );
+        final object = BiomarkerRecordOB(
+          id: idParam,
+          type: typeParam,
+          value: valueParam,
+          unit: unitParam,
+          dateTime: dateTimeParam,
+          source: sourceParam,
+        );
+
+        return object;
+      },
+    ),
+    DexaScanOB: obx_int.EntityDefinition<DexaScanOB>(
+      model: _entities[14],
+      toOneRelations: (DexaScanOB object) => [],
+      toManyRelations: (DexaScanOB object) => {},
+      getId: (DexaScanOB object) => object.id,
+      setId: (DexaScanOB object, int id) {
+        object.id = id;
+      },
+      objectToFB: (DexaScanOB object, fb.Builder fbb) {
+        fbb.startTable(9);
+        fbb.addInt64(0, object.id);
+        fbb.addInt64(1, object.scanDate.millisecondsSinceEpoch);
+        fbb.addFloat64(2, object.totalBodyFatPercent);
+        fbb.addFloat64(3, object.leanMassKG);
+        fbb.addFloat64(4, object.fatMassKG);
+        fbb.addFloat64(5, object.boneMineralDensity);
+        fbb.addFloat64(6, object.visceralFatArea);
+        fbb.addFloat64(7, object.tScore);
+        fbb.finish(fbb.endTable());
+        return object.id;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
+        final idParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          4,
+          0,
+        );
+        final scanDateParam = DateTime.fromMillisecondsSinceEpoch(
+          const fb.Int64Reader().vTableGet(buffer, rootOffset, 6, 0),
+        );
+        final totalBodyFatPercentParam = const fb.Float64Reader()
+            .vTableGetNullable(buffer, rootOffset, 8);
+        final leanMassKGParam = const fb.Float64Reader().vTableGetNullable(
+          buffer,
+          rootOffset,
+          10,
+        );
+        final fatMassKGParam = const fb.Float64Reader().vTableGetNullable(
+          buffer,
+          rootOffset,
+          12,
+        );
+        final boneMineralDensityParam = const fb.Float64Reader()
+            .vTableGetNullable(buffer, rootOffset, 14);
+        final visceralFatAreaParam = const fb.Float64Reader().vTableGetNullable(
+          buffer,
+          rootOffset,
+          16,
+        );
+        final tScoreParam = const fb.Float64Reader().vTableGetNullable(
+          buffer,
+          rootOffset,
+          18,
+        );
+        final object = DexaScanOB(
+          id: idParam,
+          scanDate: scanDateParam,
+          totalBodyFatPercent: totalBodyFatPercentParam,
+          leanMassKG: leanMassKGParam,
+          fatMassKG: fatMassKGParam,
+          boneMineralDensity: boneMineralDensityParam,
+          visceralFatArea: visceralFatAreaParam,
+          tScore: tScoreParam,
+        );
+
+        return object;
+      },
+    ),
   };
 
   return obx_int.ModelDefinition(model, bindings);
@@ -1974,6 +2485,11 @@ class ConfigOB_ {
   /// See [ConfigOB.hiveMigrationComplete].
   static final hiveMigrationComplete = obx.QueryBooleanProperty<ConfigOB>(
     _entities[0].properties[10],
+  );
+
+  /// See [ConfigOB.targetWeightKG].
+  static final targetWeightKG = obx.QueryDoubleProperty<ConfigOB>(
+    _entities[0].properties[11],
   );
 }
 
@@ -2521,5 +3037,150 @@ class WaterRecordOB_ {
   /// See [WaterRecordOB.dateTime].
   static final dateTime = obx.QueryDateProperty<WaterRecordOB>(
     _entities[9].properties[2],
+  );
+}
+
+/// [WeightRecordOB] entity fields to define ObjectBox queries.
+class WeightRecordOB_ {
+  /// See [WeightRecordOB.id].
+  static final id = obx.QueryIntegerProperty<WeightRecordOB>(
+    _entities[10].properties[0],
+  );
+
+  /// See [WeightRecordOB.weightKG].
+  static final weightKG = obx.QueryDoubleProperty<WeightRecordOB>(
+    _entities[10].properties[1],
+  );
+
+  /// See [WeightRecordOB.dateTime].
+  static final dateTime = obx.QueryDateProperty<WeightRecordOB>(
+    _entities[10].properties[2],
+  );
+}
+
+/// [StoolLogOB] entity fields to define ObjectBox queries.
+class StoolLogOB_ {
+  /// See [StoolLogOB.id].
+  static final id = obx.QueryIntegerProperty<StoolLogOB>(
+    _entities[11].properties[0],
+  );
+
+  /// See [StoolLogOB.type].
+  static final type = obx.QueryIntegerProperty<StoolLogOB>(
+    _entities[11].properties[1],
+  );
+
+  /// See [StoolLogOB.dateTime].
+  static final dateTime = obx.QueryDateProperty<StoolLogOB>(
+    _entities[11].properties[2],
+  );
+
+  /// See [StoolLogOB.notes].
+  static final notes = obx.QueryStringProperty<StoolLogOB>(
+    _entities[11].properties[3],
+  );
+}
+
+/// [SymptomLogOB] entity fields to define ObjectBox queries.
+class SymptomLogOB_ {
+  /// See [SymptomLogOB.id].
+  static final id = obx.QueryIntegerProperty<SymptomLogOB>(
+    _entities[12].properties[0],
+  );
+
+  /// See [SymptomLogOB.symptom].
+  static final symptom = obx.QueryIntegerProperty<SymptomLogOB>(
+    _entities[12].properties[1],
+  );
+
+  /// See [SymptomLogOB.severity].
+  static final severity = obx.QueryIntegerProperty<SymptomLogOB>(
+    _entities[12].properties[2],
+  );
+
+  /// See [SymptomLogOB.dateTime].
+  static final dateTime = obx.QueryDateProperty<SymptomLogOB>(
+    _entities[12].properties[3],
+  );
+
+  /// See [SymptomLogOB.notes].
+  static final notes = obx.QueryStringProperty<SymptomLogOB>(
+    _entities[12].properties[4],
+  );
+}
+
+/// [BiomarkerRecordOB] entity fields to define ObjectBox queries.
+class BiomarkerRecordOB_ {
+  /// See [BiomarkerRecordOB.id].
+  static final id = obx.QueryIntegerProperty<BiomarkerRecordOB>(
+    _entities[13].properties[0],
+  );
+
+  /// See [BiomarkerRecordOB.type].
+  static final type = obx.QueryStringProperty<BiomarkerRecordOB>(
+    _entities[13].properties[1],
+  );
+
+  /// See [BiomarkerRecordOB.value].
+  static final value = obx.QueryDoubleProperty<BiomarkerRecordOB>(
+    _entities[13].properties[2],
+  );
+
+  /// See [BiomarkerRecordOB.unit].
+  static final unit = obx.QueryStringProperty<BiomarkerRecordOB>(
+    _entities[13].properties[3],
+  );
+
+  /// See [BiomarkerRecordOB.dateTime].
+  static final dateTime = obx.QueryDateProperty<BiomarkerRecordOB>(
+    _entities[13].properties[4],
+  );
+
+  /// See [BiomarkerRecordOB.source].
+  static final source = obx.QueryIntegerProperty<BiomarkerRecordOB>(
+    _entities[13].properties[5],
+  );
+}
+
+/// [DexaScanOB] entity fields to define ObjectBox queries.
+class DexaScanOB_ {
+  /// See [DexaScanOB.id].
+  static final id = obx.QueryIntegerProperty<DexaScanOB>(
+    _entities[14].properties[0],
+  );
+
+  /// See [DexaScanOB.scanDate].
+  static final scanDate = obx.QueryDateProperty<DexaScanOB>(
+    _entities[14].properties[1],
+  );
+
+  /// See [DexaScanOB.totalBodyFatPercent].
+  static final totalBodyFatPercent = obx.QueryDoubleProperty<DexaScanOB>(
+    _entities[14].properties[2],
+  );
+
+  /// See [DexaScanOB.leanMassKG].
+  static final leanMassKG = obx.QueryDoubleProperty<DexaScanOB>(
+    _entities[14].properties[3],
+  );
+
+  /// See [DexaScanOB.fatMassKG].
+  static final fatMassKG = obx.QueryDoubleProperty<DexaScanOB>(
+    _entities[14].properties[4],
+  );
+
+  /// See [DexaScanOB.boneMineralDensity].
+  static final boneMineralDensity = obx.QueryDoubleProperty<DexaScanOB>(
+    _entities[14].properties[5],
+  );
+
+  /// See [DexaScanOB.visceralFatArea].
+  static final visceralFatArea = obx.QueryDoubleProperty<DexaScanOB>(
+    _entities[14].properties[6],
+  );
+
+  /// See [DexaScanOB.tScore].
+  static final tScore = obx.QueryDoubleProperty<DexaScanOB>(
+    _entities[14].properties[7],
   );
 }

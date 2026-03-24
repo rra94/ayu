@@ -21,6 +21,8 @@ class ConfigOB {
   /// Flag indicating whether data has been migrated from Hive to ObjectBox.
   bool hiveMigrationComplete;
 
+  double? targetWeightKG;
+
   ConfigOB({
     this.id = 0,
     this.hasAcceptedDisclaimer = false,
@@ -33,5 +35,6 @@ class ConfigOB {
     this.userProteinGoalPct,
     this.userFatGoalPct,
     this.hiveMigrationComplete = false,
+    this.targetWeightKG,
   });
 }

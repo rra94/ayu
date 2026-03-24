@@ -5,7 +5,7 @@
   "entities": [
     {
       "id": "1:6477492202799954719",
-      "lastPropertyId": "11:1547450199447428793",
+      "lastPropertyId": "12:1159123641096979405",
       "name": "ConfigOB",
       "properties": [
         {
@@ -63,6 +63,11 @@
           "id": "11:1547450199447428793",
           "name": "hiveMigrationComplete",
           "type": 1
+        },
+        {
+          "id": "12:1159123641096979405",
+          "name": "targetWeightKG",
+          "type": 8
         }
       ],
       "relations": []
@@ -671,9 +676,184 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "11:5538860049560825163",
+      "lastPropertyId": "3:896787463902377656",
+      "name": "WeightRecordOB",
+      "properties": [
+        {
+          "id": "1:4429405453386792156",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:6705470113916040982",
+          "name": "weightKG",
+          "type": 8
+        },
+        {
+          "id": "3:896787463902377656",
+          "name": "dateTime",
+          "type": 10
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "12:4420710930980106944",
+      "lastPropertyId": "4:1183281187575080314",
+      "name": "StoolLogOB",
+      "properties": [
+        {
+          "id": "1:8278386601570190806",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:1440122297551028151",
+          "name": "type",
+          "type": 6
+        },
+        {
+          "id": "3:6471414013196193241",
+          "name": "dateTime",
+          "type": 10
+        },
+        {
+          "id": "4:1183281187575080314",
+          "name": "notes",
+          "type": 9
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "13:982607073446383719",
+      "lastPropertyId": "5:9008183605618040204",
+      "name": "SymptomLogOB",
+      "properties": [
+        {
+          "id": "1:3152687350290846821",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:7228128909076205063",
+          "name": "symptom",
+          "type": 6
+        },
+        {
+          "id": "3:4378226166795625323",
+          "name": "severity",
+          "type": 6
+        },
+        {
+          "id": "4:821579706350880651",
+          "name": "dateTime",
+          "type": 10
+        },
+        {
+          "id": "5:9008183605618040204",
+          "name": "notes",
+          "type": 9
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "14:1034035110825751383",
+      "lastPropertyId": "6:4387178617261170057",
+      "name": "BiomarkerRecordOB",
+      "properties": [
+        {
+          "id": "1:6763726702024422674",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:2493638220060392753",
+          "name": "type",
+          "type": 9
+        },
+        {
+          "id": "3:1535579681657601768",
+          "name": "value",
+          "type": 8
+        },
+        {
+          "id": "4:6100382431439389365",
+          "name": "unit",
+          "type": 9
+        },
+        {
+          "id": "5:8837958407090471998",
+          "name": "dateTime",
+          "type": 10
+        },
+        {
+          "id": "6:4387178617261170057",
+          "name": "source",
+          "type": 6
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "15:1781774396636105369",
+      "lastPropertyId": "8:1182332487767697968",
+      "name": "DexaScanOB",
+      "properties": [
+        {
+          "id": "1:3033203686372988373",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:3980876848470724272",
+          "name": "scanDate",
+          "type": 10
+        },
+        {
+          "id": "3:896041955866674216",
+          "name": "totalBodyFatPercent",
+          "type": 8
+        },
+        {
+          "id": "4:8090251611330965577",
+          "name": "leanMassKG",
+          "type": 8
+        },
+        {
+          "id": "5:1115534957770209102",
+          "name": "fatMassKG",
+          "type": 8
+        },
+        {
+          "id": "6:884374273444776209",
+          "name": "boneMineralDensity",
+          "type": 8
+        },
+        {
+          "id": "7:2121348649363414868",
+          "name": "visceralFatArea",
+          "type": 8
+        },
+        {
+          "id": "8:1182332487767697968",
+          "name": "tScore",
+          "type": 8
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "10:789815896546770560",
+  "lastEntityId": "15:1781774396636105369",
   "lastIndexId": "2:7319863865959781371",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",

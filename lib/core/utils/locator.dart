@@ -62,6 +62,12 @@ import 'package:opennutritracker/features/settings/presentation/bloc/settings_bl
 import 'package:opennutritracker/core/db/data_sources/water_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/habit_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/gut_health_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/biomarker_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/dexa_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/stool_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/symptom_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/weight_data_source.dart';
+import 'package:opennutritracker/objectbox.g.dart';
 import 'package:opennutritracker/core/services/gut_health_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -216,6 +222,19 @@ Future<void> initLocator() async {
           objectBoxProvider.habitBox, objectBoxProvider.habitLogBox));
   locator.registerLazySingleton<GutHealthDataSource>(
       () => GutHealthDataSource(objectBoxProvider.gutHealthItemBox));
+  locator.registerLazySingleton<WeightDataSource>(
+      () => WeightDataSource(objectBoxProvider.weightRecordBox));
+  locator.registerLazySingleton<StoolDataSource>(
+      () => StoolDataSource(objectBoxProvider.stoolLogBox));
+  locator.registerLazySingleton<SymptomDataSource>(
+      () => SymptomDataSource(objectBoxProvider.symptomLogBox));
+  locator.registerLazySingleton<BiomarkerDataSource>(
+      () => BiomarkerDataSource(objectBoxProvider.biomarkerBox));
+  locator.registerLazySingleton<DexaDataSource>(
+      () => DexaDataSource(objectBoxProvider.dexaScanBox));
+
+  // Store (for direct box access where needed)
+  locator.registerLazySingleton<Store>(() => objectBoxProvider.store);
 
   // Services
   locator.registerLazySingleton<GutHealthService>(() => GutHealthService());
