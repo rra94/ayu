@@ -19,6 +19,7 @@ import 'core/db/entities/caffeine_log_ob.dart';
 import 'core/db/entities/config_ob.dart';
 import 'core/db/entities/dexa_scan_ob.dart';
 import 'core/db/entities/fasting_session_ob.dart';
+import 'core/db/entities/grocery_item_ob.dart';
 import 'core/db/entities/gut_health_item_ob.dart';
 import 'core/db/entities/habit_log_ob.dart';
 import 'core/db/entities/habit_ob.dart';
@@ -1383,6 +1384,76 @@ final _entities = <obx_int.ModelEntity>[
     relations: <obx_int.ModelRelation>[],
     backlinks: <obx_int.ModelBacklink>[],
   ),
+  obx_int.ModelEntity(
+    id: const obx_int.IdUid(23, 1576344663355007761),
+    name: 'GroceryItemOB',
+    lastPropertyId: const obx_int.IdUid(10, 8888737139918673305),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(1, 3270379361794308869),
+        name: 'id',
+        type: 6,
+        flags: 1,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(2, 3425345120471490516),
+        name: 'name',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 4257081532703681395),
+        name: 'brand',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(4, 6873105361917782117),
+        name: 'category',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(5, 9130503041303469492),
+        name: 'price',
+        type: 8,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(6, 4501869625205725),
+        name: 'store',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(7, 902427172344219937),
+        name: 'barcode',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(8, 6321287425307076558),
+        name: 'purchaseDate',
+        type: 10,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(9, 5864497113797741664),
+        name: 'consumed',
+        type: 1,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(10, 8888737139918673305),
+        name: 'shelfLifeDays',
+        type: 6,
+        flags: 0,
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[],
+    backlinks: <obx_int.ModelBacklink>[],
+  ),
 ];
 
 /// Shortcut for [obx.Store.new] that passes [getObjectBoxModel] and for Flutter
@@ -1423,7 +1494,7 @@ Future<obx.Store> openStore({
 obx_int.ModelDefinition getObjectBoxModel() {
   final model = obx_int.ModelInfo(
     entities: _entities,
-    lastEntityId: const obx_int.IdUid(22, 5438023546580793832),
+    lastEntityId: const obx_int.IdUid(23, 1576344663355007761),
     lastIndexId: const obx_int.IdUid(2, 7319863865959781371),
     lastRelationId: const obx_int.IdUid(0, 0),
     lastSequenceId: const obx_int.IdUid(0, 0),
@@ -3244,6 +3315,101 @@ obx_int.ModelDefinition getObjectBoxModel() {
         return object;
       },
     ),
+    GroceryItemOB: obx_int.EntityDefinition<GroceryItemOB>(
+      model: _entities[22],
+      toOneRelations: (GroceryItemOB object) => [],
+      toManyRelations: (GroceryItemOB object) => {},
+      getId: (GroceryItemOB object) => object.id,
+      setId: (GroceryItemOB object, int id) {
+        object.id = id;
+      },
+      objectToFB: (GroceryItemOB object, fb.Builder fbb) {
+        final nameOffset = fbb.writeString(object.name);
+        final brandOffset = object.brand == null
+            ? null
+            : fbb.writeString(object.brand!);
+        final categoryOffset = object.category == null
+            ? null
+            : fbb.writeString(object.category!);
+        final storeOffset = object.store == null
+            ? null
+            : fbb.writeString(object.store!);
+        final barcodeOffset = object.barcode == null
+            ? null
+            : fbb.writeString(object.barcode!);
+        fbb.startTable(11);
+        fbb.addInt64(0, object.id);
+        fbb.addOffset(1, nameOffset);
+        fbb.addOffset(2, brandOffset);
+        fbb.addOffset(3, categoryOffset);
+        fbb.addFloat64(4, object.price);
+        fbb.addOffset(5, storeOffset);
+        fbb.addOffset(6, barcodeOffset);
+        fbb.addInt64(7, object.purchaseDate.millisecondsSinceEpoch);
+        fbb.addBool(8, object.consumed);
+        fbb.addInt64(9, object.shelfLifeDays);
+        fbb.finish(fbb.endTable());
+        return object.id;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
+        final idParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          4,
+          0,
+        );
+        final nameParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 6, '');
+        final brandParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 8);
+        final categoryParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 10);
+        final priceParam = const fb.Float64Reader().vTableGetNullable(
+          buffer,
+          rootOffset,
+          12,
+        );
+        final storeParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 14);
+        final barcodeParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 16);
+        final purchaseDateParam = DateTime.fromMillisecondsSinceEpoch(
+          const fb.Int64Reader().vTableGet(buffer, rootOffset, 18, 0),
+        );
+        final consumedParam = const fb.BoolReader().vTableGet(
+          buffer,
+          rootOffset,
+          20,
+          false,
+        );
+        final shelfLifeDaysParam = const fb.Int64Reader().vTableGetNullable(
+          buffer,
+          rootOffset,
+          22,
+        );
+        final object = GroceryItemOB(
+          id: idParam,
+          name: nameParam,
+          brand: brandParam,
+          category: categoryParam,
+          price: priceParam,
+          store: storeParam,
+          barcode: barcodeParam,
+          purchaseDate: purchaseDateParam,
+          consumed: consumedParam,
+          shelfLifeDays: shelfLifeDaysParam,
+        );
+
+        return object;
+      },
+    ),
   };
 
   return obx_int.ModelDefinition(model, bindings);
@@ -4246,5 +4412,58 @@ class ProductInventoryOB_ {
   /// See [ProductInventoryOB.barcode].
   static final barcode = obx.QueryStringProperty<ProductInventoryOB>(
     _entities[21].properties[7],
+  );
+}
+
+/// [GroceryItemOB] entity fields to define ObjectBox queries.
+class GroceryItemOB_ {
+  /// See [GroceryItemOB.id].
+  static final id = obx.QueryIntegerProperty<GroceryItemOB>(
+    _entities[22].properties[0],
+  );
+
+  /// See [GroceryItemOB.name].
+  static final name = obx.QueryStringProperty<GroceryItemOB>(
+    _entities[22].properties[1],
+  );
+
+  /// See [GroceryItemOB.brand].
+  static final brand = obx.QueryStringProperty<GroceryItemOB>(
+    _entities[22].properties[2],
+  );
+
+  /// See [GroceryItemOB.category].
+  static final category = obx.QueryStringProperty<GroceryItemOB>(
+    _entities[22].properties[3],
+  );
+
+  /// See [GroceryItemOB.price].
+  static final price = obx.QueryDoubleProperty<GroceryItemOB>(
+    _entities[22].properties[4],
+  );
+
+  /// See [GroceryItemOB.store].
+  static final store = obx.QueryStringProperty<GroceryItemOB>(
+    _entities[22].properties[5],
+  );
+
+  /// See [GroceryItemOB.barcode].
+  static final barcode = obx.QueryStringProperty<GroceryItemOB>(
+    _entities[22].properties[6],
+  );
+
+  /// See [GroceryItemOB.purchaseDate].
+  static final purchaseDate = obx.QueryDateProperty<GroceryItemOB>(
+    _entities[22].properties[7],
+  );
+
+  /// See [GroceryItemOB.consumed].
+  static final consumed = obx.QueryBooleanProperty<GroceryItemOB>(
+    _entities[22].properties[8],
+  );
+
+  /// See [GroceryItemOB.shelfLifeDays].
+  static final shelfLifeDays = obx.QueryIntegerProperty<GroceryItemOB>(
+    _entities[22].properties[9],
   );
 }

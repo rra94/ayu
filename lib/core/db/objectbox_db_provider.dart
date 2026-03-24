@@ -12,6 +12,7 @@ import 'package:opennutritracker/core/db/entities/habit_log_ob.dart';
 import 'package:opennutritracker/core/db/entities/gut_health_item_ob.dart';
 import 'package:opennutritracker/core/db/entities/biomarker_record_ob.dart';
 import 'package:opennutritracker/core/db/entities/caffeine_log_ob.dart';
+import 'package:opennutritracker/core/db/entities/grocery_item_ob.dart';
 import 'package:opennutritracker/core/db/entities/product_inventory_ob.dart';
 import 'package:opennutritracker/core/db/entities/dexa_scan_ob.dart';
 import 'package:opennutritracker/core/db/entities/fasting_session_ob.dart';
@@ -43,6 +44,7 @@ class ObjectBoxDBProvider extends ChangeNotifier {
   late Box<DexaScanOB> dexaScanBox;
   late Box<CaffeineLogOB> caffeineLogBox;
   late Box<ProductInventoryOB> inventoryBox;
+  late Box<GroceryItemOB> groceryBox;
   late Box<SupplementOB> supplementBox;
   late Box<SupplementLogOB> supplementLogBox;
   late Box<FastingSessionOB> fastingSessionBox;
@@ -70,6 +72,7 @@ class ObjectBoxDBProvider extends ChangeNotifier {
     dexaScanBox = store.box<DexaScanOB>();
     caffeineLogBox = store.box<CaffeineLogOB>();
     inventoryBox = store.box<ProductInventoryOB>();
+    groceryBox = store.box<GroceryItemOB>();
     supplementBox = store.box<SupplementOB>();
     supplementLogBox = store.box<SupplementLogOB>();
     fastingSessionBox = store.box<FastingSessionOB>();

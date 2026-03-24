@@ -1139,9 +1139,68 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "23:1576344663355007761",
+      "lastPropertyId": "10:8888737139918673305",
+      "name": "GroceryItemOB",
+      "properties": [
+        {
+          "id": "1:3270379361794308869",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:3425345120471490516",
+          "name": "name",
+          "type": 9
+        },
+        {
+          "id": "3:4257081532703681395",
+          "name": "brand",
+          "type": 9
+        },
+        {
+          "id": "4:6873105361917782117",
+          "name": "category",
+          "type": 9
+        },
+        {
+          "id": "5:9130503041303469492",
+          "name": "price",
+          "type": 8
+        },
+        {
+          "id": "6:4501869625205725",
+          "name": "store",
+          "type": 9
+        },
+        {
+          "id": "7:902427172344219937",
+          "name": "barcode",
+          "type": 9
+        },
+        {
+          "id": "8:6321287425307076558",
+          "name": "purchaseDate",
+          "type": 10
+        },
+        {
+          "id": "9:5864497113797741664",
+          "name": "consumed",
+          "type": 1
+        },
+        {
+          "id": "10:8888737139918673305",
+          "name": "shelfLifeDays",
+          "type": 6
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "22:5438023546580793832",
+  "lastEntityId": "23:1576344663355007761",
   "lastIndexId": "2:7319863865959781371",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",
