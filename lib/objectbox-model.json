@@ -5,7 +5,7 @@
   "entities": [
     {
       "id": "1:6477492202799954719",
-      "lastPropertyId": "14:4565518338337104291",
+      "lastPropertyId": "16:7057383559295592709",
       "name": "ConfigOB",
       "properties": [
         {
@@ -78,6 +78,16 @@
           "id": "14:4565518338337104291",
           "name": "dailyStepGoal",
           "type": 6
+        },
+        {
+          "id": "15:6046776342296133253",
+          "name": "healthConditions",
+          "type": 9
+        },
+        {
+          "id": "16:7057383559295592709",
+          "name": "ayuOnboardingComplete",
+          "type": 1
         }
       ],
       "relations": []

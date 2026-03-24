@@ -13,6 +13,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:opennutritracker/core/db/data_sources/intake_data_source_ob.dart';
 import 'package:opennutritracker/core/services/allergen_service.dart';
+import 'package:opennutritracker/core/services/backup_service.dart';
+import 'package:opennutritracker/core/services/health_condition_service.dart';
 import 'package:opennutritracker/core/utils/csv_exporter.dart';
 import 'package:opennutritracker/features/profile/profile_page.dart';
 import 'package:opennutritracker/features/settings/presentation/widgets/goal_settings_dialog.dart';
@@ -114,10 +116,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   onTap: () => _showAllergenDialog(context),
                 ),
                 ListTile(
+                  leading: const Icon(Icons.medical_information_outlined),
+                  title: const Text('Health Conditions'),
+                  subtitle: Text(HealthConditionService.getUserConditions().isEmpty
+                      ? 'Not configured'
+                      : HealthConditionService.getUserConditions().join(', ')),
+                  onTap: () => _showHealthConditionsDialog(context),
+                ),
+                ListTile(
                   leading: const Icon(Icons.file_download_outlined),
                   title: const Text('Export CSV'),
                   subtitle: const Text('Share your food log as spreadsheet'),
                   onTap: () => _exportCsv(context),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.backup_outlined),
+                  title: const Text('Backup Data'),
+                  subtitle: const Text('Export all settings as JSON'),
+                  onTap: () async {
+                    await BackupService.shareBackup();
+                  },
                 ),
                 ListTile(
                   leading: const Icon(Icons.description_outlined),
@@ -262,6 +280,60 @@ class _SettingsScreenState extends State<SettingsScreen> {
             FilledButton(
               onPressed: () {
                 AllergenService.setUserAllergens(selected);
+                Navigator.of(ctx).pop();
+                setState(() {});
+              },
+              child: const Text('Save'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showHealthConditionsDialog(BuildContext context) {
+    final selected = Set<String>.from(HealthConditionService.getUserConditions());
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          title: const Text('Health Conditions'),
+          content: SizedBox(
+            width: double.maxFinite,
+            height: 400,
+            child: Column(
+              children: [
+                Text('Select any conditions — Ayu will tailor nutrition advice accordingly.',
+                    style: Theme.of(ctx).textTheme.bodySmall),
+                const SizedBox(height: 8),
+                Expanded(
+                  child: ListView(
+                    children: HealthConditionService.allConditions.map((c) {
+                      return CheckboxListTile(
+                        dense: true,
+                        title: Text(c, style: const TextStyle(fontSize: 14)),
+                        value: selected.contains(c),
+                        onChanged: (val) {
+                          setDialogState(() {
+                            if (val == true) selected.add(c);
+                            else selected.remove(c);
+                          });
+                        },
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () {
+                HealthConditionService.setUserConditions(selected);
                 Navigator.of(ctx).pop();
                 setState(() {});
               },

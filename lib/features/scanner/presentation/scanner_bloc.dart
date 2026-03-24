@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -40,6 +41,10 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
         if (exception == ProductNotFoundException) {
           emit(
               const ScannerFailedState(ScannerFailedStateType.productNotFound));
+        } else if (exception is TimeoutException ||
+            exception.toString().contains('SocketException') ||
+            exception.toString().contains('Connection refused')) {
+          emit(const ScannerFailedState(ScannerFailedStateType.offline));
         } else {
           emit(const ScannerFailedState(ScannerFailedStateType.error));
         }

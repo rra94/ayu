@@ -29,6 +29,12 @@ class ConfigOB {
   /// Daily step goal (default 10000)
   int? dailyStepGoal;
 
+  /// Known health conditions (comma-separated: "diabetes,hypertension,celiac")
+  String? healthConditions;
+
+  /// Whether Ayu feature onboarding has been completed
+  bool ayuOnboardingComplete;
+
   ConfigOB({
     this.id = 0,
     this.hasAcceptedDisclaimer = false,
@@ -44,5 +50,7 @@ class ConfigOB {
     this.targetWeightKG,
     this.customDeficitKcal,
     this.dailyStepGoal,
+    this.healthConditions,
+    this.ayuOnboardingComplete = false,
   });
 }

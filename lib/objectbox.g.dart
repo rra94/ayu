@@ -43,7 +43,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(1, 6477492202799954719),
     name: 'ConfigOB',
-    lastPropertyId: const obx_int.IdUid(14, 4565518338337104291),
+    lastPropertyId: const obx_int.IdUid(16, 7057383559295592709),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -128,6 +128,18 @@ final _entities = <obx_int.ModelEntity>[
         id: const obx_int.IdUid(14, 4565518338337104291),
         name: 'dailyStepGoal',
         type: 6,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(15, 6046776342296133253),
+        name: 'healthConditions',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(16, 7057383559295592709),
+        name: 'ayuOnboardingComplete',
+        type: 1,
         flags: 0,
       ),
     ],
@@ -1517,7 +1529,10 @@ obx_int.ModelDefinition getObjectBoxModel() {
         object.id = id;
       },
       objectToFB: (ConfigOB object, fb.Builder fbb) {
-        fbb.startTable(15);
+        final healthConditionsOffset = object.healthConditions == null
+            ? null
+            : fbb.writeString(object.healthConditions!);
+        fbb.startTable(17);
         fbb.addInt64(0, object.id);
         fbb.addBool(1, object.hasAcceptedDisclaimer);
         fbb.addBool(2, object.hasAcceptedPolicy);
@@ -1532,6 +1547,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
         fbb.addFloat64(11, object.targetWeightKG);
         fbb.addFloat64(12, object.customDeficitKcal);
         fbb.addInt64(13, object.dailyStepGoal);
+        fbb.addOffset(14, healthConditionsOffset);
+        fbb.addBool(15, object.ayuOnboardingComplete);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -1601,6 +1618,15 @@ obx_int.ModelDefinition getObjectBoxModel() {
           rootOffset,
           30,
         );
+        final healthConditionsParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 32);
+        final ayuOnboardingCompleteParam = const fb.BoolReader().vTableGet(
+          buffer,
+          rootOffset,
+          34,
+          false,
+        );
         final object = ConfigOB(
           id: idParam,
           hasAcceptedDisclaimer: hasAcceptedDisclaimerParam,
@@ -1616,6 +1642,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
           targetWeightKG: targetWeightKGParam,
           customDeficitKcal: customDeficitKcalParam,
           dailyStepGoal: dailyStepGoalParam,
+          healthConditions: healthConditionsParam,
+          ayuOnboardingComplete: ayuOnboardingCompleteParam,
         );
 
         return object;
@@ -3484,6 +3512,16 @@ class ConfigOB_ {
   /// See [ConfigOB.dailyStepGoal].
   static final dailyStepGoal = obx.QueryIntegerProperty<ConfigOB>(
     _entities[0].properties[13],
+  );
+
+  /// See [ConfigOB.healthConditions].
+  static final healthConditions = obx.QueryStringProperty<ConfigOB>(
+    _entities[0].properties[14],
+  );
+
+  /// See [ConfigOB.ayuOnboardingComplete].
+  static final ayuOnboardingComplete = obx.QueryBooleanProperty<ConfigOB>(
+    _entities[0].properties[15],
   );
 }
 

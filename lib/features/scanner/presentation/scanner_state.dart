@@ -39,4 +39,4 @@ class ScannerFailedState extends ScannerState {
   List<Object?> get props => [];
 }
 
-enum ScannerFailedStateType { productNotFound, error }
+enum ScannerFailedStateType { productNotFound, error, offline }
