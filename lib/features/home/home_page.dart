@@ -14,6 +14,7 @@ import 'package:opennutritracker/core/db/data_sources/water_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/habit_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/gut_health_data_source.dart';
 import 'package:opennutritracker/core/db/entities/gut_health_item_ob.dart';
+import 'package:opennutritracker/core/db/data_sources/intake_data_source_ob.dart';
 import 'package:opennutritracker/core/services/gut_health_service.dart';
 import 'package:opennutritracker/core/services/habit_notification_service.dart';
 import 'package:opennutritracker/core/services/smart_notification_service.dart';
@@ -230,6 +231,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 onDeleteIntakeCallback: onDeleteIntake,
                 onItemDragCallback: onIntakeItemDrag,
                 onItemTappedCallback: onIntakeItemTapped,
+                onItemLongPressedCallback: onIntakeItemLongPressed,
                 usesImperialUnits: usesImperialUnits,
               ),
             if (lunchIntakeList.isNotEmpty || (hour >= 11 && hour < 15))
@@ -307,27 +309,48 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     }
   }
 
-  void onIntakeItemLongPressed(
-      BuildContext context, IntakeEntity intakeEntity) async {
-    final deleteIntake = await showDialog<bool>(
-        context: context, builder: (context) => const DeleteDialog());
-
-    if (deleteIntake != null) {
-      _homeBloc.deleteIntakeItem(intakeEntity);
-      _homeBloc.add(const LoadItemsEvent());
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(S.of(context).itemDeletedSnackbar)));
-      }
-    }
-  }
-
   void onIntakeItemDrag(bool isDragging) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() {
         _isDragging = isDragging;
       });
     });
+  }
+
+  void onIntakeItemLongPressed(
+      BuildContext context, IntakeEntity intakeEntity) async {
+    final action = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(intakeEntity.meal.name ?? 'Meal'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.star, color: Colors.amber),
+              title: const Text('Add to Favorites'),
+              onTap: () => Navigator.of(ctx).pop('favorite'),
+            ),
+            ListTile(
+              leading: Icon(Icons.delete, color: Theme.of(ctx).colorScheme.error),
+              title: const Text('Delete'),
+              onTap: () => Navigator.of(ctx).pop('delete'),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (action == 'favorite') {
+      final ds = locator<IntakeDataSourceOB>();
+      await ds.toggleFavorite(intakeEntity.id, true);
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Added to favorites!')),
+        );
+      }
+    } else if (action == 'delete') {
+      onDeleteIntake(intakeEntity, null);
+    }
   }
 
   void onIntakeItemTapped(BuildContext context, IntakeEntity intakeEntity,

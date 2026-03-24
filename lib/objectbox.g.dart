@@ -130,7 +130,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(2, 222820024314402058),
     name: 'IntakeOB',
-    lastPropertyId: const obx_int.IdUid(51, 2380785250413604025),
+    lastPropertyId: const obx_int.IdUid(52, 1968518929984074793),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -438,6 +438,12 @@ final _entities = <obx_int.ModelEntity>[
         id: const obx_int.IdUid(51, 2380785250413604025),
         name: 'ingredientsText',
         type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(52, 1968518929984074793),
+        name: 'isFavorite',
+        type: 1,
         flags: 0,
       ),
     ],
@@ -1582,7 +1588,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final ingredientsTextOffset = object.ingredientsText == null
             ? null
             : fbb.writeString(object.ingredientsText!);
-        fbb.startTable(52);
+        fbb.startTable(53);
         fbb.addInt64(0, object.id);
         fbb.addOffset(1, intakeIdOffset);
         fbb.addOffset(2, unitOffset);
@@ -1634,6 +1640,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
         fbb.addFloat64(48, object.addedSugars100);
         fbb.addOffset(49, additivesTagsOffset);
         fbb.addOffset(50, ingredientsTextOffset);
+        fbb.addBool(51, object.isFavorite);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -1864,6 +1871,12 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final ingredientsTextParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGetNullable(buffer, rootOffset, 104);
+        final isFavoriteParam = const fb.BoolReader().vTableGet(
+          buffer,
+          rootOffset,
+          106,
+          false,
+        );
         final object = IntakeOB(
           id: idParam,
           intakeId: intakeIdParam,
@@ -1916,6 +1929,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           addedSugars100: addedSugars100Param,
           additivesTags: additivesTagsParam,
           ingredientsText: ingredientsTextParam,
+          isFavorite: isFavoriteParam,
         );
 
         return object;
@@ -3544,6 +3558,11 @@ class IntakeOB_ {
   /// See [IntakeOB.ingredientsText].
   static final ingredientsText = obx.QueryStringProperty<IntakeOB>(
     _entities[1].properties[50],
+  );
+
+  /// See [IntakeOB.isFavorite].
+  static final isFavorite = obx.QueryBooleanProperty<IntakeOB>(
+    _entities[1].properties[51],
   );
 }
 

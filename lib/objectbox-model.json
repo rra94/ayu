@@ -79,7 +79,7 @@
     },
     {
       "id": "2:222820024314402058",
-      "lastPropertyId": "51:2380785250413604025",
+      "lastPropertyId": "52:1968518929984074793",
       "name": "IntakeOB",
       "properties": [
         {
@@ -339,6 +339,11 @@
           "id": "51:2380785250413604025",
           "name": "ingredientsText",
           "type": 9
+        },
+        {
+          "id": "52:1968518929984074793",
+          "name": "isFavorite",
+          "type": 1
         }
       ],
       "relations": []

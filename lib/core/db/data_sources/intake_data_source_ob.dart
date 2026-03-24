@@ -91,6 +91,34 @@ class IntakeDataSourceOB {
 
     return uniqueIntake.take(number).toList();
   }
+
+  Future<List<IntakeDBO>> getFavorites() async {
+    final query = _intakeBox
+        .query(IntakeOB_.isFavorite.equals(true))
+        .order(IntakeOB_.dateTime, flags: Order.descending)
+        .build();
+    final results = query.find();
+    query.close();
+
+    // Deduplicate by meal code/name
+    final seen = <String>{};
+    final unique = results.where((ob) {
+      final key = ob.code ?? ob.name ?? ob.id.toString();
+      return seen.add(key);
+    }).toList();
+
+    return unique.take(20).map(_intakeOBToDBO).toList();
+  }
+
+  Future<void> toggleFavorite(String intakeId, bool value) async {
+    final query = _intakeBox.query(IntakeOB_.intakeId.equals(intakeId)).build();
+    final ob = query.findFirst();
+    query.close();
+    if (ob != null) {
+      ob.isFavorite = value;
+      _intakeBox.put(ob);
+    }
+  }
 }
 
 // ---------------------------------------------------------------------------

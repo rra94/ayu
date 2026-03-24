@@ -8,6 +8,7 @@ import 'package:opennutritracker/features/add_meal/presentation/bloc/add_meal_bl
 import 'package:opennutritracker/features/add_meal/presentation/bloc/food_bloc.dart';
 import 'package:opennutritracker/features/add_meal/presentation/bloc/recent_meal_bloc.dart';
 import 'package:opennutritracker/features/add_meal/presentation/widgets/default_results_widget.dart';
+import 'package:opennutritracker/features/add_meal/presentation/widgets/favorites_tab.dart';
 import 'package:opennutritracker/features/add_meal/presentation/widgets/meal_search_bar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:opennutritracker/features/add_meal/presentation/widgets/no_results_widget.dart';
@@ -42,7 +43,7 @@ class _AddMealScreenState extends State<AddMealScreen>
     _productsBloc = locator<ProductsBloc>();
     _foodBloc = locator<FoodBloc>();
     _recentMealBloc = locator<RecentMealBloc>();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
     _tabController.addListener(() {
       // Update search results when tab changes
       _onSearchSubmit(_searchStringListener.value);
@@ -98,6 +99,7 @@ class _AddMealScreenState extends State<AddMealScreen>
               const SizedBox(height: 16.0),
               TabBar(
                   tabs: [
+                    const Tab(text: 'Favorites'),
                     Tab(text: S.of(context).searchProductsPage),
                     Tab(text: S.of(context).searchFoodPage),
                     Tab(text: S.of(context).recentlyAddedLabel)
@@ -107,6 +109,7 @@ class _AddMealScreenState extends State<AddMealScreen>
               const SizedBox(height: 16),
               Expanded(
                 child: TabBarView(controller: _tabController, children: [
+                  FavoritesTab(day: _day),
                   Column(
                     children: [
                       Container(

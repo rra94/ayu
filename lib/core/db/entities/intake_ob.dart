@@ -80,6 +80,9 @@ class IntakeOB {
   List<String>? additivesTags;
   String? ingredientsText;
 
+  // Favorites
+  bool isFavorite;
+
   IntakeOB({
     this.id = 0,
     required this.intakeId,
@@ -132,5 +135,6 @@ class IntakeOB {
     this.addedSugars100,
     this.additivesTags,
     this.ingredientsText,
+    this.isFavorite = false,
   });
 }
