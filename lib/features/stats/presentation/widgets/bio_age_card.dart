@@ -46,7 +46,7 @@ class _BioAgeCardState extends State<BioAgeCard> {
     final theme = Theme.of(context);
 
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(

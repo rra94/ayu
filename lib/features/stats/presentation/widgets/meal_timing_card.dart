@@ -43,7 +43,7 @@ class _MealTimingCardState extends State<MealTimingCard> {
     final window = MealTimingCalc.eatingWindowHours(_todayIntakes);
 
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(

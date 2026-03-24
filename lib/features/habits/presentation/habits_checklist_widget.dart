@@ -27,7 +27,7 @@ class HabitsChecklistWidget extends StatelessWidget {
     final totalCount = dueToday.length;
 
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -51,7 +51,7 @@ class HabitsChecklistWidget extends StatelessWidget {
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                   decoration: BoxDecoration(
                     color: completedCount == totalCount
-                        ? Colors.green.withOpacity(0.2)
+                        ? Colors.green.withValues(alpha: 0.2)
                         : theme.colorScheme.primaryContainer,
                     borderRadius: BorderRadius.circular(12),
                   ),

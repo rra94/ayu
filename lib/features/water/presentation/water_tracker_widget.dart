@@ -21,7 +21,7 @@ class WaterTrackerWidget extends StatelessWidget {
     final goalL = (goalML / 1000).toStringAsFixed(1);
 
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(

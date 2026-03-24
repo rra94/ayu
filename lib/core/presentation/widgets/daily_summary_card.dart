@@ -36,7 +36,7 @@ class DailySummaryCard extends StatelessWidget {
     final allGood = checks.every((c) => c.passed);
 
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      
       color: allGood
           ? Colors.green.withValues(alpha: 0.1)
           : theme.colorScheme.surfaceContainerHighest,

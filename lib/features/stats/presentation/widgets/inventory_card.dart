@@ -35,7 +35,7 @@ class _InventoryCardState extends State<InventoryCard> {
     final lowStock = _products.where((p) => p.isLow).toList();
 
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(

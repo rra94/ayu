@@ -37,7 +37,7 @@ class _CaffeineCardState extends State<CaffeineCard> {
     final theme = Theme.of(context);
 
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Row(

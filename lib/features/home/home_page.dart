@@ -277,20 +277,13 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           ],
         ),
 
-        // ── Activity ──
-        CollapsibleSection(
+        // Activity tracked via HealthKit — steps card in Tracking section
+        const CollapsibleSection(
           title: 'Activity',
           icon: Icons.directions_run,
           storageKey: 'home_activity',
           initiallyExpanded: false,
-          children: [
-            ActivityVerticalList(
-              day: DateTime.now(),
-              title: S.of(context).activityLabel,
-              userActivityList: userActivities,
-              onItemLongPressedCallback: onActivityItemLongPressed,
-            ),
-          ],
+          children: [],
         ),
 
         const SizedBox(height: 48.0)

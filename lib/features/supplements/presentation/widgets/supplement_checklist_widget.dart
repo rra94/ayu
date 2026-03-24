@@ -40,7 +40,7 @@ class _SupplementChecklistWidgetState extends State<SupplementChecklistWidget> {
     if (_loading) return const SizedBox();
     if (_supplements.isEmpty) {
       return Card(
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Row(
@@ -66,7 +66,7 @@ class _SupplementChecklistWidgetState extends State<SupplementChecklistWidget> {
     final totalCount = _supplements.length;
 
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(

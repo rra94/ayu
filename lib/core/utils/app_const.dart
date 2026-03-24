@@ -7,7 +7,7 @@ class AppConst {
   static const platformNameIOS = "iOS";
   static const reportErrorEmail = "opennutritracker-dev@pm.me";
   static const sourceCodeUrl =
-      "https://github.com/simonoppowa/OpenNutriTracker";
+      "https://github.com/rra94/ayu";
 
   static Future<String> getVersionNumber() async {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();

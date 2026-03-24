@@ -29,7 +29,7 @@ class GutHealthPanel extends StatelessWidget {
     final hasItems = items.isNotEmpty;
 
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
