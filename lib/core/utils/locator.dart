@@ -62,6 +62,7 @@ import 'package:opennutritracker/features/settings/presentation/bloc/settings_bl
 import 'package:opennutritracker/core/db/data_sources/water_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/habit_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/gut_health_data_source.dart';
+import 'package:opennutritracker/core/services/daily_summary_service.dart';
 import 'package:opennutritracker/core/db/data_sources/biomarker_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/dexa_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/fasting_data_source.dart';
@@ -251,6 +252,7 @@ Future<void> initLocator() async {
 
   // Services
   locator.registerLazySingleton<GutHealthService>(() => GutHealthService());
+  locator.registerLazySingleton<DailySummaryService>(() => DailySummaryService());
 
   await _initializeConfig(locator<ConfigDataSourceOB>());
   await locator<HabitDataSource>().initializeDefaultHabits();
