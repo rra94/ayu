@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:opennutritracker/core/domain/usecase/get_config_usecase.dart';
+import 'package:opennutritracker/core/services/allergen_service.dart';
 import 'package:opennutritracker/core/services/supplement_detector.dart';
 import 'package:opennutritracker/features/add_meal/domain/entity/meal_entity.dart';
 import 'package:opennutritracker/features/scanner/data/product_not_found_exception.dart';
@@ -28,8 +29,13 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
         // Auto-detect and add supplements to stack
         await SupplementDetector.autoAddIfSupplement(result);
 
+        // Check for allergens
+        final allergenAlerts = AllergenService.checkMeal(result);
+
         emit(ScannerLoadedState(
-            product: result, usesImperialUnits: config.usesImperialUnits));
+            product: result,
+            usesImperialUnits: config.usesImperialUnits,
+            allergenAlerts: allergenAlerts));
       } catch (exception) {
         if (exception == ProductNotFoundException) {
           emit(

@@ -12,6 +12,7 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:opennutritracker/core/db/data_sources/intake_data_source_ob.dart';
+import 'package:opennutritracker/core/services/allergen_service.dart';
 import 'package:opennutritracker/core/utils/csv_exporter.dart';
 import 'package:opennutritracker/features/profile/profile_page.dart';
 import 'package:opennutritracker/features/settings/presentation/widgets/goal_settings_dialog.dart';
@@ -103,6 +104,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   leading: const Icon(Icons.import_export),
                   title: Text(S.of(context).exportImportLabel),
                   onTap: () => _showExportImportDialog(context),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.warning_amber),
+                  title: const Text('Food Allergens'),
+                  subtitle: Text(AllergenService.userAllergens.isEmpty
+                      ? 'Not configured'
+                      : AllergenService.userAllergens.join(', ')),
+                  onTap: () => _showAllergenDialog(context),
                 ),
                 ListTile(
                   leading: const Icon(Icons.file_download_outlined),
@@ -212,6 +221,54 @@ class _SettingsScreenState extends State<SettingsScreen> {
         homeBloc: _homeBloc,
         diaryBloc: _diaryBloc,
         calendarDayBloc: _calendarDayBloc,
+      ),
+    );
+  }
+
+  void _showAllergenDialog(BuildContext context) {
+    final selected = Set<String>.from(AllergenService.userAllergens);
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          title: const Text('My Allergens'),
+          content: SizedBox(
+            width: double.maxFinite,
+            height: 400,
+            child: ListView(
+              children: AllergenService.allAllergenNames.map((allergen) {
+                return CheckboxListTile(
+                  dense: true,
+                  title: Text(allergen),
+                  value: selected.contains(allergen),
+                  onChanged: (val) {
+                    setDialogState(() {
+                      if (val == true) {
+                        selected.add(allergen);
+                      } else {
+                        selected.remove(allergen);
+                      }
+                    });
+                  },
+                );
+              }).toList(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () {
+                AllergenService.setUserAllergens(selected);
+                Navigator.of(ctx).pop();
+                setState(() {});
+              },
+              child: const Text('Save'),
+            ),
+          ],
+        ),
       ),
     );
   }

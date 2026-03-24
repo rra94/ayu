@@ -53,13 +53,17 @@ class _ScannerScreenState extends State<ScannerScreen> {
               appBar: AppBar(),
               body: const Center(child: CircularProgressIndicator()));
         } else if (state is ScannerLoadedState) {
-          // Push new route after build
+          // Show allergen warning if any, then navigate
           Future.microtask(() {
             if (context.mounted) {
-              return Navigator.of(context).pushReplacementNamed(
-                  NavigationOptions.mealDetailRoute,
-                  arguments: MealDetailScreenArguments(state.product,
-                      _intakeTypeEntity, _day, state.usesImperialUnits));
+              if (state.allergenAlerts.isNotEmpty) {
+                _showAllergenWarning(context, state);
+              } else {
+                Navigator.of(context).pushReplacementNamed(
+                    NavigationOptions.mealDetailRoute,
+                    arguments: MealDetailScreenArguments(state.product,
+                        _intakeTypeEntity, _day, state.usesImperialUnits));
+              }
             }
           });
         } else if (state is ScannerFailedState) {
@@ -135,6 +139,54 @@ class _ScannerScreenState extends State<ScannerScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(S.of(context).errorFetchingProductData)));
     }
+  }
+
+  void _showAllergenWarning(BuildContext context, ScannerLoadedState state) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        icon: const Icon(Icons.warning_amber, color: Colors.red, size: 36),
+        title: const Text('Allergen Alert!'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('${state.product.name ?? 'This product'} contains:'),
+            const SizedBox(height: 8),
+            ...state.allergenAlerts.map((a) => Padding(
+              padding: const EdgeInsets.symmetric(vertical: 2),
+              child: Row(
+                children: [
+                  Icon(Icons.dangerous, size: 16, color: Colors.red),
+                  const SizedBox(width: 8),
+                  Text(a.displayName,
+                      style: const TextStyle(fontWeight: FontWeight.w600)),
+                  if (a.isTrace) const Text(' (trace)', style: TextStyle(fontSize: 12)),
+                ],
+              ),
+            )),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              Navigator.of(context).pop(); // go back to scanner
+            },
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              Navigator.of(context).pushReplacementNamed(
+                  NavigationOptions.mealDetailRoute,
+                  arguments: MealDetailScreenArguments(state.product,
+                      _intakeTypeEntity, _day, state.usesImperialUnits));
+            },
+            child: const Text('Continue Anyway'),
+          ),
+        ],
+      ),
+    );
   }
 }
 
