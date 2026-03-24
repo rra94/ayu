@@ -38,7 +38,7 @@ struct NutriData {
     }
 }
 
-// MARK: - Timeline Provider
+// MARK: - Timeline
 
 struct NutriTimelineProvider: TimelineProvider {
     func placeholder(in context: Context) -> NutriEntry {
@@ -56,10 +56,8 @@ struct NutriTimelineProvider: TimelineProvider {
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<NutriEntry>) -> Void) {
         let entry = NutriEntry(date: Date(), data: NutriData.load())
-        // Refresh every 15 minutes
         let nextUpdate = Calendar.current.date(byAdding: .minute, value: 15, to: Date())!
-        let timeline = Timeline(entries: [entry], policy: .after(nextUpdate))
-        completion(timeline)
+        completion(Timeline(entries: [entry], policy: .after(nextUpdate)))
     }
 }
 
@@ -68,7 +66,7 @@ struct NutriEntry: TimelineEntry {
     let data: NutriData
 }
 
-// MARK: - Small Widget (Circular Calorie Gauge)
+// MARK: - Small Widget (Calorie Gauge)
 
 struct NutriWidgetSmall: View {
     let data: NutriData
@@ -97,102 +95,89 @@ struct NutriWidgetSmall: View {
     }
 }
 
-// MARK: - Medium Widget (Multi-metric Row)
+// MARK: - Medium Widget (Multi-metric)
 
 struct NutriWidgetMedium: View {
     let data: NutriData
 
     var body: some View {
         HStack(spacing: 16) {
-            // Calories
-            VStack(spacing: 4) {
-                ZStack {
-                    Circle()
-                        .stroke(Color.gray.opacity(0.2), lineWidth: 4)
-                        .frame(width: 44, height: 44)
-                    Circle()
-                        .trim(from: 0, to: min(data.calorieProgress, 1.0))
-                        .stroke(Color.green, style: StrokeStyle(lineWidth: 4, lineCap: .round))
-                        .frame(width: 44, height: 44)
-                        .rotationEffect(.degrees(-90))
-                    Text("\(data.caloriesConsumed)")
-                        .font(.system(size: 11, weight: .bold))
-                }
-                Text("\(data.caloriesTarget) kcal")
-                    .font(.system(size: 9))
-                    .foregroundColor(.secondary)
+            metricGauge(
+                value: data.caloriesConsumed,
+                total: data.caloriesTarget,
+                label: "kcal",
+                color: .green
+            )
+            metricGauge(
+                value: data.waterMl,
+                total: data.waterTarget,
+                label: "ml",
+                color: .blue
+            )
+            if data.suppsTotal > 0 {
+                metricGauge(
+                    value: data.suppsTaken,
+                    total: data.suppsTotal,
+                    label: "supps",
+                    color: .orange
+                )
             }
-
-            // Water
-            VStack(spacing: 4) {
-                ZStack {
-                    Circle()
-                        .stroke(Color.gray.opacity(0.2), lineWidth: 4)
-                        .frame(width: 44, height: 44)
-                    Circle()
-                        .trim(from: 0, to: min(data.waterProgress, 1.0))
-                        .stroke(Color.blue, style: StrokeStyle(lineWidth: 4, lineCap: .round))
-                        .frame(width: 44, height: 44)
-                        .rotationEffect(.degrees(-90))
-                    Image(systemName: "drop.fill")
-                        .font(.system(size: 14))
-                        .foregroundColor(.blue)
-                }
-                Text("\(data.waterMl)ml")
-                    .font(.system(size: 9))
-                    .foregroundColor(.secondary)
-            }
-
-            // Supplements
-            VStack(spacing: 4) {
-                ZStack {
-                    Circle()
-                        .stroke(Color.gray.opacity(0.2), lineWidth: 4)
-                        .frame(width: 44, height: 44)
-                    Circle()
-                        .trim(from: 0, to: data.suppsTotal > 0 ? Double(data.suppsTaken) / Double(data.suppsTotal) : 0)
-                        .stroke(Color.orange, style: StrokeStyle(lineWidth: 4, lineCap: .round))
-                        .frame(width: 44, height: 44)
-                        .rotationEffect(.degrees(-90))
-                    Text("\(data.suppsTaken)")
-                        .font(.system(size: 14, weight: .bold))
-                }
-                Text("\(data.suppsTotal) supps")
-                    .font(.system(size: 9))
-                    .foregroundColor(.secondary)
-            }
-
-            // Fasting
             if data.fastingActive {
-                VStack(spacing: 4) {
-                    let progress = data.fastingTargetMin > 0
-                        ? Double(data.fastingElapsedMin) / Double(data.fastingTargetMin) : 0
-                    ZStack {
-                        Circle()
-                            .stroke(Color.gray.opacity(0.2), lineWidth: 4)
-                            .frame(width: 44, height: 44)
-                        Circle()
-                            .trim(from: 0, to: min(progress, 1.0))
-                            .stroke(Color.purple, style: StrokeStyle(lineWidth: 4, lineCap: .round))
-                            .frame(width: 44, height: 44)
-                            .rotationEffect(.degrees(-90))
-                        Image(systemName: "timer")
-                            .font(.system(size: 14))
-                            .foregroundColor(.purple)
-                    }
-                    Text("\(data.fastingElapsedMin / 60)h")
-                        .font(.system(size: 9))
-                        .foregroundColor(.secondary)
-                }
+                metricGauge(
+                    value: data.fastingElapsedMin / 60,
+                    total: data.fastingTargetMin / 60,
+                    label: "fast h",
+                    color: .purple
+                )
             }
         }
         .padding(.horizontal, 8)
     }
+
+    func metricGauge(value: Int, total: Int, label: String, color: Color) -> some View {
+        let progress = total > 0 ? Double(value) / Double(total) : 0
+        return VStack(spacing: 4) {
+            ZStack {
+                Circle()
+                    .stroke(Color.gray.opacity(0.2), lineWidth: 4)
+                    .frame(width: 44, height: 44)
+                Circle()
+                    .trim(from: 0, to: min(progress, 1.0))
+                    .stroke(color, style: StrokeStyle(lineWidth: 4, lineCap: .round))
+                    .frame(width: 44, height: 44)
+                    .rotationEffect(.degrees(-90))
+                Text("\(value)")
+                    .font(.system(size: 11, weight: .bold))
+            }
+            Text(label)
+                .font(.system(size: 9))
+                .foregroundColor(.secondary)
+        }
+    }
 }
 
-// MARK: - Widget Configuration
+// MARK: - Widget Entry View
 
-@main
+struct NutriWidgetEntryView: View {
+    @Environment(\.widgetFamily) var family
+    let entry: NutriEntry
+
+    var body: some View {
+        switch family {
+        case .accessoryCircular:
+            NutriWidgetSmall(data: entry.data)
+        case .systemSmall:
+            NutriWidgetSmall(data: entry.data)
+        case .systemMedium:
+            NutriWidgetMedium(data: entry.data)
+        default:
+            NutriWidgetMedium(data: entry.data)
+        }
+    }
+}
+
+// MARK: - Widget Config
+
 struct NutriWidget: Widget {
     let kind: String = "NutriWidget"
 
@@ -214,23 +199,5 @@ struct NutriWidget: Widget {
             .systemSmall,
             .systemMedium,
         ])
-    }
-}
-
-struct NutriWidgetEntryView: View {
-    @Environment(\.widgetFamily) var family
-    let entry: NutriEntry
-
-    var body: some View {
-        switch family {
-        case .accessoryCircular:
-            NutriWidgetSmall(data: entry.data)
-        case .systemSmall:
-            NutriWidgetSmall(data: entry.data)
-        case .systemMedium:
-            NutriWidgetMedium(data: entry.data)
-        default:
-            NutriWidgetMedium(data: entry.data)
-        }
     }
 }
