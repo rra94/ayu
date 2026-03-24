@@ -14,9 +14,7 @@ import 'package:opennutritracker/core/utils/locator.dart';
 import 'package:opennutritracker/core/utils/logger_config.dart';
 import 'package:opennutritracker/core/utils/navigation_options.dart';
 import 'package:opennutritracker/core/utils/theme_mode_provider.dart';
-import 'package:opennutritracker/features/activity_detail/activity_detail_screen.dart';
 import 'package:opennutritracker/features/add_meal/presentation/add_meal_screen.dart';
-import 'package:opennutritracker/features/add_activity/presentation/add_activity_screen.dart';
 import 'package:opennutritracker/features/edit_meal/presentation/edit_meal_screen.dart';
 import 'package:opennutritracker/features/onboarding/onboarding_screen.dart';
 import 'package:opennutritracker/features/receipt/presentation/receipt_scanner_screen.dart';
@@ -102,10 +100,6 @@ class AyuApp extends StatelessWidget {
         NavigationOptions.mealDetailRoute: (context) =>
             const MealDetailScreen(),
         NavigationOptions.editMealRoute: (context) => const EditMealScreen(),
-        NavigationOptions.addActivityRoute: (context) =>
-            const AddActivityScreen(),
-        NavigationOptions.activityDetailRoute: (context) =>
-            const ActivityDetailScreen(),
         NavigationOptions.imageFullScreenRoute: (context) =>
             const ImageFullScreen(),
         NavigationOptions.receiptScannerRoute: (context) =>
