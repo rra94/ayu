@@ -170,8 +170,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.of(ctx).pop();
-              Navigator.of(context).pop(); // go back to scanner
+              Navigator.of(ctx).pop(); // just close dialog, stay on scanner
             },
             child: const Text('Cancel'),
           ),

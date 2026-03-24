@@ -264,6 +264,14 @@ class SmartNotificationService {
       final active = await fastingDs.getActiveSession();
       if (active != null) return;
 
+      // Skip if a fast was completed in the last 2 hours (user manually ended)
+      final recent = await fastingDs.getCompletedSessions(limit: 1);
+      if (recent.isNotEmpty && recent.first.endTime != null) {
+        final hoursSinceEnd =
+            DateTime.now().difference(recent.first.endTime!).inMinutes / 60.0;
+        if (hoursSinceEnd < 2) return;
+      }
+
       // Find last meal time today
       final getIntake = locator<GetIntakeUsecase>();
       final now = DateTime.now();
