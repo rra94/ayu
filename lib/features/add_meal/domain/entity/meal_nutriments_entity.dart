@@ -42,6 +42,25 @@ class MealNutrimentsEntity extends Equatable {
   final double? folate100; // B9, in mcg
   final double? vitaminB12100; // in mcg
 
+  // Extended lipid profile
+  final double? monoFat100;
+  final double? polyFat100;
+  final double? transFat100;
+  final double? omega3100; // ALA + EPA + DHA combined
+  final double? omega6100;
+  final double? sugarAlcohols100;
+
+  // Amino acids (per 100g, in g)
+  final double? leucine100;
+  final double? isoleucine100;
+  final double? valine100;
+  final double? lysine100;
+  final double? methionine100;
+  final double? phenylalanine100;
+  final double? threonine100;
+  final double? tryptophan100;
+  final double? histidine100;
+
   // Other
   final double? cholesterol100; // in mg
   final double? addedSugars100; // in g
@@ -84,6 +103,21 @@ class MealNutrimentsEntity extends Equatable {
     this.vitaminB6100,
     this.folate100,
     this.vitaminB12100,
+    this.monoFat100,
+    this.polyFat100,
+    this.transFat100,
+    this.omega3100,
+    this.omega6100,
+    this.sugarAlcohols100,
+    this.leucine100,
+    this.isoleucine100,
+    this.valine100,
+    this.lysine100,
+    this.methionine100,
+    this.phenylalanine100,
+    this.threonine100,
+    this.tryptophan100,
+    this.histidine100,
     this.cholesterol100,
     this.addedSugars100,
   });
@@ -327,6 +361,31 @@ class MealNutrimentsEntity extends Equatable {
             (n) => n.nutrientId == FDCConst.fdcAddedSugarsId)
         ?.amount;
 
+    // Extended lipid
+    double? _fdc(int id) => fdcNutriment.firstWhereOrNull((n) => n.nutrientId == id)?.amount;
+    final monoFat = _fdc(FDCConst.fdcMonoFatId);
+    final polyFat = _fdc(FDCConst.fdcPolyFatId);
+    final transFat = _fdc(FDCConst.fdcTransFatId);
+    final omega3ALA = _fdc(FDCConst.fdcOmega3ALAId);
+    final omega3EPA = _fdc(FDCConst.fdcOmega3EPAId);
+    final omega3DHA = _fdc(FDCConst.fdcOmega3DHAId);
+    final omega3 = (omega3ALA != null || omega3EPA != null || omega3DHA != null)
+        ? (omega3ALA ?? 0) + (omega3EPA ?? 0) + (omega3DHA ?? 0)
+        : null;
+    final omega6 = _fdc(FDCConst.fdcOmega6Id);
+    final sugarAlcohols = _fdc(FDCConst.fdcSugarAlcoholsId);
+
+    // Amino acids
+    final leucine = _fdc(FDCConst.fdcLeucineId);
+    final isoleucine = _fdc(FDCConst.fdcIsoleucineId);
+    final valine = _fdc(FDCConst.fdcValineId);
+    final lysine = _fdc(FDCConst.fdcLysineId);
+    final methionine = _fdc(FDCConst.fdcMethionineId);
+    final phenylalanine = _fdc(FDCConst.fdcPhenylalanineId);
+    final threonine = _fdc(FDCConst.fdcThreonineId);
+    final tryptophan = _fdc(FDCConst.fdcTryptophanId);
+    final histidine = _fdc(FDCConst.fdcHistidineId);
+
     return MealNutrimentsEntity(
       energyKcal100: energyTotal,
       carbohydrates100: carbsTotal,
@@ -357,6 +416,21 @@ class MealNutrimentsEntity extends Equatable {
       vitaminB6100: vitaminB6Total,
       folate100: folateTotal,
       vitaminB12100: vitaminB12Total,
+      monoFat100: monoFat,
+      polyFat100: polyFat,
+      transFat100: transFat,
+      omega3100: omega3,
+      omega6100: omega6,
+      sugarAlcohols100: sugarAlcohols,
+      leucine100: leucine,
+      isoleucine100: isoleucine,
+      valine100: valine,
+      lysine100: lysine,
+      methionine100: methionine,
+      phenylalanine100: phenylalanine,
+      threonine100: threonine,
+      tryptophan100: tryptophan,
+      histidine100: histidine,
       cholesterol100: cholesterolTotal,
       addedSugars100: addedSugarsTotal,
     );

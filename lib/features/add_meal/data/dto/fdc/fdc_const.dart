@@ -227,6 +227,27 @@ class FDCConst {
   static const fdcCholesterolId = 1253;
   static const fdcAddedSugarsId = 1235;
 
+  // Extended lipid profile
+  static const fdcMonoFatId = 1292;
+  static const fdcPolyFatId = 1293;
+  static const fdcTransFatId = 1257;
+  static const fdcOmega3ALAId = 1404;
+  static const fdcOmega3EPAId = 1278;
+  static const fdcOmega3DHAId = 1272;
+  static const fdcOmega6Id = 1316;
+  static const fdcSugarAlcoholsId = 1086;
+
+  // Amino acids
+  static const fdcLeucineId = 1212;
+  static const fdcIsoleucineId = 1214;
+  static const fdcValineId = 1219;
+  static const fdcLysineId = 1213;
+  static const fdcMethionineId = 1215;
+  static const fdcPhenylalanineId = 1217;
+  static const fdcThreonineId = 1211;
+  static const fdcTryptophanId = 1210;
+  static const fdcHistidineId = 1221;
+
   // Measure unit codes
   static const fdcPortionServingId = 1049;
   static const fdcPortionUnknownId = 9999;
