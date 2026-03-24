@@ -8,6 +8,11 @@ import 'package:opennutritracker/core/utils/locator.dart';
 import 'package:opennutritracker/core/utils/theme_mode_provider.dart';
 import 'package:opennutritracker/core/utils/url_const.dart';
 import 'package:opennutritracker/features/diary/presentation/bloc/calendar_day_bloc.dart';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:opennutritracker/core/db/data_sources/intake_data_source_ob.dart';
+import 'package:opennutritracker/core/utils/csv_exporter.dart';
 import 'package:opennutritracker/features/profile/profile_page.dart';
 import 'package:opennutritracker/features/settings/presentation/widgets/goal_settings_dialog.dart';
 import 'package:opennutritracker/features/diary/presentation/bloc/diary_bloc.dart';
@@ -98,6 +103,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   leading: const Icon(Icons.import_export),
                   title: Text(S.of(context).exportImportLabel),
                   onTap: () => _showExportImportDialog(context),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.file_download_outlined),
+                  title: const Text('Export CSV'),
+                  subtitle: const Text('Share your food log as spreadsheet'),
+                  onTap: () => _exportCsv(context),
                 ),
                 ListTile(
                   leading: const Icon(Icons.description_outlined),
@@ -203,6 +214,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
         calendarDayBloc: _calendarDayBloc,
       ),
     );
+  }
+
+  Future<void> _exportCsv(BuildContext context) async {
+    try {
+      final ds = locator<IntakeDataSourceOB>();
+      final allOB = await ds.getAllIntakesOB();
+      final csv = CsvExporter.exportIntakes(allOB);
+
+      final dir = await getTemporaryDirectory();
+      final file = File('${dir.path}/ayu_food_log.csv');
+      await file.writeAsString(csv);
+
+      await SharePlus.instance.share(
+        ShareParams(files: [XFile(file.path)]),
+      );
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Export failed: $e')),
+        );
+      }
+    }
   }
 
   void _showExportImportDialog(BuildContext context) {

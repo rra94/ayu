@@ -92,6 +92,10 @@ class IntakeDataSourceOB {
     return uniqueIntake.take(number).toList();
   }
 
+  Future<List<IntakeOB>> getAllIntakesOB() async {
+    return _intakeBox.getAll();
+  }
+
   Future<List<IntakeDBO>> getFavorites() async {
     final query = _intakeBox
         .query(IntakeOB_.isFavorite.equals(true))
