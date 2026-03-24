@@ -19,9 +19,11 @@ class HealthKitService {
     HealthDataType.HEART_RATE_VARIABILITY_SDNN,
     HealthDataType.SLEEP_ASLEEP,
     HealthDataType.ACTIVE_ENERGY_BURNED,
+    HealthDataType.WORKOUT,
   ];
 
   static const _permissions = [
+    HealthDataAccess.READ,
     HealthDataAccess.READ,
     HealthDataAccess.READ,
     HealthDataAccess.READ,
@@ -99,6 +101,32 @@ class HealthKitService {
         'hrv_sdnn',
         'ms',
       );
+
+      // Process active energy burned (store as daily biomarker)
+      imported += await _syncBiomarker(
+        dataPoints
+            .where((d) => d.type == HealthDataType.ACTIVE_ENERGY_BURNED)
+            .toList(),
+        'active_energy',
+        'kcal',
+      );
+
+      // Process steps
+      imported += await _syncBiomarker(
+        dataPoints
+            .where((d) => d.type == HealthDataType.STEPS)
+            .toList(),
+        'steps',
+        'count',
+      );
+
+      // Log workout count
+      final workouts = dataPoints
+          .where((d) => d.type == HealthDataType.WORKOUT)
+          .toList();
+      if (workouts.isNotEmpty) {
+        _log.info('Found ${workouts.length} workouts from HealthKit');
+      }
 
       return SyncResult(success: true, importedCount: imported);
     } catch (e) {
