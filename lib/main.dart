@@ -25,6 +25,7 @@ import 'package:opennutritracker/features/settings/settings_screen.dart';
 import 'package:opennutritracker/generated/l10n.dart';
 import 'package:provider/provider.dart';
 import 'package:opennutritracker/core/services/habit_notification_service.dart';
+import 'package:opennutritracker/core/services/smart_notification_service.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 Future<void> main() async {
@@ -32,6 +33,7 @@ Future<void> main() async {
   LoggerConfig.intiLogger();
   await initLocator();
   await HabitNotificationService.init();
+  await SmartNotificationService.scheduleAll();
   final isUserInitialized = await locator<UserDataSourceOB>().hasUserData();
   final configRepo = locator<ConfigRepository>();
   final hasAcceptedAnonymousData =

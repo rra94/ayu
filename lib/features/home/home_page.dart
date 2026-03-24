@@ -16,6 +16,7 @@ import 'package:opennutritracker/core/db/data_sources/gut_health_data_source.dar
 import 'package:opennutritracker/core/db/entities/gut_health_item_ob.dart';
 import 'package:opennutritracker/core/services/gut_health_service.dart';
 import 'package:opennutritracker/core/services/habit_notification_service.dart';
+import 'package:opennutritracker/core/services/smart_notification_service.dart';
 import 'package:opennutritracker/core/utils/locator.dart';
 import 'package:opennutritracker/features/water/presentation/water_tracker_widget.dart';
 import 'package:opennutritracker/features/habits/presentation/habits_checklist_widget.dart';
@@ -100,6 +101,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     if (state == AppLifecycleState.resumed) {
       log.info('App resumed');
       _refreshPageOnDayChange();
+      SmartNotificationService.checkAndNotify();
     }
     super.didChangeAppLifecycleState(state);
   }
