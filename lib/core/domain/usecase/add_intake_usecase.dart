@@ -10,6 +10,9 @@ class AddIntakeUsecase {
 
   AddIntakeUsecase(this._intakeRepository);
 
+  /// Exposed for testing
+  static Map<String, double> get caffeineKeywordsForTest => _caffeineKeywords;
+
   /// Caffeine keywords → estimated mg per serving
   static const _caffeineKeywords = {
     'espresso': 63.0,
