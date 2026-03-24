@@ -25,6 +25,7 @@ import 'core/db/entities/habit_ob.dart';
 import 'core/db/entities/intake_ob.dart';
 import 'core/db/entities/mindfulness_session_ob.dart';
 import 'core/db/entities/physical_activity_ob.dart';
+import 'core/db/entities/product_inventory_ob.dart';
 import 'core/db/entities/sleep_record_ob.dart';
 import 'core/db/entities/stool_log_ob.dart';
 import 'core/db/entities/supplement_ob.dart';
@@ -1312,6 +1313,64 @@ final _entities = <obx_int.ModelEntity>[
     relations: <obx_int.ModelRelation>[],
     backlinks: <obx_int.ModelBacklink>[],
   ),
+  obx_int.ModelEntity(
+    id: const obx_int.IdUid(22, 5438023546580793832),
+    name: 'ProductInventoryOB',
+    lastPropertyId: const obx_int.IdUid(8, 3668339936043842932),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(1, 2160655106728104732),
+        name: 'id',
+        type: 6,
+        flags: 1,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(2, 2771732442541374550),
+        name: 'name',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 9186689074796547522),
+        name: 'brand',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(4, 2613546095708033889),
+        name: 'category',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(5, 2520399454521137228),
+        name: 'totalUses',
+        type: 6,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(6, 5161674056983032386),
+        name: 'usesRemaining',
+        type: 6,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(7, 4272689497817172119),
+        name: 'startedDate',
+        type: 10,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(8, 3668339936043842932),
+        name: 'barcode',
+        type: 9,
+        flags: 0,
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[],
+    backlinks: <obx_int.ModelBacklink>[],
+  ),
 ];
 
 /// Shortcut for [obx.Store.new] that passes [getObjectBoxModel] and for Flutter
@@ -1352,7 +1411,7 @@ Future<obx.Store> openStore({
 obx_int.ModelDefinition getObjectBoxModel() {
   final model = obx_int.ModelInfo(
     entities: _entities,
-    lastEntityId: const obx_int.IdUid(21, 6917020969235109846),
+    lastEntityId: const obx_int.IdUid(22, 5438023546580793832),
     lastIndexId: const obx_int.IdUid(2, 7319863865959781371),
     lastRelationId: const obx_int.IdUid(0, 0),
     lastSequenceId: const obx_int.IdUid(0, 0),
@@ -3079,6 +3138,85 @@ obx_int.ModelDefinition getObjectBoxModel() {
         return object;
       },
     ),
+    ProductInventoryOB: obx_int.EntityDefinition<ProductInventoryOB>(
+      model: _entities[21],
+      toOneRelations: (ProductInventoryOB object) => [],
+      toManyRelations: (ProductInventoryOB object) => {},
+      getId: (ProductInventoryOB object) => object.id,
+      setId: (ProductInventoryOB object, int id) {
+        object.id = id;
+      },
+      objectToFB: (ProductInventoryOB object, fb.Builder fbb) {
+        final nameOffset = fbb.writeString(object.name);
+        final brandOffset = object.brand == null
+            ? null
+            : fbb.writeString(object.brand!);
+        final categoryOffset = fbb.writeString(object.category);
+        final barcodeOffset = object.barcode == null
+            ? null
+            : fbb.writeString(object.barcode!);
+        fbb.startTable(9);
+        fbb.addInt64(0, object.id);
+        fbb.addOffset(1, nameOffset);
+        fbb.addOffset(2, brandOffset);
+        fbb.addOffset(3, categoryOffset);
+        fbb.addInt64(4, object.totalUses);
+        fbb.addInt64(5, object.usesRemaining);
+        fbb.addInt64(6, object.startedDate.millisecondsSinceEpoch);
+        fbb.addOffset(7, barcodeOffset);
+        fbb.finish(fbb.endTable());
+        return object.id;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
+        final idParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          4,
+          0,
+        );
+        final nameParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 6, '');
+        final brandParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 8);
+        final categoryParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 10, '');
+        final totalUsesParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          12,
+          0,
+        );
+        final usesRemainingParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          14,
+          0,
+        );
+        final startedDateParam = DateTime.fromMillisecondsSinceEpoch(
+          const fb.Int64Reader().vTableGet(buffer, rootOffset, 16, 0),
+        );
+        final barcodeParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 18);
+        final object = ProductInventoryOB(
+          id: idParam,
+          name: nameParam,
+          brand: brandParam,
+          category: categoryParam,
+          totalUses: totalUsesParam,
+          usesRemaining: usesRemainingParam,
+          startedDate: startedDateParam,
+          barcode: barcodeParam,
+        );
+
+        return object;
+      },
+    ),
   };
 
   return obx_int.ModelDefinition(model, bindings);
@@ -4028,5 +4166,48 @@ class CaffeineLogOB_ {
   /// See [CaffeineLogOB.dateTime].
   static final dateTime = obx.QueryDateProperty<CaffeineLogOB>(
     _entities[20].properties[3],
+  );
+}
+
+/// [ProductInventoryOB] entity fields to define ObjectBox queries.
+class ProductInventoryOB_ {
+  /// See [ProductInventoryOB.id].
+  static final id = obx.QueryIntegerProperty<ProductInventoryOB>(
+    _entities[21].properties[0],
+  );
+
+  /// See [ProductInventoryOB.name].
+  static final name = obx.QueryStringProperty<ProductInventoryOB>(
+    _entities[21].properties[1],
+  );
+
+  /// See [ProductInventoryOB.brand].
+  static final brand = obx.QueryStringProperty<ProductInventoryOB>(
+    _entities[21].properties[2],
+  );
+
+  /// See [ProductInventoryOB.category].
+  static final category = obx.QueryStringProperty<ProductInventoryOB>(
+    _entities[21].properties[3],
+  );
+
+  /// See [ProductInventoryOB.totalUses].
+  static final totalUses = obx.QueryIntegerProperty<ProductInventoryOB>(
+    _entities[21].properties[4],
+  );
+
+  /// See [ProductInventoryOB.usesRemaining].
+  static final usesRemaining = obx.QueryIntegerProperty<ProductInventoryOB>(
+    _entities[21].properties[5],
+  );
+
+  /// See [ProductInventoryOB.startedDate].
+  static final startedDate = obx.QueryDateProperty<ProductInventoryOB>(
+    _entities[21].properties[6],
+  );
+
+  /// See [ProductInventoryOB.barcode].
+  static final barcode = obx.QueryStringProperty<ProductInventoryOB>(
+    _entities[21].properties[7],
   );
 }

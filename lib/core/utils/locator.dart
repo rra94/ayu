@@ -66,6 +66,7 @@ import 'package:opennutritracker/core/services/daily_summary_service.dart';
 import 'package:opennutritracker/core/db/data_sources/biomarker_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/caffeine_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/dexa_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/inventory_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/fasting_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/mindfulness_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/sleep_data_source.dart';
@@ -240,6 +241,8 @@ Future<void> initLocator() async {
       () => DexaDataSource(objectBoxProvider.dexaScanBox));
   locator.registerLazySingleton<CaffeineDataSource>(
       () => CaffeineDataSource(objectBoxProvider.caffeineLogBox));
+  locator.registerLazySingleton<InventoryDataSource>(
+      () => InventoryDataSource(objectBoxProvider.inventoryBox));
   locator.registerLazySingleton<SupplementDataSource>(
       () => SupplementDataSource(
           objectBoxProvider.supplementBox, objectBoxProvider.supplementLogBox));
