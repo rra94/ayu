@@ -6,6 +6,7 @@ import 'package:opennutritracker/core/db/entities/eco_score_ob.dart';
 import 'package:opennutritracker/core/domain/usecase/get_config_usecase.dart';
 import 'package:opennutritracker/core/domain/usecase/get_intake_usecase.dart';
 import 'package:opennutritracker/core/utils/locator.dart';
+import 'package:opennutritracker/core/data/common_foods_db.dart';
 import 'package:opennutritracker/features/add_meal/domain/entity/meal_entity.dart';
 import 'package:opennutritracker/features/add_meal/domain/usecase/search_products_usecase.dart';
 
@@ -52,14 +53,23 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
     });
   }
 
-  /// Cascade search: OFF → USDA FDC → previously logged foods
+  /// Cascade search: Common foods → OFF → USDA FDC → local history
   Future<List<MealEntity>> _cascadeSearch(String query) async {
     if (query.isEmpty) return [];
 
-    // 1. Try OFF first
-    List<MealEntity> results = [];
+    // 0. Check built-in common foods first (instant, no network)
+    final commonMatches = CommonFoodsDB.search(query);
+
+    // 1. Try OFF
+    List<MealEntity> results = [...commonMatches];
     try {
-      results = await _searchProductUseCase.searchOFFProductsByString(query);
+      final offResults = await _searchProductUseCase.searchOFFProductsByString(query);
+      final existingNames = results.map((r) => r.name?.toLowerCase()).toSet();
+      for (final r in offResults) {
+        if (!existingNames.contains(r.name?.toLowerCase())) {
+          results.add(r);
+        }
+      }
     } catch (e) {
       log.info('OFF search failed, trying FDC: $e');
     }
