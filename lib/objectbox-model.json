@@ -95,11 +95,6 @@
           "type": 9
         },
         {
-          "id": "18:772813461993618442",
-          "name": "blueprintMode",
-          "type": 1
-        },
-        {
           "id": "19:7249192552959657294",
           "name": "showSustainability",
           "type": 1
@@ -1546,7 +1541,9 @@
   "modelVersionParserMinimum": 5,
   "retiredEntityUids": [],
   "retiredIndexUids": [],
-  "retiredPropertyUids": [],
+  "retiredPropertyUids": [
+    772813461993618442
+  ],
   "retiredRelationUids": [],
   "version": 1
 }

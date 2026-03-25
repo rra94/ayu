@@ -156,12 +156,6 @@ final _entities = <obx_int.ModelEntity>[
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(18, 772813461993618442),
-        name: 'blueprintMode',
-        type: 1,
-        flags: 0,
-      ),
-      obx_int.ModelProperty(
         id: const obx_int.IdUid(19, 7249192552959657294),
         name: 'showSustainability',
         type: 1,
@@ -1907,7 +1901,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
     lastSequenceId: const obx_int.IdUid(0, 0),
     retiredEntityUids: const [],
     retiredIndexUids: const [],
-    retiredPropertyUids: const [],
+    retiredPropertyUids: const [772813461993618442],
     retiredRelationUids: const [],
     modelVersion: 5,
     modelVersionParserMinimum: 5,
@@ -1948,7 +1942,6 @@ obx_int.ModelDefinition getObjectBoxModel() {
         fbb.addOffset(14, healthConditionsOffset);
         fbb.addBool(15, object.ayuOnboardingComplete);
         fbb.addOffset(16, allergenJsonOffset);
-        fbb.addBool(17, object.blueprintMode);
         fbb.addBool(18, object.showSustainability);
         fbb.finish(fbb.endTable());
         return object.id;
@@ -2031,12 +2024,6 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final allergenJsonParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGetNullable(buffer, rootOffset, 36);
-        final blueprintModeParam = const fb.BoolReader().vTableGet(
-          buffer,
-          rootOffset,
-          38,
-          false,
-        );
         final showSustainabilityParam = const fb.BoolReader().vTableGet(
           buffer,
           rootOffset,
@@ -2061,7 +2048,6 @@ obx_int.ModelDefinition getObjectBoxModel() {
           healthConditions: healthConditionsParam,
           ayuOnboardingComplete: ayuOnboardingCompleteParam,
           allergenJson: allergenJsonParam,
-          blueprintMode: blueprintModeParam,
           showSustainability: showSustainabilityParam,
         );
 
@@ -4465,14 +4451,9 @@ class ConfigOB_ {
     _entities[0].properties[16],
   );
 
-  /// See [ConfigOB.blueprintMode].
-  static final blueprintMode = obx.QueryBooleanProperty<ConfigOB>(
-    _entities[0].properties[17],
-  );
-
   /// See [ConfigOB.showSustainability].
   static final showSustainability = obx.QueryBooleanProperty<ConfigOB>(
-    _entities[0].properties[18],
+    _entities[0].properties[17],
   );
 }
 

@@ -107,7 +107,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           return _getLoadedContent(
               context,
               state.showDisclaimerDialog,
-              state.blueprintMode,
               state.totalKcalDaily,
               state.totalKcalLeft,
               state.totalKcalSupplied,
@@ -150,7 +149,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   Widget _getLoadedContent(
       BuildContext context,
       bool showDisclaimerDialog,
-      bool blueprintMode,
       double totalKcalDaily,
       double totalKcalLeft,
       double totalKcalSupplied,
@@ -193,18 +191,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           totalFatsGoal: totalFatsGoal,
           totalProteinsGoal: totalProteinsGoal,
         ),
-        if (blueprintMode)
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Chip(
-                avatar: const Icon(Icons.bolt, size: 16),
-                label: const Text('Blueprint Protocol',
-                    style: TextStyle(fontSize: 12)),
-              ),
-            ),
-          ),
         TodayViewCard(
           caloriesConsumed: totalKcalSupplied,
           calorieGoal: totalKcalDaily,

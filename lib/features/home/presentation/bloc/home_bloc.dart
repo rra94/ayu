@@ -13,7 +13,6 @@ import 'package:opennutritracker/core/domain/usecase/get_kcal_goal_usecase.dart'
 import 'package:opennutritracker/core/domain/usecase/get_macro_goal_usecase.dart';
 import 'package:opennutritracker/core/domain/usecase/get_user_activity_usecase.dart';
 import 'package:opennutritracker/core/domain/usecase/update_intake_usecase.dart';
-import 'package:opennutritracker/core/services/blueprint_service.dart';
 import 'package:opennutritracker/core/utils/calc/calorie_goal_calc.dart';
 import 'package:opennutritracker/core/utils/calc/macro_calc.dart';
 import 'package:opennutritracker/core/utils/locator.dart';
@@ -43,7 +42,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   double? _cachedCarbsGoal;
   double? _cachedFatsGoal;
   double? _cachedProteinsGoal;
-  bool _cachedBlueprintMode = false;
   String? _cachedGoalDay; // "yyyy-mm-dd" to invalidate on day change
 
   HomeBloc(
@@ -128,15 +126,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         _cachedFatsGoal = await _getMacroGoalUsecase.getFatsGoal(_cachedKcalGoal!);
         _cachedProteinsGoal = await _getMacroGoalUsecase.getProteinsGoal(_cachedKcalGoal!);
 
-        // Blueprint Mode: override macro targets with protocol constants
-        _cachedBlueprintMode = await BlueprintService.isEnabled();
-        if (_cachedBlueprintMode) {
-          _cachedKcalGoal = BlueprintService.dailyCalories.toDouble();
-          _cachedProteinsGoal = BlueprintService.proteinG;
-          _cachedFatsGoal = BlueprintService.fatG;
-          _cachedCarbsGoal = BlueprintService.carbsG;
-        }
-
         _cachedGoalDay = todayKey;
       }
 
@@ -144,14 +133,12 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       final totalCarbsGoal = _cachedCarbsGoal!;
       final totalFatsGoal = _cachedFatsGoal!;
       final totalProteinsGoal = _cachedProteinsGoal!;
-      final blueprintEnabled = _cachedBlueprintMode;
 
       final totalKcalLeft =
           CalorieGoalCalc.getDailyKcalLeft(totalKcalGoal, totalKcalIntake);
 
       emit(HomeLoadedState(
           showDisclaimerDialog: showDisclaimerDialog,
-          blueprintMode: blueprintEnabled,
           totalKcalDaily: totalKcalGoal,
           totalKcalLeft: totalKcalLeft,
           totalKcalSupplied: totalKcalIntake,

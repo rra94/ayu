@@ -141,16 +141,6 @@ class ConfigDataSourceOB {
     _configBox.put(ob);
   }
 
-  /// Get Blueprint Mode flag.
-  bool getBlueprintMode() => _getOrCreateConfig().blueprintMode;
-
-  /// Persist Blueprint Mode flag.
-  Future<void> setBlueprintMode(bool enabled) async {
-    final ob = _getOrCreateConfig();
-    ob.blueprintMode = enabled;
-    _configBox.put(ob);
-  }
-
   /// Get daily step goal.
   int getDailyStepGoal() => _getOrCreateConfig().dailyStepGoal ?? 10000;
 

@@ -38,9 +38,6 @@ class ConfigOB {
   /// JSON-encoded list of allergen strings, e.g. '["Gluten","Dairy","Nuts"]'
   String? allergenJson;
 
-  /// Whether Bryan Johnson's Blueprint longevity protocol is enabled
-  bool blueprintMode;
-
   /// Whether to show sustainability eco-score from Open Food Facts
   bool showSustainability;
 
@@ -62,7 +59,6 @@ class ConfigOB {
     this.healthConditions,
     this.ayuOnboardingComplete = false,
     this.allergenJson,
-    this.blueprintMode = false,
     this.showSustainability = false,
   });
 }
