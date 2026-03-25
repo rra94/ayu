@@ -204,13 +204,33 @@ class DataCollectionAgent {
   }
 
   /// Send the most important data request as a notification.
+  static DateTime? _lastSent;
+  static String? _lastSentType;
+
+  /// Send the most important data request as a notification.
+  /// Cooldown: max once per hour, and not the same type within 4 hours.
   static Future<void> sendDataRequest(AgentContext ctx) async {
+    // Cooldown: don't spam
+    if (_lastSent != null && DateTime.now().difference(_lastSent!).inMinutes < 60) {
+      return;
+    }
+
     final requests = await analyzeNeeds(ctx);
     if (requests.isEmpty) return;
 
     final request = requests.first;
+
+    // Don't repeat same type within 4 hours
+    if (_lastSentType == request.type &&
+        _lastSent != null &&
+        DateTime.now().difference(_lastSent!).inHours < 4) {
+      return;
+    }
+
     _log.info(
         'Data collection request: ${request.type} (${request.reason})');
+    _lastSent = DateTime.now();
+    _lastSentType = request.type;
 
     await _plugin.show(
       id: 95000 + request.type.hashCode % 1000, // unique-ish ID

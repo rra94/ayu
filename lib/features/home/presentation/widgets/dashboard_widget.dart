@@ -121,9 +121,9 @@ class _DashboardWidgetState extends State<DashboardWidget> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Column(
+                  Flexible(child: Column(
                     children: [
                       Icon(
                         Icons.keyboard_arrow_up_outlined,
@@ -132,26 +132,26 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                       Text('${widget.totalKcalSupplied.toInt()}',
                           style: Theme.of(context)
                               .textTheme
-                              .titleLarge
+                              .titleMedium
                               ?.copyWith(
                                   color:
                                       Theme.of(context).colorScheme.onSurface)),
                       Text(S.of(context).suppliedLabel,
                           style: Theme.of(context)
                               .textTheme
-                              .titleSmall
+                              .labelSmall
                               ?.copyWith(
                                   color:
                                       Theme.of(context).colorScheme.onSurface)),
                     ],
-                  ),
+                  )),
                   GestureDetector(
                     onTap: () {
                       HapticFeedback.lightImpact();
                       _showNutritionBreakdown(context);
                     },
                     child: CircularPercentIndicator(
-                      radius: 90.0,
+                      radius: 70.0,
                       lineWidth: 13.0,
                       animation: true,
                       percent: gaugeValue,
@@ -195,26 +195,26 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                       circularStrokeCap: CircularStrokeCap.round,
                     ),
                   ),
-                  Column(
+                  Flexible(child: Column(
                     children: [
                       Icon(Icons.keyboard_arrow_down_outlined,
                           color: Theme.of(context).colorScheme.onSurface),
                       Text('${widget.totalKcalBurned.toInt()}',
                           style: Theme.of(context)
                               .textTheme
-                              .titleLarge
+                              .titleMedium
                               ?.copyWith(
                                   color:
                                       Theme.of(context).colorScheme.onSurface)),
                       Text(S.of(context).burnedLabel,
                           style: Theme.of(context)
                               .textTheme
-                              .titleSmall
+                              .labelSmall
                               ?.copyWith(
                                   color:
                                       Theme.of(context).colorScheme.onSurface)),
                     ],
-                  ),
+                  )),
                 ],
               ),
               MacroNutrientsView(

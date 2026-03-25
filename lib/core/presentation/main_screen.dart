@@ -19,6 +19,7 @@ import 'package:opennutritracker/core/services/data_retention_service.dart';
 import 'package:opennutritracker/core/services/location_inference_service.dart';
 import 'package:opennutritracker/core/utils/locator.dart';
 import 'package:opennutritracker/core/services/notification_action_service.dart';
+import 'package:opennutritracker/core/services/widget_service.dart';
 import 'package:opennutritracker/features/health_connect/services/healthkit_service.dart';
 
 class MainScreen extends StatefulWidget {
@@ -41,6 +42,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     NotificationActionService.init();
+    WidgetService.init();
     DataRetentionService.pruneOldData().catchError((e) {
       debugPrint('DataRetention prune error: $e');
     });
@@ -119,36 +121,11 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       appBar: _appbarPages[_selectedPageIndex],
       body: _bodyPages[_selectedPageIndex],
       floatingActionButton: _selectedPageIndex == 0
-          ? Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                FloatingActionButton.small(
-                  heroTag: 'search',
-                  onPressed: () {
-                    final hour = DateTime.now().hour;
-                    final mealType = hour < 11
-                        ? AddMealType.breakfastType
-                        : hour < 15
-                            ? AddMealType.lunchType
-                            : hour < 21
-                                ? AddMealType.dinnerType
-                                : AddMealType.snackType;
-                    Navigator.of(context).pushNamed(
-                      NavigationOptions.addMealRoute,
-                      arguments: AddMealScreenArguments(mealType, DateTime.now()),
-                    );
-                  },
-                  tooltip: 'Search food',
-                  child: const Icon(Icons.search, size: 20),
-                ),
-                const SizedBox(height: 8),
-                FloatingActionButton(
-                  heroTag: 'camera',
-                  onPressed: () => _showCameraOptions(context),
-                  tooltip: 'Camera',
-                  child: const Icon(Icons.camera_alt),
-                ),
-              ],
+          ? FloatingActionButton(
+              heroTag: 'add',
+              onPressed: () => _showAddOptions(context),
+              tooltip: 'Add',
+              child: const Icon(Icons.add),
             )
           : null,
       bottomNavigationBar: NavigationBar(
@@ -186,7 +163,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     });
   }
 
-  void _showCameraOptions(BuildContext context) {
+  void _showAddOptions(BuildContext context) {
     final hour = DateTime.now().hour;
     final intakeType = hour < 11
         ? IntakeTypeEntity.breakfast
@@ -196,12 +173,32 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
                 ? IntakeTypeEntity.dinner
                 : IntakeTypeEntity.snack;
 
+    final mealType = hour < 11
+        ? AddMealType.breakfastType
+        : hour < 15
+            ? AddMealType.lunchType
+            : hour < 21
+                ? AddMealType.dinnerType
+                : AddMealType.snackType;
+
     showModalBottomSheet(
       context: context,
       builder: (ctx) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            ListTile(
+              leading: const Icon(Icons.search),
+              title: const Text('Search Food'),
+              subtitle: const Text('Look up by name'),
+              onTap: () {
+                Navigator.pop(ctx);
+                Navigator.of(context).pushNamed(
+                  NavigationOptions.addMealRoute,
+                  arguments: AddMealScreenArguments(mealType, DateTime.now()),
+                );
+              },
+            ),
             ListTile(
               leading: const Icon(Icons.qr_code_scanner),
               title: const Text('Scan Barcode'),
