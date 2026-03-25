@@ -37,7 +37,7 @@ class _ReceiptScannerScreenState extends State<ReceiptScannerScreen> {
     // On-device OCR via Apple Vision — image never leaves device
     List<ReceiptItem> items;
     String? rawText;
-    String? _debugError;
+    String? debugError;
     try {
       rawText = await VisionOCRService.recognizeText(image.path);
       if (rawText != null && rawText.isNotEmpty) {
@@ -55,7 +55,7 @@ class _ReceiptScannerScreenState extends State<ReceiptScannerScreen> {
       _debugError = 'OCR error: $e';
     }
 
-    if (_debugError != null && items.isEmpty) {
+    if (debugError != null && items.isEmpty) {
       setState(() => _processing = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -107,12 +107,32 @@ class _ReceiptScannerScreenState extends State<ReceiptScannerScreen> {
     }
   }
 
+  bool _cameraLaunched = false;
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
+    // Auto-launch camera on first build
+    if (!_cameraLaunched && _items.isEmpty && !_processing) {
+      _cameraLaunched = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _processImage(ImageSource.camera);
+      });
+    }
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Scan Receipt')),
+      appBar: AppBar(
+        title: const Text('Scan Receipt'),
+        actions: [
+          if (_items.isEmpty && !_processing)
+            IconButton(
+              icon: const Icon(Icons.photo_library),
+              tooltip: 'Pick from gallery',
+              onPressed: () => _processImage(ImageSource.gallery),
+            ),
+        ],
+      ),
       body: _items.isEmpty
           ? _buildCaptureView(theme)
           : _restaurantName != null
@@ -138,32 +158,13 @@ class _ReceiptScannerScreenState extends State<ReceiptScannerScreen> {
                 Icon(Icons.receipt_long, size: 64,
                     color: theme.colorScheme.secondary),
                 const SizedBox(height: 16),
-                Text('Scan a receipt',
+                Text('Take a photo of your receipt',
                     style: theme.textTheme.titleMedium),
-                const SizedBox(height: 4),
-                Text(
-                  'Take a photo or pick from gallery.\nOn-device AI reads the receipt \u2014 nothing leaves your phone.',
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
                 const SizedBox(height: 24),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    FilledButton.icon(
-                      onPressed: () => _processImage(ImageSource.camera),
-                      icon: const Icon(Icons.camera_alt),
-                      label: const Text('Camera'),
-                    ),
-                    const SizedBox(width: 16),
-                    OutlinedButton.icon(
-                      onPressed: () => _processImage(ImageSource.gallery),
-                      icon: const Icon(Icons.photo_library),
-                      label: const Text('Gallery'),
-                    ),
-                  ],
+                FilledButton.icon(
+                  onPressed: () => _processImage(ImageSource.camera),
+                  icon: const Icon(Icons.camera_alt),
+                  label: const Text('Open Camera'),
                 ),
               ],
             ),
