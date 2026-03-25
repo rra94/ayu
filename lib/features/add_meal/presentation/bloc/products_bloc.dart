@@ -8,6 +8,7 @@ import 'package:opennutritracker/core/domain/usecase/get_config_usecase.dart';
 import 'package:opennutritracker/core/domain/usecase/get_intake_usecase.dart';
 import 'package:opennutritracker/core/utils/locator.dart';
 import 'package:opennutritracker/core/data/common_foods_db.dart';
+import 'package:opennutritracker/core/data/government_foods_db.dart';
 import 'package:opennutritracker/features/add_meal/domain/entity/meal_entity.dart';
 import 'package:opennutritracker/features/add_meal/domain/usecase/search_products_usecase.dart';
 
@@ -60,6 +61,17 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
 
     // 0. Check built-in common foods first (instant, no network)
     final commonMatches = CommonFoodsDB.search(query);
+
+    // 0.5. Check government food databases (CNF, COFID, AUSNUT — bundled assets)
+    try {
+      final govResults = await GovernmentFoodsDB.search(query);
+      final existingNames = commonMatches.map((r) => r.name?.toLowerCase()).toSet();
+      for (final r in govResults) {
+        if (!existingNames.contains(r.name?.toLowerCase())) {
+          commonMatches.add(r);
+        }
+      }
+    } catch (_) {}
 
     // 1. Try OFF
     List<MealEntity> results = [...commonMatches];
