@@ -7,7 +7,7 @@
 
 Add on-device phone sensor integration to Ayu using CoreMotion (steps, activity detection, sedentary tracking), CoreLocation (significant location changes for gym/outdoor detection), and CMAltimeter (barometric pressure for weather-mood correlation). Data surfaces through an Activity Dashboard on the home page and cross-domain agent insights.
 
-**Principles:** Zero cloud. All sensor data stays on-device in ObjectBox. Location data is particularly sensitive — never exported or synced.
+**Principles:** Zero cloud. All sensor data stays on-device in ObjectBox. Location data is particularly sensitive — never exported or synced. None of the new services interact with Supabase or any remote backend.
 
 ---
 
@@ -16,22 +16,25 @@ Add on-device phone sensor integration to Ayu using CoreMotion (steps, activity 
 Three new platform channels in `AppDelegate.swift`:
 
 ### `com.rra94.ayu/core_motion`
-- `startStepCounter` — Starts `CMPedometer` live updates, streams step count + distance back to Flutter via `FlutterEventChannel`.
 - `getActivityType` — One-shot `CMMotionActivityManager` query. Returns: `stationary`, `walking`, `running`, `cycling`, `automotive`, `unknown`.
-- `getStationaryDuration` — Queries `CMMotionActivityManager` activity history, returns minutes since last non-stationary activity.
+- `getStationaryDuration` — Queries `CMMotionActivityManager` activity history (bounded to last 12 hours, cached for 5 min), returns minutes since last non-stationary activity.
+
+**Note:** Steps are read from HealthKit (already integrated via `health` package), not from a separate `CMPedometer` stream. This avoids dual sources of truth. CoreMotion is used only for activity type detection and sedentary tracking.
 
 ### `com.rra94.ayu/core_location`
-- `startSignificantLocationMonitoring` — Registers for `CLLocationManager.startMonitoringSignificantLocationChanges()`. Fires on ~500m movement.
+- `startSignificantLocationMonitoring` — Registers for `CLLocationManager.startMonitoringSignificantLocationChanges()`. Fires on ~500m movement. Uses "When In Use" permission only (sufficient for personal use, avoids "Always" permission complexity).
 - `getLastKnownLocation` — Returns cached lat/lon from last significant change.
 - Location changes pushed to Flutter via `FlutterEventChannel`, processed by `LocationInferenceService`.
+- **Lifecycle:** Monitoring starts on app foreground, iOS may continue delivering events briefly in background. No `UIBackgroundModes` `location` capability needed — gym detection works from accumulated visits while app is in use.
 
 ### `com.rra94.ayu/barometer`
-- `readPressure` — Single `CMAltimeter.startRelativeAltitudeUpdates()` reading. Returns pressure (kPa) and relative altitude (meters). Called once on app foreground, stored in ObjectBox.
+- `readPressure` — Single `CMAltimeter.startRelativeAltitudeUpdates()` reading. Returns absolute pressure (kPa) only. Called once on app foreground, stored in ObjectBox. Relative altitude is not stored (resets each time, meaningless for single readings).
 
 ### Info.plist Permissions
 - `NSMotionUsageDescription` — "Ayu tracks your activity to detect sedentary periods and suggest movement."
 - `NSLocationWhenInUseUsageDescription` — "Ayu detects gym visits and outdoor time to correlate with your health data."
-- `NSLocationAlwaysAndWhenInUseUsageDescription` — "Ayu detects gym visits and outdoor time even when the app is in the background."
+
+No "Always" location permission — "When In Use" is sufficient for personal use.
 
 ---
 
@@ -58,11 +61,10 @@ One record per app-open or per significant activity change.
 
 **`PressureReadingOB`**
 - `int id`
-- `double pressureKPa`
-- `double relativeAltitudeMeters`
+- `double pressureKPa` — absolute barometric pressure
 - `DateTime dateTime`
 
-One per app-open.
+One per app-open. No relative altitude (resets per session, useless for single readings).
 
 **`SavedLocationOB`**
 - `int id`
@@ -71,7 +73,13 @@ One per app-open.
 - `String label` — user-confirmed label ("gym", "office", etc.)
 - `int visitCount` — auto-incremented, used for auto-detection threshold
 
-Auto-detected after 3+ visits to the same spot (within radius). User confirms label once via agent suggestion.
+Auto-detected after 3+ visits to the same spot (within radius). `visitCount` incremented by `LocationInferenceService` when a new visit matches. User confirms label once via agent suggestion.
+
+### Data Retention
+- `ActivitySnapshotOB` — keep 90 days, prune older on app start.
+- `LocationVisitOB` — keep 30 days of raw lat/lon. After 30 days, delete raw coordinates but keep label + date (aggregated).
+- `PressureReadingOB` — keep 90 days, prune older.
+- `SavedLocationOB` — permanent (user-confirmed places).
 
 ### New Data Sources
 
@@ -86,11 +94,12 @@ Auto-detected after 3+ visits to the same spot (within radius). User confirms la
 
 ### `CoreMotionService`
 - Wrapper around `com.rra94.ayu/core_motion` platform channel.
-- `Stream<int> streamSteps()` — live pedometer stream.
 - `Future<String> getCurrentActivity()` — one-shot activity type.
-- `Future<int> getStationaryMinutes()` — minutes since last movement.
-- On app init: starts pedometer, stores `ActivitySnapshotOB` on each update.
-- Graceful degradation: if permission denied, methods return defaults (0 steps, "unknown" activity).
+- `Future<int> getStationaryMinutes()` — minutes since last movement (cached 5 min, bounded 12h lookback).
+- Steps come from HealthKit (existing `HealthKitService.sync()`), not from CoreMotion.
+- On app foreground: queries activity type, stores `ActivitySnapshotOB`.
+- Graceful degradation: if permission denied, methods return defaults ("unknown" activity, 0 minutes).
+- **Lifecycle:** Uses `WidgetsBindingObserver` — queries on `resumed`, no-op on `paused`.
 
 ### `LocationInferenceService`
 - Consumes location events from `com.rra94.ayu/core_location` EventChannel.
@@ -131,7 +140,7 @@ Auto-detected after 3+ visits to the same spot (within radius). User confirms la
 
 **`_pressureMoodCorrelation()`** (replaces `_weatherMoodCorrelation` skeleton)
 - Reads `BarometerService.getPressureChange(Duration(hours: 6))`.
-- If pressure dropped > 2 kPa AND user logged low mood (symptom 8, severity >= 3):
+- If pressure dropped > 0.7 kPa (~7 hPa) AND user logged low mood (symptom 8, severity >= 3):
   "Barometric pressure dropped today and you logged low mood — pressure changes can trigger headaches and fatigue. Stay hydrated and rest."
 
 **`_sedentarySleepCorrelation()`**
@@ -164,7 +173,7 @@ Two-row Card, same visual style as `TodayViewCard` (gold Lotus theme).
 |-------|----------|----------|---------|
 | 6,234 / 10k | Walking icon | 340 kcal | 45 min |
 
-- **Steps** — Live count from CoreMotion, gold `_MiniGauge` showing % of `ConfigOB.dailyStepGoal`.
+- **Steps** — Today's count from HealthKit (via `BiomarkerDataSource`), gold `_MiniGauge` showing % of `ConfigOB.dailyStepGoal` (default 10,000 if null).
 - **Activity** — Current activity type as icon (directions_walk / directions_run / directions_bike / airline_seat_recline_normal / directions_car). Updates on app foreground.
 - **Calories** — Active energy burned today from `BiomarkerDataSource` (HealthKit sync). Gold `_MiniStat`.
 - **Outdoor** — Estimated minutes outside. Gold text when > 30 min, dimmed gold otherwise.
