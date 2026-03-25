@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:opennutritracker/core/domain/entity/intake_entity.dart';
 import 'package:opennutritracker/core/domain/usecase/get_intake_usecase.dart';
 import 'package:opennutritracker/core/styles/color_schemes.dart';
 import 'package:opennutritracker/core/utils/locator.dart';
+import 'package:opennutritracker/core/utils/navigation_options.dart';
+import 'package:opennutritracker/features/add_meal/presentation/add_meal_screen.dart';
+import 'package:opennutritracker/features/add_meal/presentation/add_meal_type.dart';
 
 class PlantTrackerWidget extends StatefulWidget {
   const PlantTrackerWidget({super.key});
@@ -197,23 +201,44 @@ class _PlantTrackerWidgetState extends State<PlantTrackerWidget> {
                       spacing: 6,
                       runSpacing: 4,
                       children: _uniquePlants.map((plant) {
-                        return Chip(
-                          avatar: Icon(
-                            Icons.check_circle_outline,
-                            size: 14,
-                            color: activeColor,
-                          ),
-                          label: Text(
-                            plant,
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              color: theme.colorScheme.onSurface,
+                        return Tooltip(
+                          message: 'Tap to log more $plant',
+                          child: ActionChip(
+                            avatar: Icon(
+                              Icons.check_circle_outline,
+                              size: 14,
+                              color: activeColor,
                             ),
+                            label: Text(
+                              plant,
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                color: theme.colorScheme.onSurface,
+                              ),
+                            ),
+                            padding: EdgeInsets.zero,
+                            visualDensity: VisualDensity.compact,
+                            materialTapTargetSize:
+                                MaterialTapTargetSize.shrinkWrap,
+                            backgroundColor: activeColor.withValues(alpha: 0.08),
+                            side: BorderSide(
+                                color: activeColor.withValues(alpha: 0.25)),
+                            onPressed: () {
+                              HapticFeedback.lightImpact();
+                              final hour = DateTime.now().hour;
+                              final mealType = hour < 11
+                                  ? AddMealType.breakfastType
+                                  : hour < 15
+                                      ? AddMealType.lunchType
+                                      : hour < 21
+                                          ? AddMealType.dinnerType
+                                          : AddMealType.snackType;
+                              Navigator.of(context).pushNamed(
+                                NavigationOptions.addMealRoute,
+                                arguments: AddMealScreenArguments(
+                                    mealType, DateTime.now()),
+                              );
+                            },
                           ),
-                          padding: EdgeInsets.zero,
-                          visualDensity: VisualDensity.compact,
-                          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                          backgroundColor: activeColor.withValues(alpha: 0.08),
-                          side: BorderSide(color: activeColor.withValues(alpha: 0.25)),
                         );
                       }).toList(),
                     ),

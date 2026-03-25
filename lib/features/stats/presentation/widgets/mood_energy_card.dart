@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:opennutritracker/core/db/data_sources/symptom_data_source.dart';
 import 'package:opennutritracker/core/db/entities/symptom_log_ob.dart';
 import 'package:opennutritracker/core/utils/locator.dart';
@@ -78,7 +79,10 @@ class _MoodEnergyCardState extends State<MoodEnergyCard> {
                   final val = i + 1;
                   final selected = _todayMood == val;
                   return GestureDetector(
-                    onTap: () => _logMood(val),
+                    onTap: () {
+                      HapticFeedback.lightImpact();
+                      _logMood(val);
+                    },
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 4),
                       child: Text(
@@ -102,7 +106,10 @@ class _MoodEnergyCardState extends State<MoodEnergyCard> {
                   final val = i + 1;
                   final selected = _todayEnergy == val;
                   return GestureDetector(
-                    onTap: () => _logEnergy(val),
+                    onTap: () {
+                      HapticFeedback.lightImpact();
+                      _logEnergy(val);
+                    },
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 4),
                       child: Text(
