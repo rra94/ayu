@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:opennutritracker/core/db/data_sources/search_history_data_source.dart';
 import 'package:opennutritracker/core/services/grocery_service.dart';
 import 'package:opennutritracker/core/services/receipt_parser_service.dart';
 import 'package:opennutritracker/core/services/restaurant_lookup_service.dart';
 import 'package:opennutritracker/core/services/vision_ocr_service.dart';
+import 'package:opennutritracker/core/utils/locator.dart';
 import 'package:opennutritracker/core/utils/navigation_options.dart';
 import 'package:opennutritracker/features/meal_detail/meal_detail_screen.dart';
 import 'package:opennutritracker/features/add_meal/domain/entity/meal_entity.dart';
@@ -22,6 +24,9 @@ class _ReceiptScannerScreenState extends State<ReceiptScannerScreen> {
   bool _lookingUp = false;
   List<ReceiptItem> _items = [];
   final _selectedItems = <int>{};
+  final _autoSelectedItems = <int>{};
+
+  bool _isGroupOrder = false;
 
   // Restaurant detection
   String? _restaurantName;
@@ -73,6 +78,8 @@ class _ReceiptScannerScreenState extends State<ReceiptScannerScreen> {
     setState(() {
       _items = items;
       _selectedItems.addAll(List.generate(items.length, (i) => i));
+      _autoSelectedItems.clear();
+      _isGroupOrder = false;
       _restaurantName = restaurant;
       _processing = false;
     });
@@ -104,6 +111,34 @@ class _ReceiptScannerScreenState extends State<ReceiptScannerScreen> {
       if (mounted) {
         setState(() => _lookingUp = false);
       }
+    }
+  }
+
+  Future<void> _autoSelectFromPreferences() async {
+    final historyDs = locator<SearchHistoryDataSource>();
+
+    for (int i = 0; i < _items.length; i++) {
+      final item = _items[i];
+      // Check if user has logged this food before
+      final matches = await historyDs.getMatchingTerms(item.name, limit: 1);
+      if (matches.isNotEmpty) {
+        if (mounted) {
+          setState(() {
+            _selectedItems.add(i);
+            _autoSelectedItems.add(i);
+          });
+        }
+      }
+    }
+
+    // If nothing auto-selected, show hint
+    if (_selectedItems.isEmpty && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No preferences learned yet — select your items manually'),
+          duration: Duration(seconds: 3),
+        ),
+      );
     }
   }
 
@@ -171,6 +206,31 @@ class _ReceiptScannerScreenState extends State<ReceiptScannerScreen> {
     );
   }
 
+  // ── Group order toggle (shared by both views) ──
+
+  Widget _buildGroupOrderToggle() {
+    return SwitchListTile(
+      dense: true,
+      title: const Text('Group order'),
+      subtitle: const Text('Select only your items'),
+      value: _isGroupOrder,
+      onChanged: (v) {
+        setState(() {
+          _isGroupOrder = v;
+          _autoSelectedItems.clear();
+          if (v) {
+            // Uncheck all, then auto-check based on preferences
+            _selectedItems.clear();
+            _autoSelectFromPreferences();
+          } else {
+            // Check all
+            _selectedItems.addAll(List.generate(_items.length, (i) => i));
+          }
+        });
+      },
+    );
+  }
+
   // ── Grocery receipt (existing flow, unchanged) ──
 
   Widget _buildResultsView(ThemeData theme) {
@@ -187,6 +247,8 @@ class _ReceiptScannerScreenState extends State<ReceiptScannerScreen> {
                 onPressed: () => setState(() {
                   _items.clear();
                   _selectedItems.clear();
+                  _autoSelectedItems.clear();
+                  _isGroupOrder = false;
                   _restaurantName = null;
                   _lookupResults.clear();
                 }),
@@ -195,12 +257,14 @@ class _ReceiptScannerScreenState extends State<ReceiptScannerScreen> {
             ],
           ),
         ),
+        _buildGroupOrderToggle(),
         Expanded(
           child: ListView.builder(
             itemCount: _items.length,
             itemBuilder: (context, index) {
               final item = _items[index];
               final selected = _selectedItems.contains(index);
+              final wasAutoSelected = _autoSelectedItems.contains(index);
               return CheckboxListTile(
                 dense: true,
                 value: selected,
@@ -224,6 +288,15 @@ class _ReceiptScannerScreenState extends State<ReceiptScannerScreen> {
                   ].join(' \u00b7 '),
                   style: theme.textTheme.bodySmall,
                 ),
+                secondary: _isGroupOrder && wasAutoSelected
+                    ? Chip(
+                        label: const Text('Your pick',
+                            style: TextStyle(fontSize: 10)),
+                        labelPadding: EdgeInsets.zero,
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        visualDensity: VisualDensity.compact,
+                      )
+                    : null,
               );
             },
           ),
@@ -304,6 +377,8 @@ class _ReceiptScannerScreenState extends State<ReceiptScannerScreen> {
                 onPressed: () => setState(() {
                   _items.clear();
                   _selectedItems.clear();
+                  _autoSelectedItems.clear();
+                  _isGroupOrder = false;
                   _restaurantName = null;
                   _lookupResults.clear();
                 }),
@@ -312,6 +387,9 @@ class _ReceiptScannerScreenState extends State<ReceiptScannerScreen> {
             ],
           ),
         ),
+
+        // Group order toggle
+        _buildGroupOrderToggle(),
 
         // Loading indicator for nutrition lookup
         if (_lookingUp)
@@ -386,6 +464,7 @@ class _ReceiptScannerScreenState extends State<ReceiptScannerScreen> {
   }) {
     final kcal = bestMatch?.nutriments.energyKcal100;
     final matchName = bestMatch?.name;
+    final wasAutoSelected = _autoSelectedItems.contains(index);
 
     // Confidence indicator
     Color dotColor;
@@ -455,6 +534,18 @@ class _ReceiptScannerScreenState extends State<ReceiptScannerScreen> {
                           ),
                         ),
                       ),
+                      if (_isGroupOrder && wasAutoSelected)
+                        Padding(
+                          padding: const EdgeInsets.only(left: 8),
+                          child: Chip(
+                            label: const Text('Your pick',
+                                style: TextStyle(fontSize: 10)),
+                            labelPadding: EdgeInsets.zero,
+                            materialTapTargetSize:
+                                MaterialTapTargetSize.shrinkWrap,
+                            visualDensity: VisualDensity.compact,
+                          ),
+                        ),
                       if (item.price != null && item.price! > 0)
                         Text(
                           '\$${item.price!.toStringAsFixed(2)}',
@@ -523,6 +614,18 @@ class _ReceiptScannerScreenState extends State<ReceiptScannerScreen> {
   // ── Logging actions ──
 
   void _logSelectedItems() async {
+    // Record selected items as preferences for future group orders
+    final historyDs = locator<SearchHistoryDataSource>();
+    for (final index in _selectedItems) {
+      final item = _items[index];
+      try {
+        await historyDs.recordChoice(
+          searchTerm: item.name.toLowerCase(),
+          mealName: item.name,
+        );
+      } catch (_) {}
+    }
+
     final selectedReceiptItems = _selectedItems.map((i) => _items[i]).toList();
     await GroceryService.addFromReceipt(selectedReceiptItems);
 
@@ -567,6 +670,18 @@ class _ReceiptScannerScreenState extends State<ReceiptScannerScreen> {
 
   void _logSelectedRestaurantItems() async {
     if (_selectedItems.isEmpty) return;
+
+    // Record selected items as preferences for future group orders
+    final historyDs = locator<SearchHistoryDataSource>();
+    for (final index in _selectedItems) {
+      final item = _items[index];
+      try {
+        await historyDs.recordChoice(
+          searchTerm: item.name.toLowerCase(),
+          mealName: item.name,
+        );
+      } catch (_) {}
+    }
 
     final intakeType = _inferIntakeType();
 
