@@ -75,6 +75,9 @@ import 'package:opennutritracker/core/db/data_sources/pressure_data_source.dart'
 import 'package:opennutritracker/core/db/data_sources/saved_location_data_source.dart';
 import 'package:opennutritracker/objectbox.g.dart';
 import 'package:opennutritracker/core/services/gut_health_service.dart';
+import 'package:opennutritracker/core/services/core_motion_service.dart';
+import 'package:opennutritracker/core/services/location_inference_service.dart';
+import 'package:opennutritracker/core/services/barometer_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 final locator = GetIt.instance;
@@ -249,6 +252,9 @@ Future<void> initLocator() async {
   // Services
   locator.registerLazySingleton<GutHealthService>(() => GutHealthService());
   locator.registerLazySingleton<DailySummaryService>(() => DailySummaryService());
+  locator.registerLazySingleton<CoreMotionService>(() => CoreMotionService());
+  locator.registerLazySingleton<LocationInferenceService>(() => LocationInferenceService());
+  locator.registerLazySingleton<BarometerService>(() => BarometerService());
 
   await _initializeConfig(locator<ConfigDataSourceOB>());
   await locator<HabitDataSource>().initializeDefaultHabits();
