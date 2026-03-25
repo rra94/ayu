@@ -439,15 +439,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     }
   }
 
-  void _confirmDelete(BuildContext context, IntakeEntity intake) async {
-    bool? delete = await showDialog<bool>(
-        context: context, builder: (context) => const DeleteDialog());
-
-    if (delete == true) {
-      onDeleteIntake(intake, null);
-    }
-  }
-
   /// Show disclaimer dialog after build method
   void _showDisclaimerDialog(BuildContext context) async {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -491,8 +482,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         final logs = snapshot.data![1] as List;
         final completedIds = <int>{};
         for (final log in logs) {
-          if ((log as HabitLogOB).completed) {
-            completedIds.add((log as HabitLogOB).habitId);
+          final habitLog = log as HabitLogOB;
+          if (habitLog.completed) {
+            completedIds.add(habitLog.habitId);
           }
         }
         return HabitsChecklistWidget(

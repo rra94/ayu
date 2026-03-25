@@ -34,7 +34,7 @@ class StatsPage extends StatelessWidget {
           title: 'Body',
           icon: Icons.accessibility_new,
           storageKey: 'stats_body',
-          children: [TdeeCard(), WeightChartCard(), DexaCard()],
+          children: [TdeeCard(), WeightChartCard()],
         ),
 
         // Nutrition
@@ -45,12 +45,25 @@ class StatsPage extends StatelessWidget {
           children: [NutrientIntelligenceCard(), GlycemicCard(), MealTimingCard()],
         ),
 
+        // Labs & Body Composition
+        CollapsibleSection(
+          title: 'Labs & Body Composition',
+          icon: Icons.biotech_outlined,
+          storageKey: 'stats_labs',
+          initiallyExpanded: false,
+          children: [
+            DexaCard(),
+            BiomarkerCard(),
+            BioAgeCard(),
+          ],
+        ),
+
         // Health
         CollapsibleSection(
           title: 'Health',
           icon: Icons.favorite,
           storageKey: 'stats_health',
-          children: [LongevityInsightsCard(), BiomarkerCard(), BioAgeCard()],
+          children: [LongevityInsightsCard()],
         ),
 
         // Tracking

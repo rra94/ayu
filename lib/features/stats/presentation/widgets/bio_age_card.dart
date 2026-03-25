@@ -56,9 +56,20 @@ class _BioAgeCardState extends State<BioAgeCard> {
               children: [
                 Icon(Icons.elderly, color: theme.colorScheme.primary),
                 const SizedBox(width: 8),
-                Text('Biological Age',
-                    style: theme.textTheme.titleMedium
-                        ?.copyWith(fontWeight: FontWeight.w600)),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Biological Age',
+                          style: theme.textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.w600)),
+                      Text('Requires blood work (9 markers)',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          )),
+                    ],
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 12),
