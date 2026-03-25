@@ -73,12 +73,13 @@ class SmartNotificationService {
       presentAlert: true,
       presentBadge: true,
       presentSound: true,
+      categoryIdentifier: 'ENERGY_CHECK',
     );
 
     await _plugin.zonedSchedule(
       id: _eveningCheckInId,
-      title: 'Evening Check-in',
-      body: 'How was your day? Tap to review and fill any gaps.',
+      title: 'Rate your day',
+      body: 'How was your energy today?',
       scheduledDate: scheduledDate,
       notificationDetails: const NotificationDetails(iOS: iosDetails),
       androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
@@ -370,8 +371,9 @@ class SmartNotificationService {
 
       await _sendNotification(
         id: _dailySummaryId,
-        title: 'Daily Summary',
+        title: 'Day Score: ${score.grade}',
         body: parts.join(' · '),
+        categoryIdentifier: 'ENERGY_CHECK',
       );
     } catch (e) {
       _log.fine('Daily summary notification failed: $e');
@@ -391,12 +393,13 @@ class SmartNotificationService {
     const iosDetails = DarwinNotificationDetails(
       presentAlert: true,
       presentSound: true,
+      categoryIdentifier: 'ENERGY_CHECK',
     );
 
     await _plugin.zonedSchedule(
       id: _dailySummaryId,
-      title: 'Daily Summary',
-      body: 'Tap to see how your day went',
+      title: 'Rate your day',
+      body: 'How was your energy?',
       scheduledDate: scheduledDate,
       notificationDetails: const NotificationDetails(iOS: iosDetails),
       androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
