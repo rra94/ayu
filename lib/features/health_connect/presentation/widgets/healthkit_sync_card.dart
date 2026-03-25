@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:opennutritracker/features/health_connect/services/healthkit_service.dart';
 
 class HealthKitSyncCard extends StatefulWidget {
@@ -27,8 +28,6 @@ class _HealthKitSyncCardState extends State<HealthKitSyncCard> {
   Future<void> _sync() async {
     setState(() => _syncing = true);
 
-    final isFirstSync = !_hasPermission;
-
     if (!_hasPermission) {
       final granted = await HealthKitService.requestPermissions();
       if (!granted) {
@@ -38,10 +37,18 @@ class _HealthKitSyncCardState extends State<HealthKitSyncCard> {
       setState(() => _hasPermission = true);
     }
 
-    // First-ever sync: pull 90 days to kickstart circadian, HRV, sleep baselines
-    final result = isFirstSync
-        ? await HealthKitService.syncInitial()
-        : await HealthKitService.sync();
+    // Check if 90-day backfill has ever run (persisted across app restarts)
+    final prefs = await SharedPreferences.getInstance();
+    final hasBackfilled = prefs.getBool('healthkit_backfill_done') ?? false;
+
+    SyncResult result;
+    if (!hasBackfilled) {
+      // First-ever sync: pull 90 days to kickstart circadian, HRV, sleep baselines
+      result = await HealthKitService.syncInitial();
+      await prefs.setBool('healthkit_backfill_done', true);
+    } else {
+      result = await HealthKitService.sync();
+    }
     setState(() {
       _lastResult = result;
       _syncing = false;
