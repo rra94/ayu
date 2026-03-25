@@ -18,6 +18,7 @@ import 'package:opennutritracker/core/db/data_sources/config_data_source_ob.dart
 import 'package:opennutritracker/core/services/data_retention_service.dart';
 import 'package:opennutritracker/core/services/location_inference_service.dart';
 import 'package:opennutritracker/core/utils/locator.dart';
+import 'package:opennutritracker/features/health_connect/services/healthkit_service.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -76,6 +77,12 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     try { await locator<CoreMotionService>().recordSnapshot(); } catch (_) {}
     try { await locator<BarometerService>().recordReading(); } catch (_) {}
     try { await locator<LocationInferenceService>().startMonitoring(); } catch (_) {}
+    // Auto-sync HealthKit data on each foreground (lightweight, just last day)
+    try {
+      if (await HealthKitService.hasPermissions()) {
+        await HealthKitService.sync(days: 1);
+      }
+    } catch (_) {}
     // Load photo analysis opt-in setting
     try {
       final enabled = locator<ConfigDataSourceOB>().getShowPhotoAnalysis();

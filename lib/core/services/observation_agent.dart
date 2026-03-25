@@ -3,11 +3,14 @@ import 'package:opennutritracker/core/db/data_sources/biomarker_data_source.dart
 import 'package:opennutritracker/core/db/data_sources/caffeine_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/location_visit_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/sleep_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/supplement_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/symptom_data_source.dart';
 import 'package:opennutritracker/core/domain/usecase/get_intake_usecase.dart';
 import 'package:opennutritracker/core/domain/usecase/get_user_usecase.dart';
 import 'package:opennutritracker/core/services/agent_service.dart';
 import 'package:opennutritracker/core/services/barometer_service.dart';
+import 'package:opennutritracker/core/services/bio_age_trend_service.dart';
+import 'package:opennutritracker/core/services/circadian_service.dart';
 import 'package:opennutritracker/core/services/hrv_analysis_service.dart';
 import 'package:opennutritracker/core/utils/locator.dart';
 
@@ -64,6 +67,13 @@ class ObservationAgent {
       observations.addAll(r);
     } catch (_) {}
     try { observations.addAll(await _weeklyPatternDetection()); } catch (_) {}
+    try { observations.addAll(await _supplementTimingOptimization()); } catch (_) {}
+    try { observations.addAll(await _mealTimingInference()); } catch (_) {}
+
+    // Bio age trend — weekly insight (Monday only, avoid daily spam)
+    if (DateTime.now().weekday == DateTime.monday) {
+      try { observations.addAll(await _bioAgeTrendObservation()); } catch (_) {}
+    }
 
     _log.info('ObservationAgent found ${observations.length} cross-domain insights, context: ${ctx.observationTypes}');
     return observations;
@@ -478,6 +488,141 @@ class ObservationAgent {
           ),
         ];
       }
+    }
+
+    return [];
+  }
+
+  // ── Supplement timing optimization ──
+
+  /// Detect suboptimal supplement timing from historical data.
+  /// e.g., "You take iron with coffee — caffeine blocks absorption"
+  static Future<List<AgentSuggestion>> _supplementTimingOptimization() async {
+    final suppDs = locator<SupplementDataSource>();
+    final caffeineDs = locator<CaffeineDataSource>();
+    final getIntake = locator<GetIntakeUsecase>();
+    final now = DateTime.now();
+
+    final allSupps = await suppDs.getAllActive();
+    if (allSupps.isEmpty) return [];
+
+    // Check iron + caffeine conflict
+    final ironSupps = allSupps.where((s) => s.name.toLowerCase().contains('iron'));
+    if (ironSupps.isNotEmpty) {
+      final avgCaffeine = await caffeineDs.getTodayTotal();
+      if (avgCaffeine > 0) {
+        return [
+          AgentSuggestion(
+            type: 'observation',
+            title: 'Iron + caffeine timing',
+            message: 'You take iron and drink coffee/tea. Caffeine reduces iron absorption by 60-90%. Take iron 2h away from caffeine.',
+          ),
+        ];
+      }
+    }
+
+    // Check calcium + iron conflict (both taken same day)
+    final calciumSupps = allSupps.where((s) => s.name.toLowerCase().contains('calcium'));
+    if (calciumSupps.isNotEmpty && ironSupps.isNotEmpty) {
+      return [
+        AgentSuggestion(
+          type: 'observation',
+          title: 'Iron + calcium timing',
+          message: 'You take both iron and calcium. They compete for absorption — take them at least 2h apart.',
+        ),
+      ];
+    }
+
+    // Check vitamin D without fat
+    final vitDSupps = allSupps.where((s) {
+      final lower = s.name.toLowerCase();
+      return lower.contains('vitamin d') || lower.contains('vit d') || lower.contains('d3');
+    });
+    if (vitDSupps.isNotEmpty) {
+      // Check if morning intakes have low fat (< 5g before noon)
+      final morningIntakes = await getIntake.getBreakfastIntakeByDay(now);
+      final morningFat = morningIntakes.fold<double>(0, (s, i) => s + i.totalFatsGram);
+      if (morningFat < 5 && now.hour < 14) {
+        return [
+          AgentSuggestion(
+            type: 'observation',
+            title: 'Vitamin D needs fat',
+            message: 'Vitamin D is fat-soluble. Your breakfast has only ${morningFat.round()}g fat — take D3 with a fattier meal for better absorption.',
+          ),
+        ];
+      }
+    }
+
+    return [];
+  }
+
+  // ── Bio age trend observation ──
+
+  /// Weekly biological age trend projection (runs on Mondays).
+  static Future<List<AgentSuggestion>> _bioAgeTrendObservation() async {
+    final projection = await BioAgeTrendService.getProjection();
+    if (projection == null) return [];
+
+    return [
+      AgentSuggestion(
+        type: 'observation',
+        title: 'Biological age trend',
+        message: projection,
+      ),
+    ];
+  }
+
+  // ── Meal timing inference ──
+
+  /// Detect if today's eating pattern is unusual compared to circadian profile.
+  static Future<List<AgentSuggestion>> _mealTimingInference() async {
+    final profile = await CircadianService.buildProfile();
+    if (profile == null) return [];
+
+    final now = DateTime.now();
+    final currentHour = now.hour + now.minute / 60.0;
+    final getIntake = locator<GetIntakeUsecase>();
+
+    final todayIntakes = [
+      ...await getIntake.getBreakfastIntakeByDay(now),
+      ...await getIntake.getLunchIntakeByDay(now),
+      ...await getIntake.getDinnerIntakeByDay(now),
+      ...await getIntake.getSnackIntakeByDay(now),
+    ];
+
+    if (todayIntakes.isEmpty) return [];
+
+    final mealTimes = todayIntakes
+        .map((i) => i.dateTime.hour + i.dateTime.minute / 60.0)
+        .toList()
+      ..sort();
+    final firstMeal = mealTimes.first;
+    final lastMeal = mealTimes.last;
+    final eatingWindow = lastMeal - firstMeal;
+
+    // Check if eating window is expanding
+    if (eatingWindow > profile.eatingWindowHours + 2 && currentHour > 18) {
+      return [
+        AgentSuggestion(
+          type: 'observation',
+          title: 'Eating window expanded',
+          message:
+              'Today\'s eating window is ${eatingWindow.toStringAsFixed(1)}h vs your usual ${profile.eatingWindowHours.toStringAsFixed(1)}h. Consider closing it earlier for better sleep.',
+        ),
+      ];
+    }
+
+    // Check if first meal was unusually early or late
+    if ((firstMeal - profile.avgFirstMealHour).abs() > 2 && currentHour > 12) {
+      final direction = firstMeal > profile.avgFirstMealHour ? 'later' : 'earlier';
+      return [
+        AgentSuggestion(
+          type: 'observation',
+          title: 'Unusual meal timing',
+          message:
+              'First meal was ${(firstMeal - profile.avgFirstMealHour).abs().toStringAsFixed(1)}h $direction than usual. Consistent timing helps circadian rhythm.',
+        ),
+      ];
     }
 
     return [];
