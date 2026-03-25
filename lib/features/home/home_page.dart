@@ -9,6 +9,7 @@ import 'package:opennutritracker/core/domain/entity/user_activity_entity.dart';
 import 'package:opennutritracker/core/presentation/widgets/edit_dialog.dart';
 import 'package:opennutritracker/core/presentation/widgets/delete_dialog.dart';
 import 'package:opennutritracker/core/presentation/widgets/disclaimer_dialog.dart';
+import 'package:opennutritracker/core/domain/usecase/add_intake_usecase.dart';
 import 'package:opennutritracker/core/domain/usecase/get_user_usecase.dart';
 import 'package:opennutritracker/core/db/data_sources/water_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/habit_data_source.dart';
@@ -409,6 +410,22 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   void onDeleteIntake(IntakeEntity intake, TrackedDayEntity? trackedDayEntity) {
     _homeBloc.deleteIntakeItem(intake);
     _homeBloc.add(const LoadItemsEvent());
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${intake.meal.name ?? 'Meal'} removed'),
+          duration: const Duration(seconds: 4),
+          action: SnackBarAction(
+            label: 'Undo',
+            onPressed: () async {
+              await locator<AddIntakeUsecase>().addIntake(intake);
+              _homeBloc.add(const LoadItemsEvent());
+            },
+          ),
+        ),
+      );
+    }
   }
 
   void _confirmDelete(BuildContext context, IntakeEntity intake) async {

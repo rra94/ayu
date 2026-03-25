@@ -129,9 +129,28 @@ class _SupplementChecklistWidgetState extends State<SupplementChecklistWidget> {
                     style: theme.textTheme.labelSmall),
                 value: taken,
                 onChanged: (val) async {
+                  final nowTaken = val ?? false;
                   final ds = locator<SupplementDataSource>();
-                  await ds.toggleLog(supp.id, DateTime.now(), val ?? false);
+                  await ds.toggleLog(supp.id, DateTime.now(), nowTaken);
                   _load();
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).clearSnackBars();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                            '${supp.name} marked as ${nowTaken ? "taken" : "skipped"}'),
+                        action: SnackBarAction(
+                          label: 'Undo',
+                          onPressed: () async {
+                            await ds.toggleLog(
+                                supp.id, DateTime.now(), !nowTaken);
+                            _load();
+                          },
+                        ),
+                        duration: const Duration(seconds: 4),
+                      ),
+                    );
+                  }
                 },
               );
             }),

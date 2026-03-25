@@ -4,6 +4,7 @@ import 'package:logging/logging.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:opennutritracker/core/domain/entity/intake_type_entity.dart';
 import 'package:opennutritracker/core/presentation/widgets/error_dialog.dart';
+import 'package:opennutritracker/core/domain/usecase/delete_intake_usecase.dart';
 import 'package:opennutritracker/core/utils/locator.dart';
 import 'package:opennutritracker/core/utils/navigation_options.dart';
 import 'package:opennutritracker/features/add_meal/domain/entity/meal_entity.dart';
@@ -296,7 +297,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
 
     // Use MealDetailBloc to save — it handles AddIntakeUsecase + AddTrackedDayUsecase
     final mealDetailBloc = locator<MealDetailBloc>();
-    mealDetailBloc.addIntake(
+    final intake = await mealDetailBloc.addIntake(
         context, unit, amount.toString(), _intakeTypeEntity, product, _day);
 
     // Refresh dependent blocs
@@ -304,13 +305,24 @@ class _ScannerScreenState extends State<ScannerScreen> {
     locator<DiaryBloc>().add(const LoadDiaryYearEvent());
     locator<CalendarDayBloc>().add(RefreshCalendarDayEvent());
 
-    // Show confirmation snackbar
+    // Show confirmation snackbar with undo
     final kcal = amount * (product.nutriments.energyPerUnit ?? 0);
     final name = product.name ?? 'Item';
     if (context.mounted) {
+      ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Added $name (${kcal.round()} kcal)'),
+          duration: const Duration(seconds: 4),
+          action: SnackBarAction(
+            label: 'Undo',
+            onPressed: () async {
+              await locator<DeleteIntakeUsecase>().deleteIntake(intake);
+              locator<HomeBloc>().add(const LoadItemsEvent());
+              locator<DiaryBloc>().add(const LoadDiaryYearEvent());
+              locator<CalendarDayBloc>().add(RefreshCalendarDayEvent());
+            },
+          ),
         ),
       );
       Navigator.of(context).pop();

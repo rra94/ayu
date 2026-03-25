@@ -3,6 +3,7 @@ import 'package:opennutritracker/core/db/data_sources/peptide_data_source.dart';
 import 'package:opennutritracker/core/db/entities/peptide_ob.dart';
 import 'package:opennutritracker/core/styles/color_schemes.dart';
 import 'package:opennutritracker/core/utils/locator.dart';
+import 'package:opennutritracker/core/utils/calc/reconstitution_calc.dart';
 import 'injection_site_tracker.dart';
 import 'peptide_log_dialog.dart';
 
@@ -246,7 +247,8 @@ class _PeptideStackWidgetState extends State<PeptideStackWidget> {
 
     if (!context.mounted) return;
 
-    final logged = await showDialog<bool>(
+    // Dialog returns the log ID on confirm, or null on cancel
+    final logId = await showDialog<int>(
       context: context,
       builder: (_) => PeptideLogDialog(
         peptide: peptide,
@@ -254,8 +256,32 @@ class _PeptideStackWidgetState extends State<PeptideStackWidget> {
       ),
     );
 
-    if (logged == true) {
+    if (logId != null) {
       _load();
+      if (context.mounted) {
+        // Get the site name from the most recent log
+        final lastLog = await ds.getLastInjectionSite(peptide.id);
+        final siteName = lastLog != null
+            ? (ReconstitutionCalc.siteDisplayNames[lastLog.injectionSite] ??
+                lastLog.injectionSite)
+            : 'unknown site';
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).clearSnackBars();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('${peptide.name} logged at $siteName'),
+              action: SnackBarAction(
+                label: 'Undo',
+                onPressed: () async {
+                  await ds.deleteLog(logId);
+                  _load();
+                },
+              ),
+              duration: const Duration(seconds: 4),
+            ),
+          );
+        }
+      }
     }
   }
 
