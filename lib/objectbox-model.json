@@ -1208,9 +1208,140 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "24:3726043629588841255",
+      "lastPropertyId": "3:1482055555812843526",
+      "name": "ActivitySnapshotOB",
+      "properties": [
+        {
+          "id": "1:9218855169352328520",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:7468784593462670288",
+          "name": "activityType",
+          "type": 9
+        },
+        {
+          "id": "3:1482055555812843526",
+          "name": "dateTime",
+          "type": 10
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "25:4695001636616115857",
+      "lastPropertyId": "7:6097026218367331481",
+      "name": "LocationVisitOB",
+      "properties": [
+        {
+          "id": "1:1414251956660618072",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:2799115309493876427",
+          "name": "lat",
+          "type": 8
+        },
+        {
+          "id": "3:1418990312437030761",
+          "name": "lon",
+          "type": 8
+        },
+        {
+          "id": "4:132982664898080776",
+          "name": "arrivalTime",
+          "type": 10
+        },
+        {
+          "id": "5:5924646742097608516",
+          "name": "departureTime",
+          "type": 10
+        },
+        {
+          "id": "6:7860414609054337891",
+          "name": "label",
+          "type": 9
+        },
+        {
+          "id": "7:6097026218367331481",
+          "name": "savedLocationId",
+          "type": 6
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "26:2488768555801822320",
+      "lastPropertyId": "3:7630827916082275084",
+      "name": "PressureReadingOB",
+      "properties": [
+        {
+          "id": "1:3257268515491378416",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:328412430098300662",
+          "name": "pressureKPa",
+          "type": 8
+        },
+        {
+          "id": "3:7630827916082275084",
+          "name": "dateTime",
+          "type": 10
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "27:4365770835936123041",
+      "lastPropertyId": "6:4861489276447377096",
+      "name": "SavedLocationOB",
+      "properties": [
+        {
+          "id": "1:5239031025006901922",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:5021741579705577777",
+          "name": "lat",
+          "type": 8
+        },
+        {
+          "id": "3:7047645941933740677",
+          "name": "lon",
+          "type": 8
+        },
+        {
+          "id": "4:6304125201700913197",
+          "name": "radiusMeters",
+          "type": 8
+        },
+        {
+          "id": "5:5643761263374647098",
+          "name": "label",
+          "type": 9
+        },
+        {
+          "id": "6:4861489276447377096",
+          "name": "visitCount",
+          "type": 6
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "23:1576344663355007761",
+  "lastEntityId": "27:4365770835936123041",
   "lastIndexId": "2:7319863865959781371",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",

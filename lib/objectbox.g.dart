@@ -14,6 +14,7 @@ import 'package:objectbox/internal.dart'
 import 'package:objectbox/objectbox.dart' as obx;
 import 'package:objectbox_flutter_libs/objectbox_flutter_libs.dart';
 
+import 'core/db/entities/activity_snapshot_ob.dart';
 import 'core/db/entities/biomarker_record_ob.dart';
 import 'core/db/entities/caffeine_log_ob.dart';
 import 'core/db/entities/config_ob.dart';
@@ -24,9 +25,12 @@ import 'core/db/entities/gut_health_item_ob.dart';
 import 'core/db/entities/habit_log_ob.dart';
 import 'core/db/entities/habit_ob.dart';
 import 'core/db/entities/intake_ob.dart';
+import 'core/db/entities/location_visit_ob.dart';
 import 'core/db/entities/mindfulness_session_ob.dart';
 import 'core/db/entities/physical_activity_ob.dart';
+import 'core/db/entities/pressure_reading_ob.dart';
 import 'core/db/entities/product_inventory_ob.dart';
+import 'core/db/entities/saved_location_ob.dart';
 import 'core/db/entities/sleep_record_ob.dart';
 import 'core/db/entities/stool_log_ob.dart';
 import 'core/db/entities/supplement_ob.dart';
@@ -1466,6 +1470,160 @@ final _entities = <obx_int.ModelEntity>[
     relations: <obx_int.ModelRelation>[],
     backlinks: <obx_int.ModelBacklink>[],
   ),
+  obx_int.ModelEntity(
+    id: const obx_int.IdUid(24, 3726043629588841255),
+    name: 'ActivitySnapshotOB',
+    lastPropertyId: const obx_int.IdUid(3, 1482055555812843526),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(1, 9218855169352328520),
+        name: 'id',
+        type: 6,
+        flags: 1,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(2, 7468784593462670288),
+        name: 'activityType',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 1482055555812843526),
+        name: 'dateTime',
+        type: 10,
+        flags: 0,
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[],
+    backlinks: <obx_int.ModelBacklink>[],
+  ),
+  obx_int.ModelEntity(
+    id: const obx_int.IdUid(25, 4695001636616115857),
+    name: 'LocationVisitOB',
+    lastPropertyId: const obx_int.IdUid(7, 6097026218367331481),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(1, 1414251956660618072),
+        name: 'id',
+        type: 6,
+        flags: 1,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(2, 2799115309493876427),
+        name: 'lat',
+        type: 8,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 1418990312437030761),
+        name: 'lon',
+        type: 8,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(4, 132982664898080776),
+        name: 'arrivalTime',
+        type: 10,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(5, 5924646742097608516),
+        name: 'departureTime',
+        type: 10,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(6, 7860414609054337891),
+        name: 'label',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(7, 6097026218367331481),
+        name: 'savedLocationId',
+        type: 6,
+        flags: 0,
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[],
+    backlinks: <obx_int.ModelBacklink>[],
+  ),
+  obx_int.ModelEntity(
+    id: const obx_int.IdUid(26, 2488768555801822320),
+    name: 'PressureReadingOB',
+    lastPropertyId: const obx_int.IdUid(3, 7630827916082275084),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(1, 3257268515491378416),
+        name: 'id',
+        type: 6,
+        flags: 1,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(2, 328412430098300662),
+        name: 'pressureKPa',
+        type: 8,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 7630827916082275084),
+        name: 'dateTime',
+        type: 10,
+        flags: 0,
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[],
+    backlinks: <obx_int.ModelBacklink>[],
+  ),
+  obx_int.ModelEntity(
+    id: const obx_int.IdUid(27, 4365770835936123041),
+    name: 'SavedLocationOB',
+    lastPropertyId: const obx_int.IdUid(6, 4861489276447377096),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(1, 5239031025006901922),
+        name: 'id',
+        type: 6,
+        flags: 1,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(2, 5021741579705577777),
+        name: 'lat',
+        type: 8,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 7047645941933740677),
+        name: 'lon',
+        type: 8,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(4, 6304125201700913197),
+        name: 'radiusMeters',
+        type: 8,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(5, 5643761263374647098),
+        name: 'label',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(6, 4861489276447377096),
+        name: 'visitCount',
+        type: 6,
+        flags: 0,
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[],
+    backlinks: <obx_int.ModelBacklink>[],
+  ),
 ];
 
 /// Shortcut for [obx.Store.new] that passes [getObjectBoxModel] and for Flutter
@@ -1506,7 +1664,7 @@ Future<obx.Store> openStore({
 obx_int.ModelDefinition getObjectBoxModel() {
   final model = obx_int.ModelInfo(
     entities: _entities,
-    lastEntityId: const obx_int.IdUid(23, 1576344663355007761),
+    lastEntityId: const obx_int.IdUid(27, 4365770835936123041),
     lastIndexId: const obx_int.IdUid(2, 7319863865959781371),
     lastRelationId: const obx_int.IdUid(0, 0),
     lastSequenceId: const obx_int.IdUid(0, 0),
@@ -3438,6 +3596,233 @@ obx_int.ModelDefinition getObjectBoxModel() {
         return object;
       },
     ),
+    ActivitySnapshotOB: obx_int.EntityDefinition<ActivitySnapshotOB>(
+      model: _entities[23],
+      toOneRelations: (ActivitySnapshotOB object) => [],
+      toManyRelations: (ActivitySnapshotOB object) => {},
+      getId: (ActivitySnapshotOB object) => object.id,
+      setId: (ActivitySnapshotOB object, int id) {
+        object.id = id;
+      },
+      objectToFB: (ActivitySnapshotOB object, fb.Builder fbb) {
+        final activityTypeOffset = fbb.writeString(object.activityType);
+        fbb.startTable(4);
+        fbb.addInt64(0, object.id);
+        fbb.addOffset(1, activityTypeOffset);
+        fbb.addInt64(2, object.dateTime.millisecondsSinceEpoch);
+        fbb.finish(fbb.endTable());
+        return object.id;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
+        final idParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          4,
+          0,
+        );
+        final activityTypeParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 6, '');
+        final dateTimeParam = DateTime.fromMillisecondsSinceEpoch(
+          const fb.Int64Reader().vTableGet(buffer, rootOffset, 8, 0),
+        );
+        final object = ActivitySnapshotOB(
+          id: idParam,
+          activityType: activityTypeParam,
+          dateTime: dateTimeParam,
+        );
+
+        return object;
+      },
+    ),
+    LocationVisitOB: obx_int.EntityDefinition<LocationVisitOB>(
+      model: _entities[24],
+      toOneRelations: (LocationVisitOB object) => [],
+      toManyRelations: (LocationVisitOB object) => {},
+      getId: (LocationVisitOB object) => object.id,
+      setId: (LocationVisitOB object, int id) {
+        object.id = id;
+      },
+      objectToFB: (LocationVisitOB object, fb.Builder fbb) {
+        final labelOffset = fbb.writeString(object.label);
+        fbb.startTable(8);
+        fbb.addInt64(0, object.id);
+        fbb.addFloat64(1, object.lat);
+        fbb.addFloat64(2, object.lon);
+        fbb.addInt64(3, object.arrivalTime.millisecondsSinceEpoch);
+        fbb.addInt64(4, object.departureTime?.millisecondsSinceEpoch);
+        fbb.addOffset(5, labelOffset);
+        fbb.addInt64(6, object.savedLocationId);
+        fbb.finish(fbb.endTable());
+        return object.id;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
+        final departureTimeValue = const fb.Int64Reader().vTableGetNullable(
+          buffer,
+          rootOffset,
+          12,
+        );
+        final idParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          4,
+          0,
+        );
+        final latParam = const fb.Float64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          6,
+          0,
+        );
+        final lonParam = const fb.Float64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          8,
+          0,
+        );
+        final arrivalTimeParam = DateTime.fromMillisecondsSinceEpoch(
+          const fb.Int64Reader().vTableGet(buffer, rootOffset, 10, 0),
+        );
+        final departureTimeParam = departureTimeValue == null
+            ? null
+            : DateTime.fromMillisecondsSinceEpoch(departureTimeValue);
+        final labelParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 14, '');
+        final savedLocationIdParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          16,
+          0,
+        );
+        final object = LocationVisitOB(
+          id: idParam,
+          lat: latParam,
+          lon: lonParam,
+          arrivalTime: arrivalTimeParam,
+          departureTime: departureTimeParam,
+          label: labelParam,
+          savedLocationId: savedLocationIdParam,
+        );
+
+        return object;
+      },
+    ),
+    PressureReadingOB: obx_int.EntityDefinition<PressureReadingOB>(
+      model: _entities[25],
+      toOneRelations: (PressureReadingOB object) => [],
+      toManyRelations: (PressureReadingOB object) => {},
+      getId: (PressureReadingOB object) => object.id,
+      setId: (PressureReadingOB object, int id) {
+        object.id = id;
+      },
+      objectToFB: (PressureReadingOB object, fb.Builder fbb) {
+        fbb.startTable(4);
+        fbb.addInt64(0, object.id);
+        fbb.addFloat64(1, object.pressureKPa);
+        fbb.addInt64(2, object.dateTime.millisecondsSinceEpoch);
+        fbb.finish(fbb.endTable());
+        return object.id;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
+        final idParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          4,
+          0,
+        );
+        final pressureKPaParam = const fb.Float64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          6,
+          0,
+        );
+        final dateTimeParam = DateTime.fromMillisecondsSinceEpoch(
+          const fb.Int64Reader().vTableGet(buffer, rootOffset, 8, 0),
+        );
+        final object = PressureReadingOB(
+          id: idParam,
+          pressureKPa: pressureKPaParam,
+          dateTime: dateTimeParam,
+        );
+
+        return object;
+      },
+    ),
+    SavedLocationOB: obx_int.EntityDefinition<SavedLocationOB>(
+      model: _entities[26],
+      toOneRelations: (SavedLocationOB object) => [],
+      toManyRelations: (SavedLocationOB object) => {},
+      getId: (SavedLocationOB object) => object.id,
+      setId: (SavedLocationOB object, int id) {
+        object.id = id;
+      },
+      objectToFB: (SavedLocationOB object, fb.Builder fbb) {
+        final labelOffset = fbb.writeString(object.label);
+        fbb.startTable(7);
+        fbb.addInt64(0, object.id);
+        fbb.addFloat64(1, object.lat);
+        fbb.addFloat64(2, object.lon);
+        fbb.addFloat64(3, object.radiusMeters);
+        fbb.addOffset(4, labelOffset);
+        fbb.addInt64(5, object.visitCount);
+        fbb.finish(fbb.endTable());
+        return object.id;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
+        final idParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          4,
+          0,
+        );
+        final latParam = const fb.Float64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          6,
+          0,
+        );
+        final lonParam = const fb.Float64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          8,
+          0,
+        );
+        final radiusMetersParam = const fb.Float64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          10,
+          0,
+        );
+        final labelParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 12, '');
+        final visitCountParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          14,
+          0,
+        );
+        final object = SavedLocationOB(
+          id: idParam,
+          lat: latParam,
+          lon: lonParam,
+          radiusMeters: radiusMetersParam,
+          label: labelParam,
+          visitCount: visitCountParam,
+        );
+
+        return object;
+      },
+    ),
   };
 
   return obx_int.ModelDefinition(model, bindings);
@@ -4503,5 +4888,112 @@ class GroceryItemOB_ {
   /// See [GroceryItemOB.shelfLifeDays].
   static final shelfLifeDays = obx.QueryIntegerProperty<GroceryItemOB>(
     _entities[22].properties[9],
+  );
+}
+
+/// [ActivitySnapshotOB] entity fields to define ObjectBox queries.
+class ActivitySnapshotOB_ {
+  /// See [ActivitySnapshotOB.id].
+  static final id = obx.QueryIntegerProperty<ActivitySnapshotOB>(
+    _entities[23].properties[0],
+  );
+
+  /// See [ActivitySnapshotOB.activityType].
+  static final activityType = obx.QueryStringProperty<ActivitySnapshotOB>(
+    _entities[23].properties[1],
+  );
+
+  /// See [ActivitySnapshotOB.dateTime].
+  static final dateTime = obx.QueryDateProperty<ActivitySnapshotOB>(
+    _entities[23].properties[2],
+  );
+}
+
+/// [LocationVisitOB] entity fields to define ObjectBox queries.
+class LocationVisitOB_ {
+  /// See [LocationVisitOB.id].
+  static final id = obx.QueryIntegerProperty<LocationVisitOB>(
+    _entities[24].properties[0],
+  );
+
+  /// See [LocationVisitOB.lat].
+  static final lat = obx.QueryDoubleProperty<LocationVisitOB>(
+    _entities[24].properties[1],
+  );
+
+  /// See [LocationVisitOB.lon].
+  static final lon = obx.QueryDoubleProperty<LocationVisitOB>(
+    _entities[24].properties[2],
+  );
+
+  /// See [LocationVisitOB.arrivalTime].
+  static final arrivalTime = obx.QueryDateProperty<LocationVisitOB>(
+    _entities[24].properties[3],
+  );
+
+  /// See [LocationVisitOB.departureTime].
+  static final departureTime = obx.QueryDateProperty<LocationVisitOB>(
+    _entities[24].properties[4],
+  );
+
+  /// See [LocationVisitOB.label].
+  static final label = obx.QueryStringProperty<LocationVisitOB>(
+    _entities[24].properties[5],
+  );
+
+  /// See [LocationVisitOB.savedLocationId].
+  static final savedLocationId = obx.QueryIntegerProperty<LocationVisitOB>(
+    _entities[24].properties[6],
+  );
+}
+
+/// [PressureReadingOB] entity fields to define ObjectBox queries.
+class PressureReadingOB_ {
+  /// See [PressureReadingOB.id].
+  static final id = obx.QueryIntegerProperty<PressureReadingOB>(
+    _entities[25].properties[0],
+  );
+
+  /// See [PressureReadingOB.pressureKPa].
+  static final pressureKPa = obx.QueryDoubleProperty<PressureReadingOB>(
+    _entities[25].properties[1],
+  );
+
+  /// See [PressureReadingOB.dateTime].
+  static final dateTime = obx.QueryDateProperty<PressureReadingOB>(
+    _entities[25].properties[2],
+  );
+}
+
+/// [SavedLocationOB] entity fields to define ObjectBox queries.
+class SavedLocationOB_ {
+  /// See [SavedLocationOB.id].
+  static final id = obx.QueryIntegerProperty<SavedLocationOB>(
+    _entities[26].properties[0],
+  );
+
+  /// See [SavedLocationOB.lat].
+  static final lat = obx.QueryDoubleProperty<SavedLocationOB>(
+    _entities[26].properties[1],
+  );
+
+  /// See [SavedLocationOB.lon].
+  static final lon = obx.QueryDoubleProperty<SavedLocationOB>(
+    _entities[26].properties[2],
+  );
+
+  /// See [SavedLocationOB.radiusMeters].
+  static final radiusMeters = obx.QueryDoubleProperty<SavedLocationOB>(
+    _entities[26].properties[3],
+  );
+
+  /// See [SavedLocationOB.label].
+  static final label = obx.QueryStringProperty<SavedLocationOB>(
+    _entities[26].properties[4],
+  );
+
+  /// See [SavedLocationOB.visitCount].
+  static final visitCount = obx.QueryIntegerProperty<SavedLocationOB>(
+    _entities[26].properties[5],
   );
 }

@@ -22,6 +22,10 @@ import 'package:opennutritracker/core/db/entities/supplement_ob.dart';
 import 'package:opennutritracker/core/db/entities/stool_log_ob.dart';
 import 'package:opennutritracker/core/db/entities/symptom_log_ob.dart';
 import 'package:opennutritracker/core/db/entities/weight_record_ob.dart';
+import 'package:opennutritracker/core/db/entities/activity_snapshot_ob.dart';
+import 'package:opennutritracker/core/db/entities/location_visit_ob.dart';
+import 'package:opennutritracker/core/db/entities/pressure_reading_ob.dart';
+import 'package:opennutritracker/core/db/entities/saved_location_ob.dart';
 import 'package:opennutritracker/objectbox.g.dart';
 
 class ObjectBoxDBProvider extends ChangeNotifier {
@@ -50,6 +54,10 @@ class ObjectBoxDBProvider extends ChangeNotifier {
   late Box<FastingSessionOB> fastingSessionBox;
   late Box<SleepRecordOB> sleepRecordBox;
   late Box<MindfulnessSessionOB> mindfulnessSessionBox;
+  late Box<ActivitySnapshotOB> activitySnapshotBox;
+  late Box<LocationVisitOB> locationVisitBox;
+  late Box<PressureReadingOB> pressureReadingBox;
+  late Box<SavedLocationOB> savedLocationBox;
 
   Future<void> init() async {
     final dir = await getApplicationDocumentsDirectory();
@@ -78,6 +86,10 @@ class ObjectBoxDBProvider extends ChangeNotifier {
     fastingSessionBox = store.box<FastingSessionOB>();
     sleepRecordBox = store.box<SleepRecordOB>();
     mindfulnessSessionBox = store.box<MindfulnessSessionOB>();
+    activitySnapshotBox = store.box<ActivitySnapshotOB>();
+    locationVisitBox = store.box<LocationVisitOB>();
+    pressureReadingBox = store.box<PressureReadingOB>();
+    savedLocationBox = store.box<SavedLocationOB>();
   }
 
   void close() {
