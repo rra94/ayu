@@ -103,6 +103,16 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
               mainAxisSize: MainAxisSize.min,
               children: [
                 FloatingActionButton.small(
+                  heroTag: 'photo',
+                  onPressed: () {
+                    Navigator.of(context)
+                        .pushNamed(NavigationOptions.photoMealRoute);
+                  },
+                  tooltip: 'Photo meal',
+                  child: const Icon(Icons.photo_camera, size: 20),
+                ),
+                const SizedBox(height: 8),
+                FloatingActionButton.small(
                   heroTag: 'search',
                   onPressed: () {
                     final hour = DateTime.now().hour;

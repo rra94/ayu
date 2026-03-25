@@ -17,6 +17,7 @@ import 'package:opennutritracker/core/utils/theme_mode_provider.dart';
 import 'package:opennutritracker/features/add_meal/presentation/add_meal_screen.dart';
 import 'package:opennutritracker/features/edit_meal/presentation/edit_meal_screen.dart';
 import 'package:opennutritracker/features/onboarding/onboarding_screen.dart';
+import 'package:opennutritracker/features/photo_meal/presentation/photo_meal_screen.dart';
 import 'package:opennutritracker/features/receipt/presentation/receipt_scanner_screen.dart';
 import 'package:opennutritracker/features/scanner/scanner_screen.dart';
 import 'package:opennutritracker/features/meal_detail/meal_detail_screen.dart';
@@ -104,6 +105,8 @@ class AyuApp extends StatelessWidget {
             const ImageFullScreen(),
         NavigationOptions.receiptScannerRoute: (context) =>
             const ReceiptScannerScreen(),
+        NavigationOptions.photoMealRoute: (context) =>
+            const PhotoMealScreen(),
       },
     );
   }

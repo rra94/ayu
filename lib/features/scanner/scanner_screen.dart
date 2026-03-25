@@ -135,6 +135,15 @@ class _ScannerScreenState extends State<ScannerScreen> {
         title: Text(S.of(context).scanProductLabel),
         actions: [
           IconButton(
+            icon: const Icon(Icons.photo_camera),
+            tooltip: 'Photo to Calories',
+            onPressed: () {
+              Navigator.of(context).pushReplacementNamed(
+                NavigationOptions.photoMealRoute,
+              );
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.receipt_long),
             tooltip: 'Scan Receipt',
             onPressed: () {
