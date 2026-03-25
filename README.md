@@ -43,7 +43,6 @@ Originally forked from [OpenNutriTracker](https://github.com/simonoppowa/OpenNut
 ### Supplements & Peptides
 - Supplement stack with daily take/skip logging
 - Peptide tracker — dosing cycles, reconstitution calculator, injection site rotation with body map
-- Blueprint Mode — Bryan Johnson's longevity protocol targets
 
 ### Body & Biomarkers
 - 25 biomarkers with normal + longevity-optimal ranges

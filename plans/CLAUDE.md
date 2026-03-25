@@ -29,7 +29,7 @@ theme: lotus (navy #0D1B2A + gold #D4A843, 16px card radius)
 | M8: Phone Sensors | CoreMotion, CoreLocation, Barometer, Activity Dashboard | Done |
 | M9: Peptide Tracker | Peptide stack, reconstitution calc, injection site rotation, agent | Done |
 | M10: Polishing | 30 plants tracker, nutrient synergy, allergen persistence | Done |
-| M11: Widget & Extras | iOS Lock Screen widget, Blueprint Mode | Done |
+| M11: Widget & Extras | iOS Lock Screen widget | Done |
 
 **Implementation plan:** [`docs/superpowers/plans/2026-03-24-remaining-features.md`](../docs/superpowers/plans/2026-03-24-remaining-features.md)
 
@@ -57,7 +57,7 @@ These features were added during development and are not tracked in milestone pl
 | Nutritionix API | `m1-nutrients/nutritionix.md` | Low | OFF + USDA covers most needs |
 | Nutrient synergy checker | `m1-nutrients/synergy-checker.md` | Medium | Shows beneficial/harmful nutrient combos |
 | 30 Plants a Week tracker | `m2-home-ux/30-plants.md` | Medium | Count unique plant foods per week |
-| Blueprint Mode toggle | `m2-home-ux/blueprint-mode.md` | Low | Bryan Johnson protocol mode |
+| ~~Blueprint Mode~~ | — | Removed | Added complexity without value |
 | iOS Lock Screen widget | `m5-integrations/widget.md` | Medium | WidgetKit bridge exists but widget not built |
 | Phone sensors (CoreMotion/Location/Barometer) | `docs/superpowers/specs/2026-03-24-phone-sensors-design.md` | High | Spec approved, ready for implementation |
 
