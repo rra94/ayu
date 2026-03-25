@@ -271,27 +271,26 @@ class DayInfoWidget extends StatelessWidget {
     );
   }
 
-  String _getCaloriesTrackedDisplayString(TrackedDayEntity trackedDay) {
-    int caloriesTracked;
-    if (trackedDay.caloriesTracked.isNegative) {
-      caloriesTracked = 0;
-    } else {
-      caloriesTracked = trackedDay.caloriesTracked.toInt();
-    }
+  /// Compute totals directly from intake lists (same as HomeBloc)
+  /// to avoid drift from TrackedDayEntity's incremental tracking.
+  double get _totalKcal => _allIntakes.fold(0.0, (s, i) => s + i.totalKcal);
+  double get _totalCarbs => _allIntakes.fold(0.0, (s, i) => s + i.totalCarbsGram);
+  double get _totalFats => _allIntakes.fold(0.0, (s, i) => s + i.totalFatsGram);
+  double get _totalProteins => _allIntakes.fold(0.0, (s, i) => s + i.totalProteinsGram);
+  List<IntakeEntity> get _allIntakes => [
+    ...breakfastIntake, ...lunchIntake, ...dinnerIntake, ...snackIntake,
+  ];
 
-    return '$caloriesTracked/${trackedDay.calorieGoal.toInt()} kcal';
+  String _getCaloriesTrackedDisplayString(TrackedDayEntity trackedDay) {
+    return '${_totalKcal.toInt()}/${trackedDay.calorieGoal.toInt()} kcal';
   }
 
   String _getMacroTrackedDisplayString(TrackedDayEntity trackedDay) {
-    final carbsTracked = trackedDay.carbsTracked?.floor().toString() ?? '?';
-    final fatTracked = trackedDay.fatTracked?.floor().toString() ?? '?';
-    final proteinTracked = trackedDay.proteinTracked?.floor().toString() ?? '?';
-
     final carbsGoal = trackedDay.carbsGoal?.floor().toString() ?? '?';
     final fatGoal = trackedDay.fatGoal?.floor().toString() ?? '?';
     final proteinGoal = trackedDay.proteinGoal?.floor().toString() ?? '?';
 
-    return 'Carbs: $carbsTracked/${carbsGoal}g, Fat: $fatTracked/${fatGoal}g, Protein: $proteinTracked/${proteinGoal}g';
+    return 'Carbs: ${_totalCarbs.floor()}/${carbsGoal}g, Fat: ${_totalFats.floor()}/${fatGoal}g, Protein: ${_totalProteins.floor()}/${proteinGoal}g';
   }
 
   void showCopyOrDeleteIntakeDialog(
