@@ -114,11 +114,15 @@ struct NutriWidgetSmall: View {
     @Environment(\.widgetFamily) var family
 
     var body: some View {
-        if family == .accessoryCircular {
+        #if os(iOS)
+        if #available(iOSApplicationExtension 16.0, *), family == .accessoryCircular {
             lockScreenCircular
         } else {
             homeScreenSmall
         }
+        #else
+        homeScreenSmall
+        #endif
     }
 
     /// Lock Screen circular accessory — monochrome ring
@@ -335,10 +339,13 @@ struct NutriWidget: Widget {
         }
         .configurationDisplayName("Ayu Health")
         .description("Track calories, water, supplements, and streak at a glance.")
-        .supportedFamilies([
-            .accessoryCircular,
-            .systemSmall,
-            .systemMedium,
-        ])
+        .supportedFamilies({
+            #if os(iOS)
+            if #available(iOSApplicationExtension 16.0, *) {
+                return [.accessoryCircular, .systemSmall, .systemMedium]
+            }
+            #endif
+            return [.systemSmall, .systemMedium]
+        }())
     }
 }
