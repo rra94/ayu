@@ -48,6 +48,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   bool _blueprintMode = false;
   bool _showSustainability = false;
+  int _stepGoal = 10000;
 
   @override
   void initState() {
@@ -61,6 +62,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       if (mounted) setState(() => _blueprintMode = v);
     });
     _loadSustainabilitySetting();
+    _loadStepGoal();
   }
 
   void _loadSustainabilitySetting() {
@@ -68,6 +70,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
       final configDs = locator<ConfigDataSourceOB>();
       final enabled = configDs.getShowSustainability();
       if (mounted) setState(() => _showSustainability = enabled);
+    } catch (_) {}
+  }
+
+  void _loadStepGoal() {
+    try {
+      final configDs = locator<ConfigDataSourceOB>();
+      final goal = configDs.getDailyStepGoal();
+      if (mounted) setState(() => _stepGoal = goal);
     } catch (_) {}
   }
 
@@ -160,6 +170,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     await configDs.setShowSustainability(v);
                     setState(() => _showSustainability = v);
                   },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.directions_walk),
+                  title: const Text('Daily Step Goal'),
+                  subtitle: Text('$_stepGoal steps'),
+                  onTap: () => _showStepGoalDialog(),
                 ),
                 ListTile(
                   leading: const Icon(Icons.file_download_outlined),
@@ -379,6 +395,43 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showStepGoalDialog() {
+    final controller = TextEditingController(text: _stepGoal.toString());
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Daily Step Goal'),
+        content: TextField(
+          controller: controller,
+          keyboardType: TextInputType.number,
+          decoration: const InputDecoration(
+            labelText: 'Steps',
+            hintText: '10000',
+          ),
+          autofocus: true,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () async {
+              final value = int.tryParse(controller.text);
+              if (value != null && value > 0) {
+                final configDs = locator<ConfigDataSourceOB>();
+                await configDs.setDailyStepGoal(value);
+                setState(() => _stepGoal = value);
+              }
+              if (ctx.mounted) Navigator.of(ctx).pop();
+            },
+            child: const Text('Save'),
+          ),
+        ],
       ),
     );
   }

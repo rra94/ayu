@@ -154,74 +154,102 @@ class _PeptideStackWidgetState extends State<PeptideStackWidget> {
 
     final dimmed = !isDoseDay;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          // Checkbox
-          Checkbox(
-            value: logged,
-            activeColor: goldColor,
-            onChanged: isDoseDay
-                ? (val) async {
-                    if (val == true) {
-                      await _showLogDialog(context, p);
+    return GestureDetector(
+      onLongPress: () => showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: Text('Delete ${p.name}?'),
+          content: const Text('This will remove the peptide and its injection history.'),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+            FilledButton(
+              onPressed: () async {
+                await locator<PeptideDataSource>().deletePeptide(p.id);
+                Navigator.pop(ctx);
+                _load();
+              },
+              child: const Text('Delete'),
+            ),
+          ],
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 2),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // Checkbox
+            Checkbox(
+              value: logged,
+              activeColor: goldColor,
+              onChanged: isDoseDay
+                  ? (val) async {
+                      if (val == true) {
+                        await _showLogDialog(context, p);
+                      }
                     }
-                  }
-                : null,
-          ),
-          // Main info
-          Expanded(
-            child: Opacity(
-              opacity: dimmed ? 0.45 : 1.0,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '${p.name} \u2022 $doseStr',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      decoration:
-                          logged ? TextDecoration.lineThrough : null,
-                      color: logged
-                          ? theme.textTheme.bodyMedium?.color
-                              ?.withValues(alpha: 0.5)
-                          : null,
+                  : null,
+            ),
+            // Main info
+            Expanded(
+              child: Opacity(
+                opacity: dimmed ? 0.45 : 1.0,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '${p.name} \u2022 $doseStr',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        decoration:
+                            logged ? TextDecoration.lineThrough : null,
+                        color: logged
+                            ? theme.textTheme.bodyMedium?.color
+                                ?.withValues(alpha: 0.5)
+                            : null,
+                      ),
                     ),
-                  ),
-                  Row(
-                    children: [
-                      if (!isDoseDay && !isResting)
-                        Text(
-                          'Not a dose day',
-                          style: theme.textTheme.labelSmall?.copyWith(
-                            color: theme.textTheme.labelSmall?.color
-                                ?.withValues(alpha: 0.5),
+                    Row(
+                      children: [
+                        if (!isDoseDay && !isResting)
+                          Text(
+                            'Not a dose day',
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: theme.textTheme.labelSmall?.color
+                                  ?.withValues(alpha: 0.5),
+                            ),
+                          )
+                        else
+                          Text(
+                            '${p.dosesPerVial} doses/vial',
+                            style: theme.textTheme.labelSmall,
                           ),
-                        )
-                      else
-                        Text(
-                          '${p.dosesPerVial} doses/vial',
-                          style: theme.textTheme.labelSmall,
-                        ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-          const SizedBox(width: 8),
-          // Cycle badge
-          _buildCycleBadge(cycleText, isResting, goldColor, theme),
-          // Site map button
-          IconButton(
-            icon: Icon(Icons.map_outlined, size: 18, color: goldColor),
-            tooltip: 'Site Map',
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-            onPressed: () => showInjectionSiteSheet(context, p.id),
-          ),
-        ],
+            const SizedBox(width: 8),
+            // Cycle badge
+            _buildCycleBadge(cycleText, isResting, goldColor, theme),
+            // Edit button
+            IconButton(
+              icon: Icon(Icons.edit_outlined, size: 18, color: goldColor),
+              tooltip: 'Edit Peptide',
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+              onPressed: () => _showPeptideDialog(context, existing: p),
+            ),
+            // Site map button
+            IconButton(
+              icon: Icon(Icons.map_outlined, size: 18, color: goldColor),
+              tooltip: 'Site Map',
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+              onPressed: () => showInjectionSiteSheet(context, p.id),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -266,15 +294,23 @@ class _PeptideStackWidgetState extends State<PeptideStackWidget> {
     }
   }
 
-  void _showAddDialog(BuildContext context) {
-    final nameCtrl = TextEditingController();
-    final mgCtrl = TextEditingController();
-    final bacCtrl = TextEditingController();
-    final doseUnitsCtrl = TextEditingController();
-    final cycleDaysCtrl = TextEditingController(text: '60');
-    final restDaysCtrl = TextEditingController(text: '30');
-    String frequency = 'daily';
-    String route = 'subq';
+  void _showAddDialog(BuildContext context) => _showPeptideDialog(context);
+
+  void _showPeptideDialog(BuildContext context, {PeptideOB? existing}) {
+    final isEdit = existing != null;
+    final nameCtrl = TextEditingController(text: existing?.name ?? '');
+    final mgCtrl = TextEditingController(
+        text: existing != null ? existing.peptideMg.toString() : '');
+    final bacCtrl = TextEditingController(
+        text: existing != null ? existing.bacWaterMl.toString() : '');
+    final doseUnitsCtrl = TextEditingController(
+        text: existing != null ? existing.doseUnits.toString() : '');
+    final cycleDaysCtrl = TextEditingController(
+        text: existing?.cycleDays.toString() ?? '60');
+    final restDaysCtrl = TextEditingController(
+        text: existing?.restDays.toString() ?? '30');
+    String frequency = existing?.frequency ?? 'daily';
+    String route = existing?.route ?? 'subq';
 
     const frequencies = ['daily', 'eod', 'mon_wed_fri', '5on2off', 'weekly'];
     const routes = ['subq', 'im'];
@@ -283,7 +319,7 @@ class _PeptideStackWidgetState extends State<PeptideStackWidget> {
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setDialogState) => AlertDialog(
-          title: const Text('Add Peptide'),
+          title: Text(isEdit ? 'Edit Peptide' : 'Add Peptide'),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -292,7 +328,7 @@ class _PeptideStackWidgetState extends State<PeptideStackWidget> {
                 TextField(
                   controller: nameCtrl,
                   decoration: const InputDecoration(labelText: 'Name'),
-                  autofocus: true,
+                  autofocus: !isEdit,
                 ),
                 const SizedBox(height: 8),
                 Row(
@@ -328,7 +364,7 @@ class _PeptideStackWidgetState extends State<PeptideStackWidget> {
                 ),
                 const SizedBox(height: 8),
                 DropdownButtonFormField<String>(
-                  initialValue: frequency,
+                  value: frequency,
                   decoration: const InputDecoration(labelText: 'Frequency'),
                   items: frequencies
                       .map((f) => DropdownMenuItem(value: f, child: Text(f)))
@@ -360,7 +396,7 @@ class _PeptideStackWidgetState extends State<PeptideStackWidget> {
                 ),
                 const SizedBox(height: 8),
                 DropdownButtonFormField<String>(
-                  initialValue: route,
+                  value: route,
                   decoration: const InputDecoration(labelText: 'Route'),
                   items: routes
                       .map((r) => DropdownMenuItem(value: r, child: Text(r)))
@@ -380,22 +416,34 @@ class _PeptideStackWidgetState extends State<PeptideStackWidget> {
               onPressed: () async {
                 if (nameCtrl.text.isNotEmpty) {
                   final ds = locator<PeptideDataSource>();
-                  await ds.addPeptide(PeptideOB(
-                    name: nameCtrl.text,
-                    peptideMg: double.tryParse(mgCtrl.text) ?? 5.0,
-                    bacWaterMl: double.tryParse(bacCtrl.text) ?? 2.0,
-                    doseUnits: double.tryParse(doseUnitsCtrl.text) ?? 10.0,
-                    frequency: frequency,
-                    cycleDays: int.tryParse(cycleDaysCtrl.text) ?? 60,
-                    restDays: int.tryParse(restDaysCtrl.text) ?? 30,
-                    startDate: DateTime.now(),
-                    route: route,
-                  ));
+                  if (isEdit) {
+                    existing.name = nameCtrl.text;
+                    existing.peptideMg = double.tryParse(mgCtrl.text) ?? existing.peptideMg;
+                    existing.bacWaterMl = double.tryParse(bacCtrl.text) ?? existing.bacWaterMl;
+                    existing.doseUnits = double.tryParse(doseUnitsCtrl.text) ?? existing.doseUnits;
+                    existing.frequency = frequency;
+                    existing.cycleDays = int.tryParse(cycleDaysCtrl.text) ?? existing.cycleDays;
+                    existing.restDays = int.tryParse(restDaysCtrl.text) ?? existing.restDays;
+                    existing.route = route;
+                    await ds.updatePeptide(existing);
+                  } else {
+                    await ds.addPeptide(PeptideOB(
+                      name: nameCtrl.text,
+                      peptideMg: double.tryParse(mgCtrl.text) ?? 5.0,
+                      bacWaterMl: double.tryParse(bacCtrl.text) ?? 2.0,
+                      doseUnits: double.tryParse(doseUnitsCtrl.text) ?? 10.0,
+                      frequency: frequency,
+                      cycleDays: int.tryParse(cycleDaysCtrl.text) ?? 60,
+                      restDays: int.tryParse(restDaysCtrl.text) ?? 30,
+                      startDate: DateTime.now(),
+                      route: route,
+                    ));
+                  }
                   if (ctx.mounted) Navigator.of(ctx).pop();
                   _load();
                 }
               },
-              child: const Text('Add'),
+              child: Text(isEdit ? 'Save' : 'Add'),
             ),
           ],
         ),

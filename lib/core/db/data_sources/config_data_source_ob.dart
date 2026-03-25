@@ -151,6 +151,16 @@ class ConfigDataSourceOB {
     _configBox.put(ob);
   }
 
+  /// Get daily step goal.
+  int getDailyStepGoal() => _getOrCreateConfig().dailyStepGoal ?? 10000;
+
+  /// Persist daily step goal.
+  Future<void> setDailyStepGoal(int steps) async {
+    final ob = _getOrCreateConfig();
+    ob.dailyStepGoal = steps;
+    _configBox.put(ob);
+  }
+
   /// Get Sustainability Score visibility flag.
   bool getShowSustainability() => _getOrCreateConfig().showSustainability;
 

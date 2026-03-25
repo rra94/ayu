@@ -461,7 +461,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     return FutureBuilder(
       future: _habitsFuture,
       builder: (context, snapshot) {
-        if (!snapshot.hasData) return const SizedBox();
+        if (!snapshot.hasData || snapshot.data!.length < 2) return const SizedBox();
         final habits = snapshot.data![0] as List;
         final logs = snapshot.data![1] as List;
         final completedIds = <int>{};
