@@ -1,5 +1,6 @@
 import 'package:logging/logging.dart';
 import 'package:opennutritracker/core/db/data_sources/biomarker_data_source.dart';
+import 'package:opennutritracker/core/domain/usecase/get_user_usecase.dart';
 import 'package:opennutritracker/core/utils/calc/biological_age_calc.dart';
 import 'package:opennutritracker/core/utils/locator.dart';
 
@@ -27,6 +28,10 @@ class BioAgeTrendService {
     final allRecords = await bioDs.getAllRecords();
     if (allRecords.isEmpty) return [];
 
+    // Get the user's actual chronological age
+    final user = await locator<GetUserUsecase>().getUserData();
+    final chronoAge = user.age.toDouble();
+
     // Group records into test sessions (records within 7 days of each other)
     final sessions = <DateTime, Map<String, double>>{};
     for (final record in allRecords) {
@@ -53,12 +58,12 @@ class BioAgeTrendService {
       if (available < 3) continue;
 
       try {
-        final result = BiologicalAgeCalc.computePhenoAge(markers, 30); // TODO: get actual chrono age from user profile
+        final result = BiologicalAgeCalc.computePhenoAge(markers, chronoAge);
         if (result != null) {
           points.add(BioAgeTrendPoint(
             date: entry.key,
             bioAge: result.phenotypicAge,
-            chronoAge: 30, // TODO: get actual age
+            chronoAge: chronoAge,
           ));
         }
       } catch (e) {

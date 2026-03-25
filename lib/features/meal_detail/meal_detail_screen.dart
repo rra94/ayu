@@ -6,6 +6,7 @@ import 'package:logging/logging.dart';
 import 'package:opennutritracker/core/domain/entity/intake_type_entity.dart';
 import 'package:opennutritracker/core/presentation/widgets/meal_value_unit_text.dart';
 import 'package:opennutritracker/core/presentation/widgets/image_full_screen.dart';
+import 'package:opennutritracker/core/services/allergen_service.dart';
 import 'package:opennutritracker/core/utils/locator.dart';
 import 'package:opennutritracker/core/utils/navigation_options.dart';
 import 'package:opennutritracker/features/add_meal/domain/entity/meal_entity.dart';
@@ -47,6 +48,7 @@ class _MealDetailScreenState extends State<MealDetailScreen> {
 
   String _initialUnit = "";
   String _initialQuantity = "";
+  List<AllergenAlert> _allergenAlerts = [];
 
   @override
   void initState() {
@@ -100,7 +102,16 @@ class _MealDetailScreenState extends State<MealDetailScreen> {
           meal: meal, totalQuantity: quantityTextController.text));
     }
 
+    _checkAllergens();
+
     super.didChangeDependencies();
+  }
+
+  Future<void> _checkAllergens() async {
+    final alerts = await AllergenService.checkMeal(meal);
+    if (alerts.isNotEmpty && mounted) {
+      setState(() => _allergenAlerts = alerts);
+    }
   }
 
   @override
@@ -189,6 +200,28 @@ class _MealDetailScreenState extends State<MealDetailScreen> {
                 icon: const Icon(Icons.edit_outlined))
           ],
         ),
+        if (_allergenAlerts.isNotEmpty)
+          SliverToBoxAdapter(
+            child: Container(
+              color: Colors.red.withValues(alpha: 0.1),
+              padding: const EdgeInsets.all(12),
+              child: Row(
+                children: [
+                  const Icon(Icons.warning_amber, color: Colors.red),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Contains: ${_allergenAlerts.map((a) => a.displayName).join(", ")}',
+                      style: const TextStyle(
+                        color: Colors.red,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         SliverList(
             delegate: SliverChildListDelegate([
           const SizedBox(height: 16),

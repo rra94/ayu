@@ -23,6 +23,15 @@ class SleepDataSource {
     return results.take(limit).toList();
   }
 
+  Future<List<SleepRecordOB>> getAllRecords() async {
+    final query = _box.query()
+      ..order(SleepRecordOB_.wakeTime, flags: Order.descending);
+    final built = query.build();
+    final results = built.find();
+    built.close();
+    return results;
+  }
+
   Future<SleepRecordOB?> getLastNight() async {
     final query = _box.query()
       ..order(SleepRecordOB_.wakeTime, flags: Order.descending);

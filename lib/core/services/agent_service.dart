@@ -97,6 +97,7 @@ class AgentService {
     try { suggestions.addAll(await _peptideReminderAgent()); } catch (_) {}
     try { suggestions.addAll(await _ecoScoreAgent(ctx)); } catch (_) {}
     try { suggestions.addAll(await _calendarAgent()); } catch (_) {}
+    try { suggestions.addAll(await _missedDaysAgent(ctx)); } catch (_) {}
 
     // Phase 3: Data Collection Agent — sends targeted notification for missing data
     try { await DataCollectionAgent.sendDataRequest(ctx); } catch (_) {}
@@ -120,6 +121,7 @@ class AgentService {
       'fasting_adapt': 14,
       'gym_frequency': 15,
       'outdoor_time': 16,
+      'missed_days': 1, // high priority — welcome back message
     };
 
     suggestions.sort((a, b) {
@@ -579,6 +581,38 @@ class AgentService {
 
   static String _truncate(String s, int max) =>
       s.length > max ? '${s.substring(0, max)}...' : s;
+
+  // ── Missed Days Agent ──
+
+  /// If the user hasn't logged food in 2+ days, show a welcome-back nudge.
+  static Future<List<AgentSuggestion>> _missedDaysAgent(AgentContext ctx) async {
+    if (ctx.todayIntakes.isNotEmpty) return []; // logged today, no gap
+
+    final getIntake = locator<GetIntakeUsecase>();
+    int daysBack = 0;
+    for (int d = 1; d <= 7; d++) {
+      final day = DateTime.now().subtract(Duration(days: d));
+      final intakes = [
+        ...await getIntake.getBreakfastIntakeByDay(day),
+        ...await getIntake.getLunchIntakeByDay(day),
+        ...await getIntake.getDinnerIntakeByDay(day),
+        ...await getIntake.getSnackIntakeByDay(day),
+      ];
+      if (intakes.isNotEmpty) break;
+      daysBack = d;
+    }
+
+    if (daysBack >= 2) {
+      return [
+        AgentSuggestion(
+          type: 'missed_days',
+          title: 'Welcome back!',
+          message: 'You haven\'t logged in $daysBack days. Start fresh today \u2014 every day counts.',
+        ),
+      ];
+    }
+    return [];
+  }
 
   // ── Stress Agent ──
 

@@ -24,6 +24,15 @@ class FastingDataSource {
     return result;
   }
 
+  Future<List<FastingSessionOB>> getAllSessions() async {
+    final query = _box.query()
+        .order(FastingSessionOB_.startTime, flags: Order.descending)
+        .build();
+    final results = query.find();
+    query.close();
+    return results;
+  }
+
   Future<List<FastingSessionOB>> getCompletedSessions({int limit = 30}) async {
     final query = _box
         .query(FastingSessionOB_.endTime.notNull())

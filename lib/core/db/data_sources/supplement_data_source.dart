@@ -65,6 +65,14 @@ class SupplementDataSource {
     return results.map((l) => l.supplementId).toSet();
   }
 
+  Future<List<SupplementOB>> getAll() async {
+    return _supplementBox.getAll();
+  }
+
+  Future<List<SupplementLogOB>> getAllLogs() async {
+    return _logBox.getAll();
+  }
+
   Future<List<SupplementLogOB>> getLogsForDateRange(
       DateTime start, DateTime end) async {
     final query = _logBox
