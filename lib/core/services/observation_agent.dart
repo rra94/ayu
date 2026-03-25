@@ -19,18 +19,47 @@ class ObservationAgent {
   static final _log = Logger('ObservationAgent');
 
   /// Analyze all available data and generate cross-domain observations.
-  static Future<List<AgentSuggestion>> observe() async {
+  /// Populates [ctx] so downstream agents can adapt their behavior.
+  static Future<List<AgentSuggestion>> observe(AgentContext ctx) async {
     final observations = <AgentSuggestion>[];
 
-    try { observations.addAll(await _stressHRContradiction()); } catch (_) {}
-    try { observations.addAll(await _sleepCaffeineCorrelation()); } catch (_) {}
-    try { observations.addAll(await _moodNutritionLink()); } catch (_) {}
-    try { observations.addAll(await _sleepEatingWindow()); } catch (_) {}
-    try { observations.addAll(await _pressureMoodCorrelation()); } catch (_) {}
-    try { observations.addAll(await _sedentarySleepCorrelation()); } catch (_) {}
-    try { observations.addAll(await _gymProteinCorrelation()); } catch (_) {}
+    try {
+      final r = await _stressHRContradiction();
+      if (r.isNotEmpty) ctx.observationTypes.add('stress_hr');
+      observations.addAll(r);
+    } catch (_) {}
+    try {
+      final r = await _sleepCaffeineCorrelation();
+      if (r.isNotEmpty) { ctx.highCaffeine = true; ctx.observationTypes.add('sleep_caffeine'); }
+      observations.addAll(r);
+    } catch (_) {}
+    try {
+      final r = await _moodNutritionLink();
+      if (r.isNotEmpty) { ctx.lowMood = true; ctx.observationTypes.add('mood_nutrition'); }
+      observations.addAll(r);
+    } catch (_) {}
+    try {
+      final r = await _sleepEatingWindow();
+      if (r.isNotEmpty) { ctx.poorSleep = true; ctx.observationTypes.add('sleep_eating'); }
+      observations.addAll(r);
+    } catch (_) {}
+    try {
+      final r = await _pressureMoodCorrelation();
+      if (r.isNotEmpty) { ctx.pressureDrop = true; ctx.lowMood = true; ctx.observationTypes.add('pressure_mood'); }
+      observations.addAll(r);
+    } catch (_) {}
+    try {
+      final r = await _sedentarySleepCorrelation();
+      if (r.isNotEmpty) { ctx.sedentaryDay = true; ctx.poorSleep = true; ctx.observationTypes.add('sedentary_sleep'); }
+      observations.addAll(r);
+    } catch (_) {}
+    try {
+      final r = await _gymProteinCorrelation();
+      if (r.isNotEmpty) { ctx.gymToday = true; ctx.lowProtein = true; ctx.observationTypes.add('gym_protein'); }
+      observations.addAll(r);
+    } catch (_) {}
 
-    _log.info('ObservationAgent found ${observations.length} cross-domain insights');
+    _log.info('ObservationAgent found ${observations.length} cross-domain insights, context: ${ctx.observationTypes}');
     return observations;
   }
 

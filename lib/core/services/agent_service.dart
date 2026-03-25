@@ -35,27 +35,58 @@ class AgentSuggestion {
   });
 }
 
+/// Shared context built by ObservationAgent, read by individual agents.
+/// Lets observations inform which agents fire and what they prioritize.
+class AgentContext {
+  bool gymToday = false;
+  bool sedentaryDay = false;
+  bool poorSleep = false;
+  bool lowMood = false;
+  bool pressureDrop = false;
+  bool highCaffeine = false;
+  bool lowProtein = false;
+  final Set<String> observationTypes = {};
+
+  /// Observations already covered these topics — agents should skip them
+  bool isAlreadyCovered(String agentType) {
+    // If observation engine already flagged gym+protein, don't also show nutrient_gap for protein
+    if (agentType == 'nutrient_gap' && observationTypes.contains('gym_protein')) return true;
+    // If sedentary+sleep observation fired, don't also show sedentary agent
+    if (agentType == 'sedentary' && observationTypes.contains('sedentary_sleep')) return true;
+    // If pressure+mood fired, don't also show outdoor_time
+    if (agentType == 'outdoor_time' && observationTypes.contains('pressure_mood')) return true;
+    return false;
+  }
+}
+
 class AgentService {
   static final _log = Logger('AgentService');
 
   /// React to app foreground — check all agents and return suggestions.
+  /// Observations run FIRST to build shared context, then agents use it.
   static Future<List<AgentSuggestion>> getSuggestions() async {
     final suggestions = <AgentSuggestion>[];
 
-    try { suggestions.addAll(await _mealPatternAgent()); } catch (_) {}
-    try { suggestions.addAll(await _nutrientGapAgent()); } catch (_) {}
+    // Phase 1: Observations run first — build shared context
+    final ctx = AgentContext();
+    try {
+      final obs = await ObservationAgent.observe(ctx);
+      suggestions.addAll(obs);
+    } catch (_) {}
+
+    // Phase 2: Agents run informed by observation context
+    // Skip agents whose topic is already covered by an observation
+    try { if (!ctx.isAlreadyCovered('meal_pattern')) suggestions.addAll(await _mealPatternAgent()); } catch (_) {}
+    try { if (!ctx.isAlreadyCovered('nutrient_gap')) suggestions.addAll(await _nutrientGapAgent(ctx)); } catch (_) {}
     try { suggestions.addAll(await _fastingAdaptAgent()); } catch (_) {}
     try { suggestions.addAll(await _supplementReminderAgent()); } catch (_) {}
-    try { suggestions.addAll(await _hydrationAgent()); } catch (_) {}
+    try { suggestions.addAll(await _hydrationAgent(ctx)); } catch (_) {}
     try { suggestions.addAll(await _biomarkerAgent()); } catch (_) {}
-    try { suggestions.addAll(await _sedentaryAgent()); } catch (_) {}
+    try { if (!ctx.isAlreadyCovered('sedentary')) suggestions.addAll(await _sedentaryAgent()); } catch (_) {}
     try { suggestions.addAll(await _gymFrequencyAgent()); } catch (_) {}
-    try { suggestions.addAll(await _outdoorTimeAgent()); } catch (_) {}
+    try { if (!ctx.isAlreadyCovered('outdoor_time')) suggestions.addAll(await _outdoorTimeAgent()); } catch (_) {}
     try { suggestions.addAll(await _peptideReminderAgent()); } catch (_) {}
     try { suggestions.addAll(await _ecoScoreAgent()); } catch (_) {}
-
-    // Cross-agent observation engine — finds contradictions and correlations
-    try { suggestions.addAll(await ObservationAgent.observe()); } catch (_) {}
 
     // Priority order: observations first, then reminders, then informational
     const typePriority = {
@@ -138,7 +169,8 @@ class AgentService {
   // ── Nutrient Gap Agent ──
 
   /// After logging meals, suggests foods to fill nutrient gaps.
-  static Future<List<AgentSuggestion>> _nutrientGapAgent() async {
+  /// Context-aware: if gym day detected, prioritize protein/magnesium.
+  static Future<List<AgentSuggestion>> _nutrientGapAgent(AgentContext ctx) async {
     final getIntake = locator<GetIntakeUsecase>();
     final user = await locator<GetUserUsecase>().getUserData();
     final now = DateTime.now();
@@ -177,7 +209,15 @@ class AgentService {
 
     if (gaps.isEmpty) return [];
 
-    final topGap = gaps.first;
+    // Context-aware: on gym days, prioritize protein and magnesium
+    var topGap = gaps.first;
+    if (ctx.gymToday) {
+      final gymPriority = gaps.where((g) =>
+          g.nutrient.toLowerCase().contains('protein') ||
+          g.nutrient.toLowerCase().contains('magnesium'));
+      if (gymPriority.isNotEmpty) topGap = gymPriority.first;
+    }
+
     final topFood = topGap.suggestions.isNotEmpty
         ? topGap.suggestions.first.food
         : null;
@@ -253,7 +293,8 @@ class AgentService {
   // ── Hydration Agent ──
 
   /// Gentle water reminder based on intake pace.
-  static Future<List<AgentSuggestion>> _hydrationAgent() async {
+  /// Context-aware: more aggressive on active/gym days, mentions caffeine if relevant.
+  static Future<List<AgentSuggestion>> _hydrationAgent(AgentContext ctx) async {
     final now = DateTime.now();
     if (now.hour < 9 || now.hour > 21) return [];
 
@@ -265,13 +306,23 @@ class AgentService {
     final hoursSince9 = (now.hour - 9).clamp(0, 12);
     final expectedMl = (hoursSince9 / 12) * targetMl;
 
-    if (todayMl < expectedMl * 0.6) {
+    // On active/gym days or pressure drop days, trigger earlier (0.7 instead of 0.6)
+    final threshold = (ctx.gymToday || ctx.sedentaryDay == false || ctx.pressureDrop) ? 0.7 : 0.6;
+
+    if (todayMl < expectedMl * threshold) {
       final deficit = (expectedMl - todayMl).round();
+      final reason = ctx.gymToday
+          ? ' — extra important on gym days'
+          : ctx.highCaffeine
+              ? ' — caffeine dehydrates, drink extra'
+              : ctx.pressureDrop
+                  ? ' — pressure dropped, hydration helps'
+                  : '';
       return [
         AgentSuggestion(
           type: 'hydration',
           title: 'Drink water',
-          message: 'You\'re ${deficit}ml behind pace. Have a glass!',
+          message: 'You\'re ${deficit}ml behind pace$reason.',
         ),
       ];
     }
