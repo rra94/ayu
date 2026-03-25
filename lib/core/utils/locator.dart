@@ -69,6 +69,10 @@ import 'package:opennutritracker/core/db/data_sources/supplement_data_source.dar
 import 'package:opennutritracker/core/db/data_sources/stool_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/symptom_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/weight_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/activity_snapshot_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/location_visit_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/pressure_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/saved_location_data_source.dart';
 import 'package:opennutritracker/objectbox.g.dart';
 import 'package:opennutritracker/core/services/gut_health_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -230,6 +234,14 @@ Future<void> initLocator() async {
       () => SleepDataSource(objectBoxProvider.sleepRecordBox));
   locator.registerLazySingleton<MindfulnessDataSource>(
       () => MindfulnessDataSource(objectBoxProvider.mindfulnessSessionBox));
+  locator.registerLazySingleton<ActivitySnapshotDataSource>(
+      () => ActivitySnapshotDataSource(objectBoxProvider.activitySnapshotBox));
+  locator.registerLazySingleton<LocationVisitDataSource>(
+      () => LocationVisitDataSource(objectBoxProvider.locationVisitBox));
+  locator.registerLazySingleton<PressureDataSource>(
+      () => PressureDataSource(objectBoxProvider.pressureReadingBox));
+  locator.registerLazySingleton<SavedLocationDataSource>(
+      () => SavedLocationDataSource(objectBoxProvider.savedLocationBox));
 
   // Store (for direct box access where needed)
   locator.registerLazySingleton<Store>(() => objectBoxProvider.store);
