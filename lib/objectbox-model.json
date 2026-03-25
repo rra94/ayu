@@ -109,7 +109,7 @@
     },
     {
       "id": "2:222820024314402058",
-      "lastPropertyId": "52:1968518929984074793",
+      "lastPropertyId": "54:1476381368972264513",
       "name": "IntakeOB",
       "properties": [
         {
@@ -374,6 +374,16 @@
           "id": "52:1968518929984074793",
           "name": "isFavorite",
           "type": 1
+        },
+        {
+          "id": "53:5771823587479035770",
+          "name": "ecoscoreGrade",
+          "type": 9
+        },
+        {
+          "id": "54:1476381368972264513",
+          "name": "ecoscoreScore",
+          "type": 8
         }
       ],
       "relations": []

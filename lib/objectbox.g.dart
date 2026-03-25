@@ -174,7 +174,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(2, 222820024314402058),
     name: 'IntakeOB',
-    lastPropertyId: const obx_int.IdUid(52, 1968518929984074793),
+    lastPropertyId: const obx_int.IdUid(54, 1476381368972264513),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -488,6 +488,18 @@ final _entities = <obx_int.ModelEntity>[
         id: const obx_int.IdUid(52, 1968518929984074793),
         name: 'isFavorite',
         type: 1,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(53, 5771823587479035770),
+        name: 'ecoscoreGrade',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(54, 1476381368972264513),
+        name: 'ecoscoreScore',
+        type: 8,
         flags: 0,
       ),
     ],
@@ -2107,7 +2119,10 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final ingredientsTextOffset = object.ingredientsText == null
             ? null
             : fbb.writeString(object.ingredientsText!);
-        fbb.startTable(53);
+        final ecoscoreGradeOffset = object.ecoscoreGrade == null
+            ? null
+            : fbb.writeString(object.ecoscoreGrade!);
+        fbb.startTable(55);
         fbb.addInt64(0, object.id);
         fbb.addOffset(1, intakeIdOffset);
         fbb.addOffset(2, unitOffset);
@@ -2160,6 +2175,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
         fbb.addOffset(49, additivesTagsOffset);
         fbb.addOffset(50, ingredientsTextOffset);
         fbb.addBool(51, object.isFavorite);
+        fbb.addOffset(52, ecoscoreGradeOffset);
+        fbb.addFloat64(53, object.ecoscoreScore);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -2390,6 +2407,14 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final ingredientsTextParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGetNullable(buffer, rootOffset, 104);
+        final ecoscoreGradeParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 108);
+        final ecoscoreScoreParam = const fb.Float64Reader().vTableGetNullable(
+          buffer,
+          rootOffset,
+          110,
+        );
         final isFavoriteParam = const fb.BoolReader().vTableGet(
           buffer,
           rootOffset,
@@ -2448,6 +2473,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
           addedSugars100: addedSugars100Param,
           additivesTags: additivesTagsParam,
           ingredientsText: ingredientsTextParam,
+          ecoscoreGrade: ecoscoreGradeParam,
+          ecoscoreScore: ecoscoreScoreParam,
           isFavorite: isFavoriteParam,
         );
 
@@ -4709,6 +4736,16 @@ class IntakeOB_ {
   /// See [IntakeOB.isFavorite].
   static final isFavorite = obx.QueryBooleanProperty<IntakeOB>(
     _entities[1].properties[51],
+  );
+
+  /// See [IntakeOB.ecoscoreGrade].
+  static final ecoscoreGrade = obx.QueryStringProperty<IntakeOB>(
+    _entities[1].properties[52],
+  );
+
+  /// See [IntakeOB.ecoscoreScore].
+  static final ecoscoreScore = obx.QueryDoubleProperty<IntakeOB>(
+    _entities[1].properties[53],
   );
 }
 

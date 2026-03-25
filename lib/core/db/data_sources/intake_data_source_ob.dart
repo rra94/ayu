@@ -181,6 +181,8 @@ IntakeOB _intakeDBOToOB(IntakeDBO dbo) {
     addedSugars100: dbo.meal.nutriments.addedSugars100,
     additivesTags: dbo.meal.additivesTags,
     ingredientsText: dbo.meal.ingredientsText,
+    ecoscoreGrade: dbo.meal.ecoscoreGrade,
+    ecoscoreScore: dbo.meal.ecoscoreScore,
   );
 }
 
@@ -206,6 +208,8 @@ IntakeDBO _intakeOBToDBO(IntakeOB ob) {
       source: MealSourceDBO.values[ob.mealSource],
       additivesTags: ob.additivesTags,
       ingredientsText: ob.ingredientsText,
+      ecoscoreGrade: ob.ecoscoreGrade,
+      ecoscoreScore: ob.ecoscoreScore,
       nutriments: MealNutrimentsDBO(
         energyKcal100: ob.energyKcal100,
         carbohydrates100: ob.carbohydrates100,

@@ -13,6 +13,7 @@ import 'package:opennutritracker/core/domain/usecase/get_kcal_goal_usecase.dart'
 import 'package:opennutritracker/core/domain/usecase/get_macro_goal_usecase.dart';
 import 'package:opennutritracker/core/domain/usecase/get_user_activity_usecase.dart';
 import 'package:opennutritracker/core/domain/usecase/update_intake_usecase.dart';
+import 'package:opennutritracker/core/services/blueprint_service.dart';
 import 'package:opennutritracker/core/utils/calc/calorie_goal_calc.dart';
 import 'package:opennutritracker/core/utils/calc/macro_calc.dart';
 import 'package:opennutritracker/core/utils/locator.dart';
@@ -104,19 +105,29 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       final totalKcalActivities =
           userActivities.map((activity) => activity.burnedKcal).toList().sum;
 
-      final totalKcalGoal = await _getKcalGoalUsecase.getKcalGoal();
-      final totalCarbsGoal =
+      var totalKcalGoal = await _getKcalGoalUsecase.getKcalGoal();
+      var totalCarbsGoal =
           await _getMacroGoalUsecase.getCarbsGoal(totalKcalGoal);
-      final totalFatsGoal =
+      var totalFatsGoal =
           await _getMacroGoalUsecase.getFatsGoal(totalKcalGoal);
-      final totalProteinsGoal =
+      var totalProteinsGoal =
           await _getMacroGoalUsecase.getProteinsGoal(totalKcalGoal);
+
+      // Blueprint Mode: override macro targets with protocol constants
+      final blueprintEnabled = await BlueprintService.isEnabled();
+      if (blueprintEnabled) {
+        totalKcalGoal = BlueprintService.dailyCalories.toDouble();
+        totalProteinsGoal = BlueprintService.proteinG;
+        totalFatsGoal = BlueprintService.fatG;
+        totalCarbsGoal = BlueprintService.carbsG;
+      }
 
       final totalKcalLeft =
           CalorieGoalCalc.getDailyKcalLeft(totalKcalGoal, totalKcalIntake);
 
       emit(HomeLoadedState(
           showDisclaimerDialog: showDisclaimerDialog,
+          blueprintMode: blueprintEnabled,
           totalKcalDaily: totalKcalGoal,
           totalKcalLeft: totalKcalLeft,
           totalKcalSupplied: totalKcalIntake,

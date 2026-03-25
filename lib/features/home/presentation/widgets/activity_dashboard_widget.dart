@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:opennutritracker/core/db/data_sources/biomarker_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/config_data_source_ob.dart';
 import 'package:opennutritracker/core/db/data_sources/location_visit_data_source.dart';
 import 'package:opennutritracker/core/db/entities/biomarker_record_ob.dart';
 import 'package:opennutritracker/core/services/core_motion_service.dart';
@@ -18,6 +19,7 @@ class ActivityDashboardWidget extends StatefulWidget {
 class _ActivityDashboardWidgetState extends State<ActivityDashboardWidget> {
   // Today
   int _steps = 0;
+  int _stepGoal = 10000;
   String _activity = 'unknown';
   double _activeKcal = 0;
   double _outdoorMinutes = 0;
@@ -42,6 +44,8 @@ class _ActivityDashboardWidgetState extends State<ActivityDashboardWidget> {
       final motionService = locator<CoreMotionService>();
       final locationService = locator<LocationInferenceService>();
       final visitDs = locator<LocationVisitDataSource>();
+      final configDs = locator<ConfigDataSourceOB>();
+      final stepGoal = configDs.getDailyStepGoal();
 
       // Today's steps — latest record
       final stepRecords = await bioDs.getRecordsByType('steps');
@@ -81,6 +85,7 @@ class _ActivityDashboardWidgetState extends State<ActivityDashboardWidget> {
       if (mounted) {
         setState(() {
           _steps = todaySteps.round();
+          _stepGoal = stepGoal;
           _activity = activity;
           _activeKcal = todayEnergy;
           _outdoorMinutes = outdoorMin;
@@ -159,8 +164,8 @@ class _ActivityDashboardWidgetState extends State<ActivityDashboardWidget> {
     final gold = isLight ? ayuGoldMuted : ayuGoldLight;
     final goldDim = gold.withValues(alpha: 0.6);
 
-    const stepGoal = 10000;
-    final stepPct = (stepGoal > 0 ? _steps / stepGoal : 0.0).clamp(0.0, 1.0);
+    final stepPct =
+        (_stepGoal > 0 ? _steps / _stepGoal : 0.0).clamp(0.0, 1.0);
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),

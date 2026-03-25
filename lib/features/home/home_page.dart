@@ -52,6 +52,9 @@ import 'package:opennutritracker/core/presentation/widgets/daily_summary_card.da
 import 'package:opennutritracker/features/nutrition/presentation/micronutrient_summary_screen.dart';
 import 'package:opennutritracker/generated/l10n.dart';
 
+/// Home page uses HomeBloc for core nutrition data (kcal, macros, intakes)
+/// and direct data source access for self-contained widgets (water, habits,
+/// supplements, peptides) that manage their own state.
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -63,8 +66,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   final log = Logger('HomePage');
 
   late HomeBloc _homeBloc;
-  // ignore: unused_field (kept for potential future use)
-  bool _isDragging = false;
 
   // Cached futures to prevent jitter on scroll rebuild
   late Future<double> _waterFuture;
@@ -106,6 +107,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           return _getLoadedContent(
               context,
               state.showDisclaimerDialog,
+              state.blueprintMode,
               state.totalKcalDaily,
               state.totalKcalLeft,
               state.totalKcalSupplied,
@@ -148,6 +150,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   Widget _getLoadedContent(
       BuildContext context,
       bool showDisclaimerDialog,
+      bool blueprintMode,
       double totalKcalDaily,
       double totalKcalLeft,
       double totalKcalSupplied,
@@ -190,6 +193,18 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           totalFatsGoal: totalFatsGoal,
           totalProteinsGoal: totalProteinsGoal,
         ),
+        if (blueprintMode)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Chip(
+                avatar: const Icon(Icons.bolt, size: 16),
+                label: const Text('Blueprint Protocol',
+                    style: TextStyle(fontSize: 12)),
+              ),
+            ),
+          ),
         TodayViewCard(
           caloriesConsumed: totalKcalSupplied,
           calorieGoal: totalKcalDaily,
@@ -347,11 +362,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   void onIntakeItemDrag(bool isDragging) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      setState(() {
-        _isDragging = isDragging;
-      });
-    });
+    // no-op: drag state is managed internally by IntakeVerticalList
   }
 
   void onIntakeItemLongPressed(
@@ -435,9 +446,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     if (delete == true) {
       onDeleteIntake(intake, null);
     }
-    setState(() {
-      _isDragging = false;
-    });
   }
 
   /// Show disclaimer dialog after build method

@@ -80,6 +80,10 @@ class IntakeOB {
   List<String>? additivesTags;
   String? ingredientsText;
 
+  // Eco-score
+  String? ecoscoreGrade;
+  double? ecoscoreScore;
+
   // Favorites
   bool isFavorite;
 
@@ -135,6 +139,8 @@ class IntakeOB {
     this.addedSugars100,
     this.additivesTags,
     this.ingredientsText,
+    this.ecoscoreGrade,
+    this.ecoscoreScore,
     this.isFavorite = false,
   });
 }
