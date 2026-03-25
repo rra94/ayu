@@ -37,16 +37,31 @@ class _ReceiptScannerScreenState extends State<ReceiptScannerScreen> {
     // On-device OCR via Apple Vision — image never leaves device
     List<ReceiptItem> items;
     String? rawText;
+    String? _debugError;
     try {
       rawText = await VisionOCRService.recognizeText(image.path);
       if (rawText != null && rawText.isNotEmpty) {
         items = ReceiptParserService.parseText(rawText);
+        if (items.isEmpty) {
+          _debugError = 'OCR found text but no items matched.\nRaw text:\n${rawText.substring(0, rawText.length.clamp(0, 500))}';
+        }
       } else {
         items = [];
+        _debugError = 'OCR returned no text. Check camera focus and lighting.';
       }
-    } catch (_) {
+    } catch (e) {
       items = [];
       rawText = null;
+      _debugError = 'OCR error: $e';
+    }
+
+    if (_debugError != null && items.isEmpty) {
+      setState(() => _processing = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(_debugError), duration: const Duration(seconds: 6)),
+        );
+      }
     }
 
     // Detect restaurant
