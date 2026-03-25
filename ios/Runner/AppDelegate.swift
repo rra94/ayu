@@ -5,9 +5,11 @@ import CoreMotion
 import CoreLocation
 import EventKit
 import MapKit
+import UserNotifications
+import Intents
 
 @main
-@objc class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate, UNUserNotificationCenterDelegate {
+@objc class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate {
 
   private var locationManager: CLLocationManager?
   private var locationChannel: FlutterMethodChannel?
@@ -218,7 +220,6 @@ import MapKit
             activity.userInfo = ["action": id]
             activity.isEligibleForSearch = true
             activity.isEligibleForPrediction = true
-            activity.suggestedInvocationPhrase = title
             activity.persistentIdentifier = id
 
             // Donate
@@ -246,7 +247,7 @@ import MapKit
       let cal = Calendar.current
       let start = cal.startOfDay(for: Date())
       let end = cal.date(byAdding: .day, value: 1, to: start)!
-      let predicate = store.predicateForEvents(withStart: start, end: end)
+      let predicate = store.predicateForEvents(withStart: start, end: end, calendars: nil)
       let events = store.events(matching: predicate)
 
       let mapped = events.map { event -> [String: Any] in
@@ -483,7 +484,7 @@ import MapKit
 
   // MARK: - UNUserNotificationCenterDelegate
 
-  func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+  override func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
     let actionId = response.actionIdentifier
     let categoryId = response.notification.request.content.categoryIdentifier
 
@@ -495,10 +496,6 @@ import MapKit
     completionHandler()
   }
 
-  // Show notifications even when app is in foreground
-  func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNPresentationOptions) -> Void) {
-    completionHandler([.banner, .sound, .badge])
-  }
 
   // MARK: - MapKit Place Detection
 
