@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:opennutritracker/core/db/data_sources/supplement_data_source.dart';
 import 'package:opennutritracker/core/db/entities/supplement_ob.dart';
+import 'package:opennutritracker/core/services/intent_donation_service.dart';
 import 'package:opennutritracker/core/utils/locator.dart';
 
 class SupplementChecklistWidget extends StatefulWidget {
@@ -132,6 +133,9 @@ class _SupplementChecklistWidgetState extends State<SupplementChecklistWidget> {
                   final nowTaken = val ?? false;
                   final ds = locator<SupplementDataSource>();
                   await ds.toggleLog(supp.id, DateTime.now(), nowTaken);
+                  if (nowTaken) {
+                    IntentDonationService.donateTakeSupplements();
+                  }
                   _load();
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).clearSnackBars();

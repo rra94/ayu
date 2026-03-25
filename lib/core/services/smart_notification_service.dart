@@ -54,6 +54,7 @@ class SmartNotificationService {
       id: top.notificationId,
       title: top.title,
       body: top.body,
+      categoryIdentifier: top.categoryIdentifier,
     );
   }
 
@@ -99,6 +100,7 @@ class SmartNotificationService {
     const iosDetails = DarwinNotificationDetails(
       presentAlert: true,
       presentSound: true,
+      categoryIdentifier: 'MEAL_REMINDER',
     );
 
     await _plugin.zonedSchedule(
@@ -125,6 +127,7 @@ class SmartNotificationService {
     const iosDetails = DarwinNotificationDetails(
       presentAlert: true,
       presentSound: true,
+      categoryIdentifier: 'SUPPLEMENT_REMINDER',
     );
 
     await _plugin.zonedSchedule(
@@ -174,6 +177,7 @@ class SmartNotificationService {
             notificationId: _mealReminderId,
             title: 'Log your meals',
             body: 'You haven\'t logged lunch yet. Tap to add.',
+            categoryIdentifier: 'MEAL_REMINDER',
           ));
         }
       } catch (_) {}
@@ -190,6 +194,7 @@ class SmartNotificationService {
             notificationId: _waterReminderId,
             title: 'Drink more water',
             body: 'Only ${total.round()}ml logged today. Stay hydrated!',
+            categoryIdentifier: 'WATER_REMINDER',
           ));
         }
       } catch (_) {}
@@ -208,6 +213,7 @@ class SmartNotificationService {
             notificationId: _suppReminderId,
             title: 'Supplements pending',
             body: '$remaining supplement${remaining > 1 ? 's' : ''} not taken yet.',
+            categoryIdentifier: 'SUPPLEMENT_REMINDER',
           ));
         }
       } catch (_) {}
@@ -264,18 +270,20 @@ class SmartNotificationService {
     required int id,
     required String title,
     required String body,
+    String? categoryIdentifier,
   }) async {
-    const iosDetails = DarwinNotificationDetails(
+    final iosDetails = DarwinNotificationDetails(
       presentAlert: true,
       presentBadge: true,
       presentSound: true,
+      categoryIdentifier: categoryIdentifier,
     );
 
     await _plugin.show(
       id: id,
       title: title,
       body: body,
-      notificationDetails: const NotificationDetails(iOS: iosDetails),
+      notificationDetails: NotificationDetails(iOS: iosDetails),
     );
   }
 
@@ -403,11 +411,13 @@ class _MissingEntry {
   final int notificationId;
   final String title;
   final String body;
+  final String? categoryIdentifier;
 
   _MissingEntry({
     required this.type,
     required this.notificationId,
     required this.title,
     required this.body,
+    this.categoryIdentifier,
   });
 }

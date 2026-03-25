@@ -5,6 +5,7 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:opennutritracker/core/domain/entity/intake_type_entity.dart';
 import 'package:opennutritracker/core/presentation/widgets/error_dialog.dart';
 import 'package:opennutritracker/core/domain/usecase/delete_intake_usecase.dart';
+import 'package:opennutritracker/core/services/intent_donation_service.dart';
 import 'package:opennutritracker/core/utils/locator.dart';
 import 'package:opennutritracker/core/utils/navigation_options.dart';
 import 'package:opennutritracker/features/add_meal/domain/entity/meal_entity.dart';
@@ -372,6 +373,8 @@ class _ScannerScreenState extends State<ScannerScreen> {
     locator<HomeBloc>().add(const LoadItemsEvent());
     locator<DiaryBloc>().add(const LoadDiaryYearEvent());
     locator<CalendarDayBloc>().add(RefreshCalendarDayEvent());
+
+    IntentDonationService.donateScanMeal();
 
     // Show confirmation snackbar with undo
     final kcal = amount * (product.nutriments.energyPerUnit ?? 0);

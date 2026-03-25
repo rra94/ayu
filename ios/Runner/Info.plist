@@ -68,5 +68,14 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>NSUserActivityTypes</key>
+	<array>
+		<string>com.rra94.ayu.log_water</string>
+		<string>com.rra94.ayu.log_coffee</string>
+		<string>com.rra94.ayu.start_fast</string>
+		<string>com.rra94.ayu.take_supplements</string>
+		<string>com.rra94.ayu.scan_meal</string>
+		<string>com.rra94.ayu.log_weight</string>
+	</array>
 </dict>
 </plist>

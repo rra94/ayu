@@ -8,6 +8,7 @@ import 'package:opennutritracker/core/domain/entity/intake_type_entity.dart';
 import 'package:opennutritracker/core/styles/color_schemes.dart';
 import 'package:opennutritracker/core/utils/locator.dart';
 import 'package:opennutritracker/core/utils/navigation_options.dart';
+import 'package:opennutritracker/core/services/intent_donation_service.dart';
 import 'package:opennutritracker/features/scanner/scanner_screen.dart';
 
 class QuickActionBar extends StatelessWidget {
@@ -33,6 +34,7 @@ class QuickActionBar extends StatelessWidget {
               onTap: () async {
                 final ds = locator<WaterDataSource>();
                 await ds.addWaterRecord(250, DateTime.now());
+                IntentDonationService.donateLogWater();
                 onActionComplete();
               },
             ),
@@ -58,6 +60,7 @@ class QuickActionBar extends StatelessWidget {
                 await ds.addLog(CaffeineLogOB(
                   amountMg: 95, source: 'coffee', dateTime: DateTime.now(),
                 ));
+                IntentDonationService.donateLogCoffee();
                 onActionComplete();
               },
             ),
@@ -76,6 +79,7 @@ class QuickActionBar extends StatelessWidget {
                     type: 0,
                   ));
                 }
+                IntentDonationService.donateStartFast();
                 onActionComplete();
               },
             ),

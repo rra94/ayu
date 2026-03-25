@@ -18,6 +18,7 @@ import 'package:opennutritracker/core/db/data_sources/config_data_source_ob.dart
 import 'package:opennutritracker/core/services/data_retention_service.dart';
 import 'package:opennutritracker/core/services/location_inference_service.dart';
 import 'package:opennutritracker/core/utils/locator.dart';
+import 'package:opennutritracker/core/services/notification_action_service.dart';
 import 'package:opennutritracker/features/health_connect/services/healthkit_service.dart';
 
 class MainScreen extends StatefulWidget {
@@ -39,6 +40,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    NotificationActionService.init();
     DataRetentionService.pruneOldData();
     _onAppResumed();
     _scheduleMidnightRefresh();

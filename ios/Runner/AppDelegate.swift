@@ -6,11 +6,12 @@ import CoreLocation
 import EventKit
 
 @main
-@objc class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate {
+@objc class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate, UNUserNotificationCenterDelegate {
 
   private var locationManager: CLLocationManager?
   private var locationChannel: FlutterMethodChannel?
   private var lastKnownLocation: CLLocation?
+  private var notificationActionChannel: FlutterMethodChannel?
 
   override func application(
     _ application: UIApplication,
@@ -118,6 +119,106 @@ import EventKit
       } else {
         result(FlutterMethodNotImplemented)
       }
+    }
+
+    // MARK: - Notification Categories with Actions
+    let waterCategory = UNNotificationCategory(
+        identifier: "WATER_REMINDER",
+        actions: [
+            UNNotificationAction(identifier: "WATER_250", title: "+250ml", options: []),
+            UNNotificationAction(identifier: "WATER_500", title: "+500ml", options: []),
+            UNNotificationAction(identifier: "WATER_SKIP", title: "Skip", options: [.destructive]),
+        ],
+        intentIdentifiers: [],
+        options: []
+    )
+
+    let supplementCategory = UNNotificationCategory(
+        identifier: "SUPPLEMENT_REMINDER",
+        actions: [
+            UNNotificationAction(identifier: "SUPPS_ALL_TAKEN", title: "All Taken ✓", options: []),
+            UNNotificationAction(identifier: "SUPPS_OPEN", title: "Open App", options: [.foreground]),
+        ],
+        intentIdentifiers: [],
+        options: []
+    )
+
+    let fastCategory = UNNotificationCategory(
+        identifier: "FAST_REMINDER",
+        actions: [
+            UNNotificationAction(identifier: "FAST_START_16", title: "Start 16:8", options: []),
+            UNNotificationAction(identifier: "FAST_SKIP", title: "Not Tonight", options: [.destructive]),
+        ],
+        intentIdentifiers: [],
+        options: []
+    )
+
+    let mealCategory = UNNotificationCategory(
+        identifier: "MEAL_REMINDER",
+        actions: [
+            UNNotificationAction(identifier: "MEAL_PHOTO", title: "Photo Meal", options: [.foreground]),
+            UNNotificationAction(identifier: "MEAL_SEARCH", title: "Search", options: [.foreground]),
+            UNNotificationAction(identifier: "MEAL_SKIP", title: "Skip", options: [.destructive]),
+        ],
+        intentIdentifiers: [],
+        options: []
+    )
+
+    let energyCategory = UNNotificationCategory(
+        identifier: "ENERGY_CHECK",
+        actions: [
+            UNNotificationAction(identifier: "ENERGY_1", title: "1 😴", options: []),
+            UNNotificationAction(identifier: "ENERGY_2", title: "2", options: []),
+            UNNotificationAction(identifier: "ENERGY_3", title: "3 😐", options: []),
+            UNNotificationAction(identifier: "ENERGY_4", title: "4", options: []),
+            UNNotificationAction(identifier: "ENERGY_5", title: "5 ⚡", options: []),
+        ],
+        intentIdentifiers: [],
+        options: []
+    )
+
+    UNUserNotificationCenter.current().setNotificationCategories([
+        waterCategory, supplementCategory, fastCategory, mealCategory, energyCategory
+    ])
+    UNUserNotificationCenter.current().delegate = self
+
+    // ── Notification Actions channel ─────────────────────────────────────
+    let notifChannel = FlutterMethodChannel(
+        name: "com.rra94.ayu/notification_actions",
+        binaryMessenger: controller.binaryMessenger
+    )
+    self.notificationActionChannel = notifChannel
+
+    // ── Siri Intent Donations channel ────────────────────────────────────
+    let intentChannel = FlutterMethodChannel(
+        name: "com.rra94.ayu/intents",
+        binaryMessenger: controller.binaryMessenger
+    )
+    intentChannel.setMethodCallHandler { (call, result) in
+        if call.method == "donate" {
+            guard let args = call.arguments as? [String: Any],
+                  let id = args["id"] as? String,
+                  let title = args["title"] as? String,
+                  let desc = args["description"] as? String else {
+                result(nil)
+                return
+            }
+
+            let activity = NSUserActivity(activityType: "com.rra94.ayu.\(id)")
+            activity.title = title
+            activity.userInfo = ["action": id]
+            activity.isEligibleForSearch = true
+            activity.isEligibleForPrediction = true
+            activity.suggestedInvocationPhrase = title
+            activity.persistentIdentifier = id
+
+            // Donate
+            activity.becomeCurrent()
+
+            result(true)
+        } else {
+            result(FlutterMethodNotImplemented)
+        }
     }
 
     try! setExcludeFromiCloudBackup(isExcluded: true)
@@ -360,6 +461,25 @@ import EventKit
       "lat": loc.coordinate.latitude,
       "lon": loc.coordinate.longitude
     ])
+  }
+
+  // MARK: - UNUserNotificationCenterDelegate
+
+  func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+    let actionId = response.actionIdentifier
+    let categoryId = response.notification.request.content.categoryIdentifier
+
+    notificationActionChannel?.invokeMethod("onAction", arguments: [
+        "action": actionId,
+        "category": categoryId,
+    ])
+
+    completionHandler()
+  }
+
+  // Show notifications even when app is in foreground
+  func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNPresentationOptions) -> Void) {
+    completionHandler([.banner, .sound, .badge])
   }
 
   // MARK: - Barometer helpers
