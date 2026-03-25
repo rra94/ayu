@@ -352,16 +352,23 @@ class _ScannerScreenState extends State<ScannerScreen> {
     final product = state.product;
 
     // Determine default amount and unit:
-    // - If product has serving values, use 1 serving
-    // - Otherwise use 100g
+    // - If product has serving quantity, use it (e.g., 250g for a can)
+    // - If product has mealQuantity from OFF, use it
+    // - Otherwise fall back to 100g
     final double amount;
     final String unit;
-    if (product.hasServingValues && product.servingQuantity != null) {
+    if (product.servingQuantity != null && product.servingQuantity! > 0) {
       amount = product.servingQuantity!;
-      unit = UnitDropdownItem.g.toString(); // stored as grams in the DB
+      unit = product.servingUnit ?? UnitDropdownItem.g.toString();
     } else {
-      amount = 100.0;
-      unit = UnitDropdownItem.g.toString();
+      final mealQty = double.tryParse(product.mealQuantity ?? '');
+      if (mealQty != null && mealQty > 0 && mealQty != 100) {
+        amount = mealQty;
+        unit = product.mealUnit ?? UnitDropdownItem.g.toString();
+      } else {
+        amount = 100.0;
+        unit = UnitDropdownItem.g.toString();
+      }
     }
 
     // Use MealDetailBloc to save — it handles AddIntakeUsecase + AddTrackedDayUsecase
@@ -380,23 +387,27 @@ class _ScannerScreenState extends State<ScannerScreen> {
     final kcal = amount * (product.nutriments.energyPerUnit ?? 0);
     final name = product.name ?? 'Item';
     if (context.mounted) {
-      ScaffoldMessenger.of(context).clearSnackBars();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Added $name (${kcal.round()} kcal)'),
-          duration: const Duration(seconds: 4),
-          action: SnackBarAction(
-            label: 'Undo',
-            onPressed: () async {
-              await locator<DeleteIntakeUsecase>().deleteIntake(intake);
-              locator<HomeBloc>().add(const LoadItemsEvent());
-              locator<DiaryBloc>().add(const LoadDiaryYearEvent());
-              locator<CalendarDayBloc>().add(RefreshCalendarDayEvent());
-            },
-          ),
-        ),
-      );
+      // Pop scanner first, then show snackbar on the parent screen
       Navigator.of(context).pop();
+      // Use a microtask to show snackbar after navigation completes
+      Future.microtask(() {
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Added $name (${kcal.round()} kcal)'),
+            duration: const Duration(seconds: 4),
+            action: SnackBarAction(
+              label: 'Undo',
+              onPressed: () async {
+                await locator<DeleteIntakeUsecase>().deleteIntake(intake);
+                locator<HomeBloc>().add(const LoadItemsEvent());
+                locator<DiaryBloc>().add(const LoadDiaryYearEvent());
+                locator<CalendarDayBloc>().add(RefreshCalendarDayEvent());
+              },
+            ),
+          ),
+        );
+      });
     }
   }
 
