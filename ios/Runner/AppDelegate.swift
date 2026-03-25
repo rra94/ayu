@@ -3,6 +3,7 @@ import Flutter
 import Vision
 import CoreMotion
 import CoreLocation
+import EventKit
 
 @main
 @objc class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate {
@@ -76,6 +77,19 @@ import CoreLocation
       }
     }
 
+    // ── EventKit Calendar channel ────────────────────────────────────────
+    let calendarChannel = FlutterMethodChannel(
+      name: "com.rra94.ayu/calendar",
+      binaryMessenger: controller.binaryMessenger
+    )
+    calendarChannel.setMethodCallHandler { (call, result) in
+      if call.method == "getTodayEvents" {
+        self.getTodayEvents(result: result)
+      } else {
+        result(FlutterMethodNotImplemented)
+      }
+    }
+
     // ── Barometer channel ──────────────────────────────────────────────────
     let barometerChannel = FlutterMethodChannel(
       name: "com.rra94.ayu/barometer",
@@ -91,6 +105,35 @@ import CoreLocation
 
     try! setExcludeFromiCloudBackup(isExcluded: true)
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+  }
+
+  // MARK: - EventKit Calendar
+
+  private func getTodayEvents(result: @escaping FlutterResult) {
+    let store = EKEventStore()
+    store.requestFullAccessToEvents { granted, error in
+      guard granted else {
+        result([])
+        return
+      }
+      let cal = Calendar.current
+      let start = cal.startOfDay(for: Date())
+      let end = cal.date(byAdding: .day, value: 1, to: start)!
+      let predicate = store.predicateForEvents(withStart: start, end: end)
+      let events = store.events(matching: predicate)
+
+      let mapped = events.map { event -> [String: Any] in
+        let startComps = cal.dateComponents([.hour, .minute], from: event.startDate)
+        let endComps = cal.dateComponents([.hour, .minute], from: event.endDate)
+        return [
+          "title": event.title ?? "",
+          "startHour": Double(startComps.hour ?? 0) + Double(startComps.minute ?? 0) / 60.0,
+          "endHour": Double(endComps.hour ?? 0) + Double(endComps.minute ?? 0) / 60.0,
+          "location": event.location ?? "",
+        ]
+      }
+      DispatchQueue.main.async { result(mapped) }
+    }
   }
 
   // MARK: - Vision OCR

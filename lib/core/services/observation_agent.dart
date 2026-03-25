@@ -63,6 +63,7 @@ class ObservationAgent {
       final r = await _hrvNutritionCorrelation();
       observations.addAll(r);
     } catch (_) {}
+    try { observations.addAll(await _weeklyPatternDetection()); } catch (_) {}
 
     _log.info('ObservationAgent found ${observations.length} cross-domain insights, context: ${ctx.observationTypes}');
     return observations;
@@ -338,6 +339,88 @@ class ObservationAgent {
         ),
       ];
     }
+    return [];
+  }
+
+  // ── Weekly pattern detection ──
+
+  /// Detect weekly patterns in behavior — runs once per day.
+  /// Finds correlations the user might not notice.
+  static Future<List<AgentSuggestion>> _weeklyPatternDetection() async {
+    final now = DateTime.now();
+    // Only run this analysis once per day, in the morning
+    if (now.hour < 8 || now.hour > 10) return [];
+
+    final getIntake = locator<GetIntakeUsecase>();
+    final sleepDs = locator<SleepDataSource>();
+
+    // Analyze last 7 days
+    double totalProtein = 0;
+    double totalCalories = 0;
+    int daysWithData = 0;
+    double totalSleepScore = 0;
+    int sleepDays = 0;
+
+    for (int d = 1; d <= 7; d++) {
+      final day = now.subtract(Duration(days: d));
+      final intakes = [
+        ...await getIntake.getBreakfastIntakeByDay(day),
+        ...await getIntake.getLunchIntakeByDay(day),
+        ...await getIntake.getDinnerIntakeByDay(day),
+        ...await getIntake.getSnackIntakeByDay(day),
+      ];
+      if (intakes.isNotEmpty) {
+        totalProtein += intakes.fold<double>(0, (s, i) => s + i.totalProteinsGram);
+        totalCalories += intakes.fold<double>(0, (s, i) => s + i.totalKcal);
+        daysWithData++;
+      }
+    }
+
+    final sleepRecords = await sleepDs.getRecords(limit: 7);
+    for (final s in sleepRecords) {
+      totalSleepScore += s.sleepScore;
+      sleepDays++;
+    }
+
+    if (daysWithData < 3) return [];
+
+    final avgProtein = totalProtein / daysWithData;
+    final avgCalories = totalCalories / daysWithData;
+    final avgSleep = sleepDays > 0 ? totalSleepScore / sleepDays : 0;
+
+    // Pattern: consistently low protein
+    if (avgProtein < 60) {
+      return [
+        AgentSuggestion(
+          type: 'observation',
+          title: 'Weekly trend: low protein',
+          message: 'You averaged ${avgProtein.round()}g/day this week. Aim for 1.2-1.6g per kg body weight for recovery and muscle maintenance.',
+        ),
+      ];
+    }
+
+    // Pattern: good sleep correlates with calorie discipline
+    if (avgSleep > 70 && avgCalories < 2200) {
+      return [
+        AgentSuggestion(
+          type: 'observation',
+          title: 'Great week',
+          message: 'Sleep score ${avgSleep.round()}/100 and ${avgCalories.round()} avg kcal — consistency is paying off.',
+        ),
+      ];
+    }
+
+    // Pattern: poor sleep trend
+    if (avgSleep < 50 && sleepDays >= 3) {
+      return [
+        AgentSuggestion(
+          type: 'observation',
+          title: 'Sleep trending down',
+          message: 'Average sleep score ${avgSleep.round()}/100 this week. Review: caffeine timing, screen time, eating window.',
+        ),
+      ];
+    }
+
     return [];
   }
 

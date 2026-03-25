@@ -12,6 +12,7 @@ import 'package:opennutritracker/core/services/circadian_service.dart';
 import 'package:opennutritracker/core/services/core_motion_service.dart';
 import 'package:opennutritracker/core/services/hrv_analysis_service.dart';
 import 'package:opennutritracker/core/services/location_inference_service.dart';
+import 'package:opennutritracker/core/services/calendar_service.dart';
 import 'package:opennutritracker/core/services/observation_agent.dart';
 import 'package:opennutritracker/core/domain/usecase/get_user_usecase.dart';
 import 'package:opennutritracker/core/utils/calc/optimal_range_calc.dart';
@@ -93,25 +94,27 @@ class AgentService {
     try { if (!ctx.isAlreadyCovered('outdoor_time')) suggestions.addAll(await _outdoorTimeAgent()); } catch (_) {}
     try { suggestions.addAll(await _peptideReminderAgent()); } catch (_) {}
     try { suggestions.addAll(await _ecoScoreAgent()); } catch (_) {}
+    try { suggestions.addAll(await _calendarAgent()); } catch (_) {}
 
     // Priority order: observations first, then reminders, then informational
     const typePriority = {
       'stress': 0,
       'observation': 1,
-      'circadian': 2,
-      'supplement_timing': 3,
-      'nutrient_gap': 4,
-      'peptide_reminder': 5,
-      'supplement_reminder': 6,
-      'hydration': 7,
-      'sedentary': 8,
-      'meal_pattern': 9,
-      'eco_score': 10,
-      'biomarker_stale': 11,
-      'biomarker_wellness': 12,
-      'fasting_adapt': 13,
-      'gym_frequency': 14,
-      'outdoor_time': 15,
+      'calendar': 2,
+      'circadian': 3,
+      'supplement_timing': 4,
+      'nutrient_gap': 5,
+      'peptide_reminder': 6,
+      'supplement_reminder': 7,
+      'hydration': 8,
+      'sedentary': 9,
+      'meal_pattern': 10,
+      'eco_score': 11,
+      'biomarker_stale': 12,
+      'biomarker_wellness': 13,
+      'fasting_adapt': 14,
+      'gym_frequency': 15,
+      'outdoor_time': 16,
     };
 
     suggestions.sort((a, b) {
@@ -512,6 +515,77 @@ class AgentService {
 
     return [];
   }
+
+  // ── Calendar Agent ──
+
+  /// Reads today's calendar events and gives time-sensitive nutrition advice.
+  static Future<List<AgentSuggestion>> _calendarAgent() async {
+    final events = await CalendarService.getTodayEvents();
+    if (events.isEmpty) return [];
+
+    final now = DateTime.now().hour + DateTime.now().minute / 60.0;
+
+    for (final event in events) {
+      final hoursUntil = event.startHour - now;
+      if (hoursUntil < 0 || hoursUntil > 4) continue; // only next 4 hours
+
+      switch (event.inferredType) {
+        case 'exercise':
+          if (hoursUntil < 2) {
+            return [
+              AgentSuggestion(
+                type: 'calendar',
+                title: 'Gym in ${(hoursUntil * 60).round()} min',
+                message: 'Have a pre-workout snack with carbs + protein. Hydrate extra.',
+              ),
+            ];
+          }
+        case 'dining':
+          if (hoursUntil < 3) {
+            final restaurant = event.location.isNotEmpty ? event.location : event.title;
+            return [
+              AgentSuggestion(
+                type: 'calendar',
+                title: 'Dining out at ${_truncate(restaurant, 25)}',
+                message: 'Eat lighter now — save calories for dinner. Consider protein-first at the restaurant.',
+              ),
+            ];
+          }
+        case 'travel':
+          return [
+            AgentSuggestion(
+              type: 'calendar',
+              title: 'Travel day',
+              message: 'Pack healthy snacks, stay hydrated (cabin air is dry), and maintain your eating schedule.',
+            ),
+          ];
+        case 'medical':
+          final past = event.endHour < now;
+          if (past) {
+            return [
+              AgentSuggestion(
+                type: 'calendar',
+                title: 'Log your results',
+                message: 'You had a medical appointment — update biomarkers with any new lab values.',
+              ),
+            ];
+          }
+        case 'fasting':
+          return [
+            AgentSuggestion(
+              type: 'calendar',
+              title: 'Fasting scheduled',
+              message: 'Your calendar shows a fast today. Stay hydrated with water and electrolytes.',
+            ),
+          ];
+      }
+    }
+
+    return [];
+  }
+
+  static String _truncate(String s, int max) =>
+      s.length > max ? '${s.substring(0, max)}...' : s;
 
   // ── Stress Agent ──
 
