@@ -13,16 +13,26 @@ class _HealthKitSyncCardState extends State<HealthKitSyncCard> {
   bool _syncing = false;
   bool _hasPermission = false;
   SyncResult? _lastResult;
+  DateTime? _lastSyncTime;
 
   @override
   void initState() {
     super.initState();
-    _checkPermissions();
+    _checkState();
   }
 
-  Future<void> _checkPermissions() async {
+  Future<void> _checkState() async {
     final has = await HealthKitService.hasPermissions();
-    setState(() => _hasPermission = has);
+    final prefs = await SharedPreferences.getInstance();
+    final lastSyncMs = prefs.getInt('healthkit_last_sync');
+    if (mounted) {
+      setState(() {
+        _hasPermission = has;
+        _lastSyncTime = lastSyncMs != null
+            ? DateTime.fromMillisecondsSinceEpoch(lastSyncMs)
+            : null;
+      });
+    }
   }
 
   Future<void> _sync() async {
@@ -37,29 +47,35 @@ class _HealthKitSyncCardState extends State<HealthKitSyncCard> {
       setState(() => _hasPermission = true);
     }
 
-    // Check if 90-day backfill has ever run (persisted across app restarts)
     final prefs = await SharedPreferences.getInstance();
     final hasBackfilled = prefs.getBool('healthkit_backfill_done') ?? false;
 
     SyncResult result;
     if (!hasBackfilled) {
-      // First-ever sync: pull 90 days to kickstart circadian, HRV, sleep baselines
       result = await HealthKitService.syncInitial();
       await prefs.setBool('healthkit_backfill_done', true);
     } else {
       result = await HealthKitService.sync();
     }
+
+    // Save last sync time
+    await prefs.setInt(
+        'healthkit_last_sync', DateTime.now().millisecondsSinceEpoch);
+
     setState(() {
       _lastResult = result;
+      _lastSyncTime = DateTime.now();
       _syncing = false;
     });
   }
 
-  Future<void> _reconnect() async {
-    // Re-request permissions to allow user to grant additional data types
-    final granted = await HealthKitService.requestPermissions();
-    setState(() => _hasPermission = granted);
-    if (granted) _sync();
+  String _formatLastSync() {
+    if (_lastSyncTime == null) return '';
+    final diff = DateTime.now().difference(_lastSyncTime!);
+    if (diff.inMinutes < 1) return 'Just now';
+    if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
+    if (diff.inHours < 24) return '${diff.inHours}h ago';
+    return '${diff.inDays}d ago';
   }
 
   @override
@@ -67,7 +83,6 @@ class _HealthKitSyncCardState extends State<HealthKitSyncCard> {
     final theme = Theme.of(context);
 
     return Card(
-      
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -75,11 +90,27 @@ class _HealthKitSyncCardState extends State<HealthKitSyncCard> {
           children: [
             Row(
               children: [
-                Icon(Icons.favorite, color: Colors.red),
+                const Icon(Icons.favorite, color: Colors.red),
                 const SizedBox(width: 8),
                 Text('Apple Health',
                     style: theme.textTheme.titleMedium
                         ?.copyWith(fontWeight: FontWeight.w600)),
+                if (_hasPermission && _lastSyncTime != null) ...[
+                  const SizedBox(width: 8),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: Colors.green.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      'Connected',
+                      style: theme.textTheme.labelSmall
+                          ?.copyWith(color: Colors.green, fontSize: 10),
+                    ),
+                  ),
+                ],
                 const Spacer(),
                 if (_syncing)
                   const SizedBox(
@@ -87,19 +118,22 @@ class _HealthKitSyncCardState extends State<HealthKitSyncCard> {
                     height: 20,
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
-                else ...[
-                  if (_hasPermission)
-                    TextButton(
-                      onPressed: _reconnect,
-                      child: const Text('Reconnect'),
-                    ),
+                else
                   TextButton(
                     onPressed: _sync,
-                    child: Text(_hasPermission ? 'Sync' : 'Connect'),
+                    child: Text(_hasPermission ? 'Re-sync' : 'Connect'),
                   ),
-                ],
               ],
             ),
+            if (_hasPermission && _lastSyncTime != null) ...[
+              const SizedBox(height: 4),
+              Text(
+                'Auto-syncs on app open · Last: ${_formatLastSync()}',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
             if (_lastResult != null) ...[
               const SizedBox(height: 4),
               Text(
@@ -114,7 +148,7 @@ class _HealthKitSyncCardState extends State<HealthKitSyncCard> {
               ),
             ] else if (!_hasPermission)
               Text(
-                'Connect to import weight, sleep, heart rate & HRV',
+                'Connect to import weight, sleep, heart rate, HRV & steps',
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
