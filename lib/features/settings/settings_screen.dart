@@ -28,6 +28,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:opennutritracker/core/services/blueprint_service.dart';
 import 'package:opennutritracker/features/settings/presentation/widgets/calculations_dialog.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -44,6 +45,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   late DiaryBloc _diaryBloc;
   late CalendarDayBloc _calendarDayBloc;
 
+  bool _blueprintMode = false;
+
   @override
   void initState() {
     _settingsBloc = locator<SettingsBloc>();
@@ -52,6 +55,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _diaryBloc = locator<DiaryBloc>();
     _calendarDayBloc = locator<CalendarDayBloc>();
     super.initState();
+    BlueprintService.isEnabled().then((v) {
+      if (mounted) setState(() => _blueprintMode = v);
+    });
   }
 
   @override
@@ -122,6 +128,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ? 'Not configured'
                       : HealthConditionService.getUserConditions().join(', ')),
                   onTap: () => _showHealthConditionsDialog(context),
+                ),
+                SwitchListTile(
+                  secondary: const Icon(Icons.science_outlined),
+                  title: const Text('Blueprint Mode'),
+                  subtitle: const Text('Bryan Johnson\'s longevity protocol targets'),
+                  value: _blueprintMode,
+                  onChanged: (v) async {
+                    await BlueprintService.setEnabled(v);
+                    setState(() => _blueprintMode = v);
+                  },
                 ),
                 ListTile(
                   leading: const Icon(Icons.file_download_outlined),

@@ -49,7 +49,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(1, 6477492202799954719),
     name: 'ConfigOB',
-    lastPropertyId: const obx_int.IdUid(17, 8970579051260580521),
+    lastPropertyId: const obx_int.IdUid(18, 772813461993618442),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -152,6 +152,12 @@ final _entities = <obx_int.ModelEntity>[
         id: const obx_int.IdUid(17, 8970579051260580521),
         name: 'allergenJson',
         type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(18, 772813461993618442),
+        name: 'blueprintMode',
+        type: 1,
         flags: 0,
       ),
     ],
@@ -1847,7 +1853,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final allergenJsonOffset = object.allergenJson == null
             ? null
             : fbb.writeString(object.allergenJson!);
-        fbb.startTable(18);
+        fbb.startTable(19);
         fbb.addInt64(0, object.id);
         fbb.addBool(1, object.hasAcceptedDisclaimer);
         fbb.addBool(2, object.hasAcceptedPolicy);
@@ -1865,6 +1871,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
         fbb.addOffset(14, healthConditionsOffset);
         fbb.addBool(15, object.ayuOnboardingComplete);
         fbb.addOffset(16, allergenJsonOffset);
+        fbb.addBool(17, object.blueprintMode);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -1946,6 +1953,12 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final allergenJsonParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGetNullable(buffer, rootOffset, 36);
+        final blueprintModeParam = const fb.BoolReader().vTableGet(
+          buffer,
+          rootOffset,
+          38,
+          false,
+        );
         final object = ConfigOB(
           id: idParam,
           hasAcceptedDisclaimer: hasAcceptedDisclaimerParam,
@@ -1964,6 +1977,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           healthConditions: healthConditionsParam,
           ayuOnboardingComplete: ayuOnboardingCompleteParam,
           allergenJson: allergenJsonParam,
+          blueprintMode: blueprintModeParam,
         );
 
         return object;
@@ -4274,6 +4288,11 @@ class ConfigOB_ {
   /// See [ConfigOB.allergenJson].
   static final allergenJson = obx.QueryStringProperty<ConfigOB>(
     _entities[0].properties[16],
+  );
+
+  /// See [ConfigOB.blueprintMode].
+  static final blueprintMode = obx.QueryBooleanProperty<ConfigOB>(
+    _entities[0].properties[17],
   );
 }
 

@@ -38,6 +38,9 @@ class ConfigOB {
   /// JSON-encoded list of allergen strings, e.g. '["Gluten","Dairy","Nuts"]'
   String? allergenJson;
 
+  /// Whether Bryan Johnson's Blueprint longevity protocol is enabled
+  bool blueprintMode;
+
   ConfigOB({
     this.id = 0,
     this.hasAcceptedDisclaimer = false,
@@ -56,5 +59,6 @@ class ConfigOB {
     this.healthConditions,
     this.ayuOnboardingComplete = false,
     this.allergenJson,
+    this.blueprintMode = false,
   });
 }

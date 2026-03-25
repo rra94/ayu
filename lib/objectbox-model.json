@@ -5,7 +5,7 @@
   "entities": [
     {
       "id": "1:6477492202799954719",
-      "lastPropertyId": "17:8970579051260580521",
+      "lastPropertyId": "18:772813461993618442",
       "name": "ConfigOB",
       "properties": [
         {
@@ -93,6 +93,11 @@
           "id": "17:8970579051260580521",
           "name": "allergenJson",
           "type": 9
+        },
+        {
+          "id": "18:772813461993618442",
+          "name": "blueprintMode",
+          "type": 1
         }
       ],
       "relations": []
