@@ -160,6 +160,16 @@ class ConfigDataSourceOB {
     ob.showSustainability = enabled;
     _configBox.put(ob);
   }
+
+  /// Get Photo Meal Analysis opt-in flag.
+  bool getShowPhotoAnalysis() => _getOrCreateConfig().showPhotoAnalysis;
+
+  /// Persist Photo Meal Analysis opt-in flag.
+  Future<void> setShowPhotoAnalysis(bool enabled) async {
+    final ob = _getOrCreateConfig();
+    ob.showPhotoAnalysis = enabled;
+    _configBox.put(ob);
+  }
 }
 
 // ---------------------------------------------------------------------------

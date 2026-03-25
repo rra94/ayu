@@ -5,7 +5,7 @@
   "entities": [
     {
       "id": "1:6477492202799954719",
-      "lastPropertyId": "19:7249192552959657294",
+      "lastPropertyId": "20:116370160000831466",
       "name": "ConfigOB",
       "properties": [
         {
@@ -97,6 +97,11 @@
         {
           "id": "19:7249192552959657294",
           "name": "showSustainability",
+          "type": 1
+        },
+        {
+          "id": "20:116370160000831466",
+          "name": "showPhotoAnalysis",
           "type": 1
         }
       ],

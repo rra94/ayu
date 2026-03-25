@@ -14,6 +14,7 @@ import 'package:opennutritracker/core/utils/navigation_options.dart';
 import 'package:opennutritracker/generated/l10n.dart';
 import 'package:opennutritracker/core/services/barometer_service.dart';
 import 'package:opennutritracker/core/services/core_motion_service.dart';
+import 'package:opennutritracker/core/db/data_sources/config_data_source_ob.dart';
 import 'package:opennutritracker/core/services/data_retention_service.dart';
 import 'package:opennutritracker/core/services/location_inference_service.dart';
 import 'package:opennutritracker/core/utils/locator.dart';
@@ -28,6 +29,7 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   int _selectedPageIndex = 0;
   Timer? _midnightTimer;
+  bool _photoAnalysisEnabled = false;
 
   late List<Widget> _bodyPages;
   late List<PreferredSizeWidget> _appbarPages;
@@ -74,6 +76,11 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     try { await locator<CoreMotionService>().recordSnapshot(); } catch (_) {}
     try { await locator<BarometerService>().recordReading(); } catch (_) {}
     try { await locator<LocationInferenceService>().startMonitoring(); } catch (_) {}
+    // Load photo analysis opt-in setting
+    try {
+      final enabled = locator<ConfigDataSourceOB>().getShowPhotoAnalysis();
+      if (mounted) setState(() => _photoAnalysisEnabled = enabled);
+    } catch (_) {}
   }
 
   @override
@@ -102,16 +109,19 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
           ? Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                FloatingActionButton.small(
-                  heroTag: 'photo',
-                  onPressed: () {
-                    Navigator.of(context)
-                        .pushNamed(NavigationOptions.photoMealRoute);
-                  },
-                  tooltip: 'Photo meal',
-                  child: const Icon(Icons.photo_camera, size: 20),
-                ),
-                const SizedBox(height: 8),
+                // Only show photo FAB if user opted in
+                if (_photoAnalysisEnabled) ...[
+                  FloatingActionButton.small(
+                    heroTag: 'photo',
+                    onPressed: () {
+                      Navigator.of(context)
+                          .pushNamed(NavigationOptions.photoMealRoute);
+                    },
+                    tooltip: 'Photo meal',
+                    child: const Icon(Icons.photo_camera, size: 20),
+                  ),
+                  const SizedBox(height: 8),
+                ],
                 FloatingActionButton.small(
                   heroTag: 'search',
                   onPressed: () {

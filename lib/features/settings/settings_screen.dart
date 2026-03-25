@@ -46,6 +46,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   late CalendarDayBloc _calendarDayBloc;
 
   bool _showSustainability = false;
+  bool _photoAnalysis = false;
   int _stepGoal = 10000;
 
   @override
@@ -57,6 +58,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _calendarDayBloc = locator<CalendarDayBloc>();
     super.initState();
     _loadSustainabilitySetting();
+    _loadPhotoAnalysisSetting();
     _loadStepGoal();
   }
 
@@ -65,6 +67,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
       final configDs = locator<ConfigDataSourceOB>();
       final enabled = configDs.getShowSustainability();
       if (mounted) setState(() => _showSustainability = enabled);
+    } catch (_) {}
+  }
+
+  void _loadPhotoAnalysisSetting() {
+    try {
+      final configDs = locator<ConfigDataSourceOB>();
+      final enabled = configDs.getShowPhotoAnalysis();
+      if (mounted) setState(() => _photoAnalysis = enabled);
     } catch (_) {}
   }
 
@@ -154,6 +164,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     final configDs = locator<ConfigDataSourceOB>();
                     await configDs.setShowSustainability(v);
                     setState(() => _showSustainability = v);
+                  },
+                ),
+                SwitchListTile(
+                  secondary: const Icon(Icons.photo_camera_outlined),
+                  title: const Text('Photo Meal Analysis'),
+                  subtitle: const Text('Uses Google Gemini (photo sent to cloud)'),
+                  value: _photoAnalysis,
+                  onChanged: (v) async {
+                    final configDs = locator<ConfigDataSourceOB>();
+                    await configDs.setShowPhotoAnalysis(v);
+                    setState(() => _photoAnalysis = v);
                   },
                 ),
                 ListTile(

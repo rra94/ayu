@@ -27,9 +27,12 @@ class PhotoMealScreen extends StatefulWidget {
 
 class _PhotoMealScreenState extends State<PhotoMealScreen> {
   final ImagePicker _picker = ImagePicker();
+  final TextEditingController _manualController = TextEditingController();
 
   bool _isAnalyzing = false;
   bool _hasFailed = false;
+  bool _showManualInput = false;
+  bool _consentShown = false;
   String? _imagePath;
   FoodPhotoResult? _result;
   String _statusText = 'Identifying foods...';
@@ -40,7 +43,45 @@ class _PhotoMealScreenState extends State<PhotoMealScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) => _takePhoto());
   }
 
+  @override
+  void dispose() {
+    _manualController.dispose();
+    super.dispose();
+  }
+
   Future<void> _takePhoto() async {
+    // Show one-time privacy consent before sending photo to Gemini
+    if (!_consentShown) {
+      final proceed = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          icon: const Icon(Icons.privacy_tip),
+          title: const Text('Photo Analysis'),
+          content: const Text(
+            'Your photo will be sent to Google Gemini for food identification. '
+            'The photo is not stored or used for training. '
+            'All nutrition data comes from local databases.\n\n'
+            'Continue?',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: const Text('Continue'),
+            ),
+          ],
+        ),
+      );
+      if (proceed != true) {
+        if (mounted) Navigator.of(context).pop();
+        return;
+      }
+      _consentShown = true;
+    }
+
     final XFile? photo = await _picker.pickImage(
       source: ImageSource.camera,
       imageQuality: 80,
@@ -56,6 +97,7 @@ class _PhotoMealScreenState extends State<PhotoMealScreen> {
       _imagePath = photo.path;
       _isAnalyzing = true;
       _hasFailed = false;
+      _showManualInput = false;
       _statusText = 'Identifying foods...';
     });
 
@@ -64,9 +106,10 @@ class _PhotoMealScreenState extends State<PhotoMealScreen> {
     if (!mounted) return;
 
     if (result == null || result.items.isEmpty) {
+      // Gemini failed — show manual text input as offline/error fallback
       setState(() {
         _isAnalyzing = false;
-        _hasFailed = true;
+        _showManualInput = true;
       });
       return;
     }
@@ -89,6 +132,48 @@ class _PhotoMealScreenState extends State<PhotoMealScreen> {
     setState(() {
       _isAnalyzing = false;
       _result = result;
+    });
+  }
+
+  Future<void> _onManualSubmit(String text) async {
+    if (text.trim().isEmpty) return;
+    setState(() {
+      _isAnalyzing = true;
+      _statusText = 'Looking up nutrition...';
+      _showManualInput = false;
+    });
+
+    // Parse meal description into individual items
+    final itemNames = text
+        .split(RegExp(r',\s*|\s+and\s+|\s+with\s+'))
+        .where((s) => s.trim().isNotEmpty)
+        .toList();
+
+    final rawItems = itemNames
+        .map((name) => FoodPhotoItem(
+              name: name.trim(),
+              grams: 100,
+              kcal: 0,
+              protein: 0,
+              fat: 0,
+              carbs: 0,
+            ))
+        .toList();
+
+    final enriched = await PhotoEnrichmentService.enrichItems(rawItems);
+
+    if (!mounted) return;
+
+    final totalKcal =
+        enriched.where((i) => i.selected).fold(0.0, (s, i) => s + i.kcal);
+
+    setState(() {
+      _result = FoodPhotoResult(
+        dishName: null,
+        items: enriched,
+        totalKcal: totalKcal,
+      );
+      _isAnalyzing = false;
     });
   }
 
@@ -251,15 +336,26 @@ class _PhotoMealScreenState extends State<PhotoMealScreen> {
     locator<CalendarDayBloc>().add(RefreshCalendarDayEvent());
 
     if (mounted) {
+      final loggedCount = checkedItems.length;
+      final totalKcal = _selectedTotal.round();
+      Navigator.of(context).pop();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Logged ${checkedItems.length} item${checkedItems.length > 1 ? 's' : ''}'
-            ' (${_selectedTotal.round()} kcal)',
+            'Logged $loggedCount item${loggedCount > 1 ? 's' : ''}'
+            ' ($totalKcal kcal)',
           ),
+          action: SnackBarAction(
+            label: 'View in Diary',
+            onPressed: () {
+              // Navigate to diary tab (index 1) via the main screen
+              // The Navigator root is the main screen; pop any routes then switch tab
+              Navigator.of(context).popUntil((route) => route.isFirst);
+            },
+          ),
+          duration: const Duration(seconds: 4),
         ),
       );
-      Navigator.of(context).pop();
     }
   }
 
@@ -275,11 +371,13 @@ class _PhotoMealScreenState extends State<PhotoMealScreen> {
       ),
       body: _isAnalyzing
           ? _buildAnalyzing(theme, gold)
-          : _hasFailed
-              ? _buildFailed(theme, gold)
-              : _result != null
-                  ? _buildResults(theme, gold)
-                  : const SizedBox(),
+          : _showManualInput
+              ? _buildManualInput(theme, gold)
+              : _hasFailed
+                  ? _buildFailed(theme, gold)
+                  : _result != null
+                      ? _buildResults(theme, gold)
+                      : const SizedBox(),
     );
   }
 
@@ -304,6 +402,68 @@ class _PhotoMealScreenState extends State<PhotoMealScreen> {
           Text(
             _statusText,
             style: theme.textTheme.titleMedium,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildManualInput(ThemeData theme, Color gold) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          const SizedBox(height: 32),
+          Icon(Icons.edit_note, size: 56, color: gold),
+          const SizedBox(height: 12),
+          Text(
+            "Couldn't identify food",
+            style: theme.textTheme.titleLarge,
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Describe your meal below — we\'ll look up the nutrition for you.',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'e.g. "chicken breast with rice and salad"',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+              fontStyle: FontStyle.italic,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 24),
+          TextField(
+            controller: _manualController,
+            textInputAction: TextInputAction.search,
+            onSubmitted: _onManualSubmit,
+            decoration: InputDecoration(
+              hintText: 'What did you eat?',
+              border: const OutlineInputBorder(),
+              suffixIcon: IconButton(
+                icon: const Icon(Icons.search),
+                onPressed: () => _onManualSubmit(_manualController.text),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          FilledButton.icon(
+            onPressed: () => _onManualSubmit(_manualController.text),
+            icon: const Icon(Icons.search),
+            label: const Text('Look Up Nutrition'),
+          ),
+          const SizedBox(height: 12),
+          OutlinedButton.icon(
+            onPressed: _takePhoto,
+            icon: const Icon(Icons.camera_alt),
+            label: const Text('Try Photo Again'),
           ),
         ],
       ),

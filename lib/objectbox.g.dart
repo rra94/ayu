@@ -52,7 +52,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(1, 6477492202799954719),
     name: 'ConfigOB',
-    lastPropertyId: const obx_int.IdUid(19, 7249192552959657294),
+    lastPropertyId: const obx_int.IdUid(20, 116370160000831466),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -160,6 +160,12 @@ final _entities = <obx_int.ModelEntity>[
       obx_int.ModelProperty(
         id: const obx_int.IdUid(19, 7249192552959657294),
         name: 'showSustainability',
+        type: 1,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(20, 116370160000831466),
+        name: 'showPhotoAnalysis',
         type: 1,
         flags: 0,
       ),
@@ -2048,7 +2054,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final allergenJsonOffset = object.allergenJson == null
             ? null
             : fbb.writeString(object.allergenJson!);
-        fbb.startTable(20);
+        fbb.startTable(21);
         fbb.addInt64(0, object.id);
         fbb.addBool(1, object.hasAcceptedDisclaimer);
         fbb.addBool(2, object.hasAcceptedPolicy);
@@ -2067,6 +2073,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
         fbb.addBool(15, object.ayuOnboardingComplete);
         fbb.addOffset(16, allergenJsonOffset);
         fbb.addBool(18, object.showSustainability);
+        fbb.addBool(19, object.showPhotoAnalysis);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -2154,6 +2161,12 @@ obx_int.ModelDefinition getObjectBoxModel() {
           40,
           false,
         );
+        final showPhotoAnalysisParam = const fb.BoolReader().vTableGet(
+          buffer,
+          rootOffset,
+          42,
+          false,
+        );
         final object = ConfigOB(
           id: idParam,
           hasAcceptedDisclaimer: hasAcceptedDisclaimerParam,
@@ -2173,6 +2186,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           ayuOnboardingComplete: ayuOnboardingCompleteParam,
           allergenJson: allergenJsonParam,
           showSustainability: showSustainabilityParam,
+          showPhotoAnalysis: showPhotoAnalysisParam,
         );
 
         return object;
@@ -4738,6 +4752,11 @@ class ConfigOB_ {
   /// See [ConfigOB.showSustainability].
   static final showSustainability = obx.QueryBooleanProperty<ConfigOB>(
     _entities[0].properties[17],
+  );
+
+  /// See [ConfigOB.showPhotoAnalysis].
+  static final showPhotoAnalysis = obx.QueryBooleanProperty<ConfigOB>(
+    _entities[0].properties[18],
   );
 }
 

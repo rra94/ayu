@@ -41,6 +41,9 @@ class ConfigOB {
   /// Whether to show sustainability eco-score from Open Food Facts
   bool showSustainability;
 
+  /// Whether to show the photo meal analysis FAB (opt-in, sends photo to Google Gemini)
+  bool showPhotoAnalysis;
+
   ConfigOB({
     this.id = 0,
     this.hasAcceptedDisclaimer = false,
@@ -60,5 +63,6 @@ class ConfigOB {
     this.ayuOnboardingComplete = false,
     this.allergenJson,
     this.showSustainability = false,
+    this.showPhotoAnalysis = false,
   });
 }
