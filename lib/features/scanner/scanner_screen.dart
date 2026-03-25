@@ -8,8 +8,12 @@ import 'package:opennutritracker/core/utils/locator.dart';
 import 'package:opennutritracker/core/utils/navigation_options.dart';
 import 'package:opennutritracker/features/add_meal/domain/entity/meal_entity.dart';
 import 'package:opennutritracker/features/add_meal/domain/entity/meal_nutriments_entity.dart';
+import 'package:opennutritracker/features/diary/presentation/bloc/calendar_day_bloc.dart';
+import 'package:opennutritracker/features/diary/presentation/bloc/diary_bloc.dart';
 import 'package:opennutritracker/features/edit_meal/presentation/edit_meal_screen.dart';
+import 'package:opennutritracker/features/home/presentation/bloc/home_bloc.dart';
 import 'package:opennutritracker/features/meal_detail/meal_detail_screen.dart';
+import 'package:opennutritracker/features/meal_detail/presentation/bloc/meal_detail_bloc.dart';
 import 'package:opennutritracker/features/scanner/presentation/scanner_bloc.dart';
 import 'package:opennutritracker/generated/l10n.dart';
 
@@ -70,14 +74,11 @@ class _ScannerScreenState extends State<ScannerScreen> {
               return;
             }
 
-            // Food: show allergen warning or go to meal detail
+            // Food: show allergen warning or quick-add dialog
             if (state.allergenAlerts.isNotEmpty) {
               _showAllergenWarning(context, state);
             } else {
-              Navigator.of(context).pushReplacementNamed(
-                  NavigationOptions.mealDetailRoute,
-                  arguments: MealDetailScreenArguments(state.product,
-                      _intakeTypeEntity, _day, state.usesImperialUnits));
+              _showQuickAddDialog(context, state);
             }
           });
         } else if (state is ScannerFailedState) {
@@ -204,6 +205,116 @@ class _ScannerScreenState extends State<ScannerScreen> {
         false,
       ),
     );
+  }
+
+  void _showQuickAddDialog(BuildContext context, ScannerLoadedState state) {
+    final product = state.product;
+    final servingDesc = product.servingSize ??
+        (product.servingQuantity != null
+            ? '${product.servingQuantity} ${product.servingUnit ?? 'g'}'
+            : '100g');
+    final kcalText = product.nutriments.energyKcal100 != null
+        ? '${product.nutriments.energyKcal100!.round()} kcal / 100g'
+        : '';
+
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              product.name ?? 'Unknown Product',
+              style: Theme.of(ctx).textTheme.titleLarge,
+            ),
+            if (kcalText.isNotEmpty) ...[
+              const SizedBox(height: 4),
+              Text(kcalText,
+                  style: Theme.of(ctx).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(ctx).colorScheme.secondary)),
+            ],
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Expanded(
+                  child: FilledButton.icon(
+                    onPressed: () async {
+                      Navigator.of(ctx).pop();
+                      await _quickAdd(context, state);
+                    },
+                    icon: const Icon(Icons.bolt),
+                    label: Text('Quick Add ($servingDesc)'),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () {
+                      Navigator.of(ctx).pop();
+                      Navigator.of(context).pushReplacementNamed(
+                        NavigationOptions.mealDetailRoute,
+                        arguments: MealDetailScreenArguments(
+                            product,
+                            _intakeTypeEntity,
+                            _day,
+                            state.usesImperialUnits),
+                      );
+                    },
+                    icon: const Icon(Icons.tune),
+                    label: const Text('Details'),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _quickAdd(BuildContext context, ScannerLoadedState state) async {
+    final product = state.product;
+
+    // Determine default amount and unit:
+    // - If product has serving values, use 1 serving
+    // - Otherwise use 100g
+    final double amount;
+    final String unit;
+    if (product.hasServingValues && product.servingQuantity != null) {
+      amount = product.servingQuantity!;
+      unit = UnitDropdownItem.g.toString(); // stored as grams in the DB
+    } else {
+      amount = 100.0;
+      unit = UnitDropdownItem.g.toString();
+    }
+
+    // Use MealDetailBloc to save — it handles AddIntakeUsecase + AddTrackedDayUsecase
+    final mealDetailBloc = locator<MealDetailBloc>();
+    mealDetailBloc.addIntake(
+        context, unit, amount.toString(), _intakeTypeEntity, product, _day);
+
+    // Refresh dependent blocs
+    locator<HomeBloc>().add(const LoadItemsEvent());
+    locator<DiaryBloc>().add(const LoadDiaryYearEvent());
+    locator<CalendarDayBloc>().add(RefreshCalendarDayEvent());
+
+    // Show confirmation snackbar
+    final kcal = amount * (product.nutriments.energyPerUnit ?? 0);
+    final name = product.name ?? 'Item';
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Added $name (${kcal.round()} kcal)'),
+        ),
+      );
+      Navigator.of(context).pop();
+    }
   }
 
   void _showAllergenWarning(BuildContext context, ScannerLoadedState state) {
