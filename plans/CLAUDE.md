@@ -4,28 +4,58 @@
 
 ## Architecture Defaults
 ```yaml
-db: objectbox
+db: objectbox (23 entities)
 architecture: modular (feature-module pattern + service layer)
 state: bloc (feature-level, not monolithic)
 params: named
 platform: flutter_ios
-ai: on_device (Core ML / pure Dart)
+ai: on_device (Apple Vision OCR, pure Dart agents)
 testing: manual_iphone (after each milestone)
+theme: lotus (navy #0D1B2A + gold #D4A843, 16px card radius)
 ```
 
 ## Milestone Index
 
 | Milestone | Directory | Status |
 |-----------|-----------|--------|
-| [M0: Architecture Refactor](m0-architecture/) | ObjectBox migration, modular structure, service layer | Not started |
-| [M1: Nutrient Pipeline](m1-nutrients/) | Micronutrients, RDA, added sugar, Nutritionix, synergy checker | Not started |
-| [M2: Home Page UX](m2-home-ux/) | Water, habits, gut health, patterns, 30 plants, Blueprint Mode | Not started |
-| [M3: Stats Tab](m3-stats/) | Weight, DEXA, biomarkers, bio age, food-to-feeling, Bristol stool | Not started |
-| [M4: Longevity Suite](m4-longevity/) | Supplements, fasting, sleep, meal timing, NSDR timer | Not started |
-| [M5: Integrations](m5-integrations/) | HealthKit, HRV correlation, Lock Screen widget | Not started |
-| [M6: Intelligence](m6-intelligence/) | Net carbs, GI/GL, omega ratio, weekly review, daily summary | Not started |
+| [M0: Architecture Refactor](m0-architecture/) | ObjectBox migration, modular structure, service layer | Done |
+| [M1: Nutrient Pipeline](m1-nutrients/) | Micronutrients, RDA, added sugar, data resolution | Done |
+| [M2: Home Page UX](m2-home-ux/) | Water, habits, gut health, quick actions, today view | Done |
+| [M3: Stats Tab](m3-stats/) | Weight, DEXA, biomarkers, bio age, food-to-feeling, Bristol stool | Done |
+| [M4: Longevity Suite](m4-longevity/) | Supplements, fasting, sleep, meal timing, streaks, NSDR | Done |
+| [M5: Integrations](m5-integrations/) | HealthKit, HRV correlation, longevity insights | Done |
+| [M6: Intelligence](m6-intelligence/) | Net carbs, GI/GL, weekly review, daily summary, agents | Done |
+| [M7: Smart Nutrition](m7-smart-nutrition/) | Bioavailability engine, nutrient recommendations | Done |
 
-## Feature Index (A–Z + competitive edge)
+## Implemented But Not Originally Planned
+
+These features were added during development and are not tracked in milestone plan files:
+
+| Feature | Key Files | Notes |
+|---------|-----------|-------|
+| Allergen alerts | `allergen_service.dart` | User-configured allergens, scanned product warnings |
+| Receipt scanning (Vision OCR) | `AppDelegate.swift`, `receipt_parser_service.dart` | Apple Vision on-device, grocery classification |
+| Health conditions | `health_condition_service.dart` | 16 conditions incl. cosmetic (acne, hair loss, dental) |
+| Caffeine tracking | `caffeine_data_source.dart`, `caffeine_log_ob.dart` | Quick-add from home, agent-aware |
+| Cross-agent observation engine | `observation_agent.dart` | 5 cross-domain correlations |
+| Smart notifications | `smart_notification_service.dart` | Auto-start fast, missing entry reminders |
+| Supplement auto-detection | `supplement_detector.dart` | Barcode scan auto-adds supplements |
+| Custom food entry | `scanner_screen.dart` | Create custom entry for not-found items |
+| Grocery/pantry tracking | `grocery_service.dart`, `inventory_data_source.dart` | Receipt-based, expiry alerts |
+| Lotus theme | `color_schemes.dart`, `main.dart` | Navy + gold, 11 component themes |
+
+## Not Yet Implemented (from original plans)
+
+| Feature | Plan File | Priority | Notes |
+|---------|-----------|----------|-------|
+| Nutritionix API | `m1-nutrients/nutritionix.md` | Low | OFF + USDA covers most needs |
+| Nutrient synergy checker | `m1-nutrients/synergy-checker.md` | Medium | Shows beneficial/harmful nutrient combos |
+| 30 Plants a Week tracker | `m2-home-ux/30-plants.md` | Medium | Count unique plant foods per week |
+| Blueprint Mode toggle | `m2-home-ux/blueprint-mode.md` | Low | Bryan Johnson protocol mode |
+| iOS Lock Screen widget | `m5-integrations/widget.md` | Medium | WidgetKit bridge exists but widget not built |
+| Phone sensors (CoreMotion/Location/Barometer) | `docs/superpowers/specs/2026-03-24-phone-sensors-design.md` | High | Spec approved, ready for implementation |
+
+## Feature Index (A-Z)
 
 ### Core Features
 - **A.** Gut health panel → [m2-home-ux/gut-health.md](m2-home-ux/gut-health.md)
@@ -46,31 +76,33 @@ testing: manual_iphone (after each milestone)
 - **P.** Added sugar → [m1-nutrients/added-sugar.md](m1-nutrients/added-sugar.md)
 - **Q.** Cheat meal streak → [m4-longevity/streaks.md](m4-longevity/streaks.md)
 - **R.** Pattern auto-logging → [m2-home-ux/patterns.md](m2-home-ux/patterns.md)
-- **S.** Nutritionix API → [m1-nutrients/nutritionix.md](m1-nutrients/nutritionix.md)
-- **T.** DEXA scan → [m3-stats/dexa.md](m3-stats/dexa.md)
-- **U.** Biological age → [m3-stats/bio-age.md](m3-stats/bio-age.md)
-- **V.** Longevity insights → [m5-integrations/longevity-insights.md](m5-integrations/longevity-insights.md)
-- **W.** Net carbs + GI/GL → [m6-intelligence/glycemic.md](m6-intelligence/glycemic.md)
-- **X.** Condensed Home → [m2-home-ux/condensed-layout.md](m2-home-ux/condensed-layout.md)
-- **Y.** Weekly review → [m6-intelligence/weekly-review.md](m6-intelligence/weekly-review.md)
-- **Z.** Lock Screen widget → [m5-integrations/widget.md](m5-integrations/widget.md)
+- **S.** DEXA scan → [m3-stats/dexa.md](m3-stats/dexa.md)
+- **T.** Biological age → [m3-stats/bio-age.md](m3-stats/bio-age.md)
+- **U.** Longevity insights → [m5-integrations/longevity-insights.md](m5-integrations/longevity-insights.md)
+- **V.** Net carbs + GI/GL → [m6-intelligence/glycemic.md](m6-intelligence/glycemic.md)
+- **W.** Condensed Home → [m2-home-ux/condensed-layout.md](m2-home-ux/condensed-layout.md)
+- **X.** Weekly review → [m6-intelligence/weekly-review.md](m6-intelligence/weekly-review.md)
+- **Y.** Lock Screen widget → [m5-integrations/widget.md](m5-integrations/widget.md)
 
 ### Competitive Edge Features (unique to Ayu)
-- Nutrient Synergy Checker → [m1-nutrients/synergy-checker.md](m1-nutrients/synergy-checker.md)
-- 30 Plants a Week → [m2-home-ux/30-plants.md](m2-home-ux/30-plants.md)
-- Blueprint Mode → [m2-home-ux/blueprint-mode.md](m2-home-ux/blueprint-mode.md)
 - Food-to-Feeling Engine → [m3-stats/food-to-feeling.md](m3-stats/food-to-feeling.md)
 - Bristol Stool Scale → [m3-stats/bristol-stool.md](m3-stats/bristol-stool.md)
 - NSDR/Meditation Timer → [m4-longevity/nsdr.md](m4-longevity/nsdr.md)
 - HRV-Meal Correlation → [m5-integrations/hrv-correlation.md](m5-integrations/hrv-correlation.md)
+- Bioavailability Engine → [m7-smart-nutrition/](m7-smart-nutrition/)
+- Cross-Agent Observation Engine → `lib/core/services/observation_agent.dart`
+- On-Device Vision OCR → `ios/Runner/AppDelegate.swift`
+- Health Condition Awareness → `lib/core/services/health_condition_service.dart`
 
 ## Dependencies
 ```yaml
 objectbox: ^4.0.1
 objectbox_flutter_libs: ^4.0.1
 fl_chart: ^0.69.0
-health: ^11.0.0
+health: ^13.3.1
 home_widget: ^0.7.0
+mobile_scanner: ^7.0.0
+flutter_local_notifications: ^21.0.0
 ```
 
 ## Sources

@@ -18,75 +18,96 @@ Built on top of [OpenNutriTracker](https://github.com/simonoppowa/OpenNutriTrack
 
 ## Features
 
-### Nutrition (M1)
+### Nutrition
 - Barcode scanning with OFF + USDA FDC fallback
 - 23 vitamins & minerals with RDA% progress bars
 - Added sugar tracking
 - Glycemic load estimation (~200 food GI database)
 - Net carbs (total carbs - fiber)
 - Per-serving nutrient display
+- Food allergen alerts (user-configured allergens)
+- Custom food entry for items not in database
 
-### Home Dashboard (M2)
+### Home Dashboard
 - Water tracking with daily goal
 - Daily habits checklist with smart time-based reminders
-- Gut health panel — auto-detects 80+ harmful additives from OFF E-numbers
-- Daily summary card (calories, protein, gut health pass/fail)
+- Gut health panel — auto-detects 64 harmful additives from OFF E-numbers
+- Today View card (calories, water, supplements, sleep, streak at a glance)
+- Quick action bar (water +250ml, scan, coffee, fast)
 - Supplement checklist with take/skip logging
 - Fasting timer (16:8, 18:6, 20:4, OMAD presets)
 - NSDR / meditation countdown timer
+- Caffeine tracking
 
-### Stats Tab (M3)
+### Stats Tab
 - TDEE/BMR with thermic effect of food (auto from macros)
 - Weight tracker with fl_chart, target line, and ETA
 - 25 biomarkers with normal + longevity-optimal ranges (red/yellow/green)
+- 8 wellness biomarkers (hair, skin, teeth, nails, energy, sleep quality, stress, Norwood scale)
 - Biological age (Levine 2018 Phenotypic Age from 9 blood markers)
-- Food-to-Feeling correlation engine (symptom → trigger food analysis)
+- Longevity Score (0-100 composite)
+- Food-to-Feeling correlation engine (symptom -> trigger food analysis)
 - Bristol Stool Scale logger with 30-day distribution
 - DEXA body composition manual entry
 - Meal timing 24h clock with eating window visualization
 - Cheat meal streak tracker
 - Weekly review digest (wins, improvements, week-over-week trends)
+- Grocery/pantry tracking with receipt scanning
 
-### Longevity Suite (M4)
+### Longevity Suite
 - Supplement stack with daily adherence tracking
-- Intermittent fasting timer with circular countdown
+- Intermittent fasting timer with circular countdown + auto-start/stop
 - Sleep logging (bedtime, wake, quality 1-5) with 7-day trends
 - Meal timing analysis
 - Clean eating streak calculator
 
-### Integrations (M5)
-- Apple HealthKit sync (weight, sleep, HR, HRV, steps)
+### Integrations
+- Apple HealthKit sync (weight, sleep, HR, HRV, steps, workouts)
 - HRV vs. late-meal correlation analysis
 - Longevity insights engine (biomarker-based recommendations)
 - iOS WidgetKit data bridge (Lock Screen + Home Screen widgets)
 
-### Intelligence (M6)
-- DailySummaryEntity — aggregates all daily data (AI-ready with toJson())
-- Weekly review service with automated wins/improvements detection
+### Intelligence
+- 7 on-device agents: meal pattern, nutrient gap, fasting adapt, supplement, hydration, biomarker, cross-domain observation
+- Cross-agent observation engine (stress+HR contradiction, sleep+caffeine, mood+nutrition, sleep+eating window, weather+mood)
 - Smart notifications for missing entries (meals, water, supplements, sleep)
+- Auto-start fasting after meal logging gap
+- DailySummaryEntity — aggregates all daily data
+- Weekly review service with automated wins/improvements detection
 
-### Smart Nutrition (M8)
+### Smart Nutrition
 - **Bioavailability engine** — estimates real absorption for 10+ nutrients based on meal context
-  - Iron: 2–35% depending on heme vs non-heme, vitamin C, calcium, phytates
-  - Calcium: 5–40% (kale 49% bioavailable vs spinach 5% due to oxalates)
-  - Fat-soluble vitamins (A, D, E, K): 10–90% based on dietary fat in meal
+  - Iron: 2-35% depending on heme vs non-heme, vitamin C, calcium, phytates
+  - Calcium: 5-40% (kale 49% bioavailable vs spinach 5% due to oxalates)
+  - Fat-soluble vitamins (A, D, E, K): 10-90% based on dietary fat in meal
   - Shows enhancers/inhibitors detected in your meals
 - **Food recommendations** — suggests specific foods to fill micronutrient gaps
-  - Shows both raw content AND bioavailable amount (e.g., "Spinach: 3.6mg iron → 0.18mg absorbed")
+  - Shows both raw content AND bioavailable amount
   - Gender/age-aware RDA targets, ranked by lowest %RDA
   - Absorption tips (e.g., "Pair with vitamin C to boost iron 2-6x")
 - Research-backed: WHO/FAO 2001, Hurrell & Egli 2010, Weaver 1999, Schuchardt 2017
+
+### On-Device Vision
+- Apple Vision OCR for receipt scanning (no cloud, no API key)
+- Auto-classifies grocery items from receipts (produce, protein, dairy, etc.)
+- Supplement auto-detection from barcode scans
+
+### Health Awareness
+- 16 health conditions with nutrient rules (including cosmetic: acne, dental, eczema, hair loss)
+- Configurable during onboarding and updateable in settings
+- Condition-specific nutrient increase/avoid recommendations
 
 ## Tech Stack
 
 ```
 Flutter (iOS only — Android deprecated)
-ObjectBox (local DB)
+ObjectBox (local DB, 23 entities)
 BLoC (state management)
 fl_chart (charts)
 health (HealthKit)
 flutter_local_notifications
 home_widget (WidgetKit bridge)
+Apple Vision framework (on-device OCR)
 ```
 
 > **Note:** Android support is deprecated. Ayu is developed and tested exclusively for iOS.
@@ -103,6 +124,7 @@ home_widget (WidgetKit bridge)
 
 - All data stored locally on device (ObjectBox)
 - HealthKit data never leaves the device
+- On-device OCR (Apple Vision, no cloud)
 - No cloud dependency, no accounts, no tracking
 - Open source
 
@@ -110,7 +132,8 @@ home_widget (WidgetKit bridge)
 
 ```bash
 flutter pub get
-flutter pub run build_runner build
+cd ios && pod install && cd ..
+dart run build_runner build --delete-conflicting-outputs
 flutter run
 ```
 

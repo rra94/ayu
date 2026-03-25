@@ -1,4 +1,4 @@
-# M8: Smart Nutrition — Recommendations + Bioavailability
+# M7: Smart Nutrition — Recommendations + Bioavailability
 
 ## Overview
 
