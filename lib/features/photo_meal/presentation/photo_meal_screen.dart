@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:opennutritracker/core/domain/entity/intake_type_entity.dart';
 import 'package:opennutritracker/core/services/gemini_food_vision_service.dart';
+import 'package:opennutritracker/core/services/photo_enrichment_service.dart';
 import 'package:opennutritracker/core/styles/color_schemes.dart';
 import 'package:opennutritracker/core/utils/id_generator.dart';
 import 'package:opennutritracker/core/utils/locator.dart';
@@ -31,6 +32,7 @@ class _PhotoMealScreenState extends State<PhotoMealScreen> {
   bool _hasFailed = false;
   String? _imagePath;
   FoodPhotoResult? _result;
+  String _statusText = 'Identifying foods...';
 
   @override
   void initState() {
@@ -54,9 +56,10 @@ class _PhotoMealScreenState extends State<PhotoMealScreen> {
       _imagePath = photo.path;
       _isAnalyzing = true;
       _hasFailed = false;
+      _statusText = 'Identifying foods...';
     });
 
-    final result = await GeminiFoodVisionService.analyzePhoto(photo.path);
+    var result = await GeminiFoodVisionService.analyzePhoto(photo.path);
 
     if (!mounted) return;
 
@@ -65,12 +68,28 @@ class _PhotoMealScreenState extends State<PhotoMealScreen> {
         _isAnalyzing = false;
         _hasFailed = true;
       });
-    } else {
-      setState(() {
-        _isAnalyzing = false;
-        _result = result;
-      });
+      return;
     }
+
+    // Enrich identified foods with verified nutrition from databases
+    setState(() { _statusText = 'Looking up nutrition...'; });
+    final enrichedItems =
+        await PhotoEnrichmentService.enrichItems(result.items);
+
+    if (!mounted) return;
+
+    result = FoodPhotoResult(
+      dishName: result.dishName,
+      items: enrichedItems,
+      totalKcal: enrichedItems
+          .where((i) => i.selected)
+          .fold(0.0, (s, i) => s + i.kcal),
+    );
+
+    setState(() {
+      _isAnalyzing = false;
+      _result = result;
+    });
   }
 
   double get _selectedTotal {
@@ -113,18 +132,37 @@ class _PhotoMealScreenState extends State<PhotoMealScreen> {
 
     if (newGrams != null && newGrams > 0) {
       setState(() {
-        // Scale nutrition proportionally
-        final ratio = newGrams / item.grams;
         final index = _result!.items.indexOf(item);
-        _result!.items[index] = FoodPhotoItem(
-          name: item.name,
-          grams: newGrams,
-          kcal: item.kcal * ratio,
-          protein: item.protein * ratio,
-          fat: item.fat * ratio,
-          carbs: item.carbs * ratio,
-          selected: item.selected,
-        );
+        if (item.matchedMeal != null) {
+          // Re-scale from database per-100g values for accuracy
+          final n = item.matchedMeal!.nutriments;
+          final factor = newGrams / 100.0;
+          _result!.items[index] = FoodPhotoItem(
+            name: item.name,
+            grams: newGrams,
+            kcal: (n.energyKcal100 ?? 0) * factor,
+            protein: (n.proteins100 ?? 0) * factor,
+            fat: (n.fat100 ?? 0) * factor,
+            carbs: (n.carbohydrates100 ?? 0) * factor,
+            selected: item.selected,
+            matchedMeal: item.matchedMeal,
+            source: item.source,
+          );
+        } else {
+          // Scale proportionally from current values (Gemini estimate)
+          final ratio = newGrams / item.grams;
+          _result!.items[index] = FoodPhotoItem(
+            name: item.name,
+            grams: newGrams,
+            kcal: item.kcal * ratio,
+            protein: item.protein * ratio,
+            fat: item.fat * ratio,
+            carbs: item.carbs * ratio,
+            selected: item.selected,
+            matchedMeal: null,
+            source: item.source,
+          );
+        }
       });
     }
   }
@@ -146,30 +184,56 @@ class _PhotoMealScreenState extends State<PhotoMealScreen> {
     final day = DateTime.now();
 
     for (final item in checkedItems) {
-      // Normalize nutrition to per-100g values
-      final scale = item.grams > 0 ? 100.0 / item.grams : 1.0;
-      final nutriments = MealNutrimentsEntity(
-        energyKcal100: item.kcal * scale,
-        carbohydrates100: item.carbs * scale,
-        fat100: item.fat * scale,
-        proteins100: item.protein * scale,
-        sugars100: null,
-        saturatedFat100: null,
-        fiber100: null,
-      );
+      final MealEntity meal;
 
-      final meal = MealEntity(
-        code: IdGenerator.getUniqueID(),
-        name: item.name,
-        url: null,
-        mealQuantity: '100',
-        mealUnit: 'g',
-        servingQuantity: item.grams,
-        servingUnit: 'g',
-        servingSize: '${item.grams.round()}g',
-        nutriments: nutriments,
-        source: MealSourceEntity.custom,
-      );
+      if (item.matchedMeal != null) {
+        // Use the verified database MealEntity (has full micronutrients)
+        // Override name with what Gemini identified (may be more specific)
+        final matched = item.matchedMeal!;
+        meal = MealEntity(
+          code: matched.code ?? IdGenerator.getUniqueID(),
+          name: item.name,
+          brands: matched.brands,
+          thumbnailImageUrl: matched.thumbnailImageUrl,
+          mainImageUrl: matched.mainImageUrl,
+          url: matched.url,
+          mealQuantity: '100',
+          mealUnit: 'g',
+          servingQuantity: item.grams,
+          servingUnit: 'g',
+          servingSize: '${item.grams.round()}g',
+          additivesTags: matched.additivesTags,
+          ingredientsText: matched.ingredientsText,
+          ecoscoreGrade: matched.ecoscoreGrade,
+          ecoscoreScore: matched.ecoscoreScore,
+          nutriments: matched.nutriments,
+          source: MealSourceEntity.custom,
+        );
+      } else {
+        // Gemini estimate — build from macro values (no micronutrients)
+        final scale = item.grams > 0 ? 100.0 / item.grams : 1.0;
+        final nutriments = MealNutrimentsEntity(
+          energyKcal100: item.kcal * scale,
+          carbohydrates100: item.carbs * scale,
+          fat100: item.fat * scale,
+          proteins100: item.protein * scale,
+          sugars100: null,
+          saturatedFat100: null,
+          fiber100: null,
+        );
+        meal = MealEntity(
+          code: IdGenerator.getUniqueID(),
+          name: item.name,
+          url: null,
+          mealQuantity: '100',
+          mealUnit: 'g',
+          servingQuantity: item.grams,
+          servingUnit: 'g',
+          servingSize: '${item.grams.round()}g',
+          nutriments: nutriments,
+          source: MealSourceEntity.custom,
+        );
+      }
 
       await mealDetailBloc.addIntake(
         context,
@@ -238,7 +302,7 @@ class _PhotoMealScreenState extends State<PhotoMealScreen> {
           CircularProgressIndicator(color: gold),
           const SizedBox(height: 16),
           Text(
-            'Analyzing your meal...',
+            _statusText,
             style: theme.textTheme.titleMedium,
           ),
         ],
@@ -417,16 +481,38 @@ class _PhotoMealScreenState extends State<PhotoMealScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    '${item.name}  ~${item.grams.round()}g',
-                    style: theme.textTheme.bodyLarge?.copyWith(
-                      fontWeight: FontWeight.w500,
-                      color: item.selected
-                          ? null
-                          : theme.colorScheme.onSurfaceVariant,
-                      decoration:
-                          item.selected ? null : TextDecoration.lineThrough,
-                    ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          '${item.name}  ~${item.grams.round()}g',
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            fontWeight: FontWeight.w500,
+                            color: item.selected
+                                ? null
+                                : theme.colorScheme.onSurfaceVariant,
+                            decoration: item.selected
+                                ? null
+                                : TextDecoration.lineThrough,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      if (item.isVerified)
+                        _buildBadge(
+                          context,
+                          icon: Icons.check_circle_outline,
+                          label: 'Verified',
+                          color: Colors.green,
+                        )
+                      else
+                        _buildBadge(
+                          context,
+                          icon: Icons.warning_amber_outlined,
+                          label: 'Estimated',
+                          color: Colors.orange,
+                        ),
+                    ],
                   ),
                   const SizedBox(height: 2),
                   Text(
@@ -450,6 +536,28 @@ class _PhotoMealScreenState extends State<PhotoMealScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildBadge(
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    required Color color,
+  }) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 12, color: color),
+        const SizedBox(width: 2),
+        Text(
+          label,
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                color: color,
+                fontWeight: FontWeight.w600,
+              ),
+        ),
+      ],
     );
   }
 }

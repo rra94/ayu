@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:logging/logging.dart';
 import 'package:opennutritracker/core/utils/env.dart';
+import 'package:opennutritracker/features/add_meal/domain/entity/meal_entity.dart';
 
 class FoodPhotoResult {
   final String? dishName;
@@ -15,11 +16,13 @@ class FoodPhotoResult {
 class FoodPhotoItem {
   final String name;
   final double grams;
-  final double kcal;
-  final double protein;
-  final double fat;
-  final double carbs;
+  double kcal;
+  double protein;
+  double fat;
+  double carbs;
   bool selected;
+  MealEntity? matchedMeal; // verified database match
+  String source; // 'common_db', 'government_db', 'calorie_ninja', 'off', 'gemini_estimate'
 
   FoodPhotoItem({
     required this.name,
@@ -29,7 +32,11 @@ class FoodPhotoItem {
     required this.fat,
     required this.carbs,
     this.selected = true,
+    this.matchedMeal,
+    this.source = 'gemini_estimate',
   });
+
+  bool get isVerified => source != 'gemini_estimate';
 }
 
 class GeminiFoodVisionService {
@@ -51,20 +58,15 @@ class GeminiFoodVisionService {
           {
             'parts': [
               {
-                'text': '''Analyze this meal photo. Break down EVERY visible ingredient/component with estimated weight in grams and nutrition.
-
-For mixed dishes (salads, bowls, plates with multiple items), list each ingredient separately.
-If you can identify the dish name, include it.
-
+                'text': '''Identify all food items in this image with estimated portion size in grams.
 Return ONLY valid JSON (no markdown, no code blocks):
 {
   "dish": "dish name or null",
   "items": [
-    {"name": "ingredient", "grams": 100, "kcal": 165, "protein": 31, "fat": 3.6, "carbs": 0}
-  ],
-  "total_kcal": 392
+    {"name": "grilled chicken breast", "grams": 150},
+    {"name": "steamed broccoli", "grams": 80}
+  ]
 }
-
 If this is not a food photo, return: {"error": "not_food"}'''
               },
               {
@@ -118,18 +120,18 @@ If this is not a food photo, return: {"error": "not_food"}'''
         return FoodPhotoItem(
           name: item['name'] as String? ?? 'Unknown',
           grams: (item['grams'] as num?)?.toDouble() ?? 100,
-          kcal: (item['kcal'] as num?)?.toDouble() ?? 0,
-          protein: (item['protein'] as num?)?.toDouble() ?? 0,
-          fat: (item['fat'] as num?)?.toDouble() ?? 0,
-          carbs: (item['carbs'] as num?)?.toDouble() ?? 0,
+          kcal: 0,
+          protein: 0,
+          fat: 0,
+          carbs: 0,
+          source: 'gemini_estimate',
         );
       }).toList();
 
       return FoodPhotoResult(
         dishName: result['dish'] as String?,
         items: items,
-        totalKcal: (result['total_kcal'] as num?)?.toDouble() ??
-            items.fold(0.0, (sum, i) => sum + i.kcal),
+        totalKcal: 0,
       );
     } catch (e) {
       _log.severe('Gemini Vision failed: $e');
