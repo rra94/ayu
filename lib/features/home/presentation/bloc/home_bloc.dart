@@ -38,6 +38,14 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
   DateTime currentDay = DateTime.now();
 
+  // Cache daily goals so they don't shift on every reload
+  double? _cachedKcalGoal;
+  double? _cachedCarbsGoal;
+  double? _cachedFatsGoal;
+  double? _cachedProteinsGoal;
+  bool _cachedBlueprintMode = false;
+  String? _cachedGoalDay; // "yyyy-mm-dd" to invalidate on day change
+
   HomeBloc(
       this._getConfigUsecase,
       this._addConfigUsecase,
@@ -112,22 +120,31 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       final totalKcalActivities =
           userActivities.map((activity) => activity.burnedKcal).toList().sum;
 
-      var totalKcalGoal = await _getKcalGoalUsecase.getKcalGoal();
-      var totalCarbsGoal =
-          await _getMacroGoalUsecase.getCarbsGoal(totalKcalGoal);
-      var totalFatsGoal =
-          await _getMacroGoalUsecase.getFatsGoal(totalKcalGoal);
-      var totalProteinsGoal =
-          await _getMacroGoalUsecase.getProteinsGoal(totalKcalGoal);
+      // Cache goals per day — recompute only on day change, not every reload
+      final todayKey = '${currentDay.year}-${currentDay.month}-${currentDay.day}';
+      if (_cachedGoalDay != todayKey || _cachedKcalGoal == null) {
+        _cachedKcalGoal = await _getKcalGoalUsecase.getKcalGoal();
+        _cachedCarbsGoal = await _getMacroGoalUsecase.getCarbsGoal(_cachedKcalGoal!);
+        _cachedFatsGoal = await _getMacroGoalUsecase.getFatsGoal(_cachedKcalGoal!);
+        _cachedProteinsGoal = await _getMacroGoalUsecase.getProteinsGoal(_cachedKcalGoal!);
 
-      // Blueprint Mode: override macro targets with protocol constants
-      final blueprintEnabled = await BlueprintService.isEnabled();
-      if (blueprintEnabled) {
-        totalKcalGoal = BlueprintService.dailyCalories.toDouble();
-        totalProteinsGoal = BlueprintService.proteinG;
-        totalFatsGoal = BlueprintService.fatG;
-        totalCarbsGoal = BlueprintService.carbsG;
+        // Blueprint Mode: override macro targets with protocol constants
+        _cachedBlueprintMode = await BlueprintService.isEnabled();
+        if (_cachedBlueprintMode) {
+          _cachedKcalGoal = BlueprintService.dailyCalories.toDouble();
+          _cachedProteinsGoal = BlueprintService.proteinG;
+          _cachedFatsGoal = BlueprintService.fatG;
+          _cachedCarbsGoal = BlueprintService.carbsG;
+        }
+
+        _cachedGoalDay = todayKey;
       }
+
+      final totalKcalGoal = _cachedKcalGoal!;
+      final totalCarbsGoal = _cachedCarbsGoal!;
+      final totalFatsGoal = _cachedFatsGoal!;
+      final totalProteinsGoal = _cachedProteinsGoal!;
+      final blueprintEnabled = _cachedBlueprintMode;
 
       final totalKcalLeft =
           CalorieGoalCalc.getDailyKcalLeft(totalKcalGoal, totalKcalIntake);
