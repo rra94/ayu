@@ -93,28 +93,160 @@ class _SleepCardState extends State<SleepCard> {
     final hours = last.durationHours;
     final stars = '★' * last.qualityScore + '☆' * (5 - last.qualityScore);
 
-    return Row(
-      children: [
-        Text(
-          '${hours.toStringAsFixed(1)}h',
-          style: theme.textTheme.headlineMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: hours >= 7 ? Colors.green : Colors.orange,
-          ),
-        ),
-        const SizedBox(width: 12),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    return InkWell(
+      onTap: () => _showEditDialog(context, last),
+      borderRadius: BorderRadius.circular(8),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Row(
           children: [
-            Text(stars, style: const TextStyle(color: Colors.amber)),
-            if (last.notes != null && last.notes!.isNotEmpty)
-              Text(last.notes!,
-                  style: theme.textTheme.labelSmall,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis),
+            Text(
+              '${hours.toStringAsFixed(1)}h',
+              style: theme.textTheme.headlineMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: hours >= 7 ? Colors.green : Colors.orange,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(stars, style: const TextStyle(color: Colors.amber)),
+                  if (last.notes != null && last.notes!.isNotEmpty)
+                    Text(last.notes!,
+                        style: theme.textTheme.labelSmall,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis),
+                ],
+              ),
+            ),
+            Icon(Icons.edit_outlined,
+                size: 14,
+                color: theme.colorScheme.onSurfaceVariant),
           ],
         ),
-      ],
+      ),
+    );
+  }
+
+  void _showEditDialog(BuildContext context, SleepRecordOB record) {
+    TimeOfDay bedTime =
+        TimeOfDay(hour: record.bedTime.hour, minute: record.bedTime.minute);
+    TimeOfDay wakeTime =
+        TimeOfDay(hour: record.wakeTime.hour, minute: record.wakeTime.minute);
+    int quality = record.qualityScore;
+    final notesController =
+        TextEditingController(text: record.notes ?? '');
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          title: const Text('Edit Sleep Entry'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                title: const Text('Bedtime'),
+                trailing: Text(bedTime.format(ctx)),
+                onTap: () async {
+                  final picked = await showTimePicker(
+                    context: ctx,
+                    initialTime: bedTime,
+                  );
+                  if (picked != null) {
+                    setDialogState(() => bedTime = picked);
+                  }
+                },
+              ),
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                title: const Text('Wake time'),
+                trailing: Text(wakeTime.format(ctx)),
+                onTap: () async {
+                  final picked = await showTimePicker(
+                    context: ctx,
+                    initialTime: wakeTime,
+                  );
+                  if (picked != null) {
+                    setDialogState(() => wakeTime = picked);
+                  }
+                },
+              ),
+              Row(
+                children: [
+                  const Text('Quality: '),
+                  Expanded(
+                    child: Slider(
+                      value: quality.toDouble(),
+                      min: 1,
+                      max: 5,
+                      divisions: 4,
+                      label: '$quality',
+                      onChanged: (val) =>
+                          setDialogState(() => quality = val.round()),
+                    ),
+                  ),
+                  Text('$quality/5'),
+                ],
+              ),
+              TextField(
+                controller: notesController,
+                decoration: const InputDecoration(
+                  labelText: 'Notes (optional)',
+                ),
+                maxLines: 1,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () async {
+                // Reconstruct date from the original record's date, replacing time
+                final bedDate = DateTime(
+                  record.bedTime.year,
+                  record.bedTime.month,
+                  record.bedTime.day,
+                  bedTime.hour,
+                  bedTime.minute,
+                );
+                final wakeDate = DateTime(
+                  record.wakeTime.year,
+                  record.wakeTime.month,
+                  record.wakeTime.day,
+                  wakeTime.hour,
+                  wakeTime.minute,
+                );
+                final notes = notesController.text.trim();
+
+                final ds = locator<SleepDataSource>();
+                // Same id → ObjectBox upserts (updates in place)
+                await ds.addRecord(SleepRecordOB(
+                  id: record.id,
+                  bedTime: bedDate,
+                  wakeTime: wakeDate,
+                  qualityScore: quality,
+                  notes: notes.isEmpty ? null : notes,
+                  source: record.source,
+                  deepSleepMin: record.deepSleepMin,
+                  lightSleepMin: record.lightSleepMin,
+                  remSleepMin: record.remSleepMin,
+                  awakeMin: record.awakeMin,
+                ));
+                if (ctx.mounted) Navigator.of(ctx).pop();
+                _load();
+              },
+              child: const Text('Update'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -254,7 +386,7 @@ class _SleepCardState extends State<SleepCard> {
                   wakeTime: wake,
                   qualityScore: quality,
                 ));
-                Navigator.of(ctx).pop();
+                if (ctx.mounted) Navigator.of(ctx).pop();
                 _load();
               },
               child: const Text('Save'),

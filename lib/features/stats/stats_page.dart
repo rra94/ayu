@@ -13,6 +13,8 @@ import 'package:opennutritracker/features/stats/presentation/widgets/meal_timing
 import 'package:opennutritracker/features/stats/presentation/widgets/nutrient_intelligence_card.dart';
 import 'package:opennutritracker/features/stats/presentation/widgets/streak_card.dart';
 import 'package:opennutritracker/features/stats/presentation/widgets/tdee_card.dart';
+import 'package:opennutritracker/features/stats/presentation/widgets/bioavailability_card.dart';
+import 'package:opennutritracker/features/stats/presentation/widgets/glucose_card.dart';
 import 'package:opennutritracker/features/stats/presentation/widgets/weekly_review_card.dart';
 import 'package:opennutritracker/features/stats/presentation/widgets/weight_chart_card.dart';
 import 'package:opennutritracker/features/sleep/presentation/widgets/sleep_card.dart';
@@ -54,6 +56,7 @@ class StatsPage extends StatelessWidget {
           children: [
             DexaCard(),
             BiomarkerCard(),
+            GlucoseCard(),
             BioAgeCard(),
           ],
         ),
@@ -63,7 +66,7 @@ class StatsPage extends StatelessWidget {
           title: 'Health',
           icon: Icons.favorite,
           storageKey: 'stats_health',
-          children: [LongevityInsightsCard()],
+          children: [LongevityInsightsCard(), BioavailabilityCard()],
         ),
 
         // Tracking

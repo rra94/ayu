@@ -186,41 +186,103 @@ class _BiomarkerCardState extends State<BiomarkerCard> {
             ? 'Normal'
             : 'Out of range';
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
-      child: Row(
-        children: [
-          Container(
-            width: 8,
-            height: 8,
-            decoration: BoxDecoration(
-              color: color,
-              shape: BoxShape.circle,
-            ),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(def.name, style: theme.textTheme.bodySmall),
-          ),
-          Text(
-            '${value.toStringAsFixed(1)} ${def.unit}',
-            style: theme.textTheme.bodySmall
-                ?.copyWith(fontWeight: FontWeight.w600),
-          ),
-          const SizedBox(width: 8),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              label,
-              style: theme.textTheme.labelSmall?.copyWith(
+    final record = _latestValues[def.key]!;
+
+    return InkWell(
+      onTap: () => _showEditDialog(context, def, record),
+      borderRadius: BorderRadius.circular(8),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
+        child: Row(
+          children: [
+            Container(
+              width: 8,
+              height: 8,
+              decoration: BoxDecoration(
                 color: color,
-                fontSize: 9,
+                shape: BoxShape.circle,
               ),
             ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(def.name, style: theme.textTheme.bodySmall),
+            ),
+            Text(
+              '${value.toStringAsFixed(1)} ${def.unit}',
+              style: theme.textTheme.bodySmall
+                  ?.copyWith(fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                label,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: color,
+                  fontSize: 9,
+                ),
+              ),
+            ),
+            const SizedBox(width: 4),
+            Icon(Icons.edit_outlined,
+                size: 14,
+                color: theme.colorScheme.onSurfaceVariant),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showEditDialog(
+      BuildContext context, BiomarkerDef def, BiomarkerRecordOB record) {
+    final valueController =
+        TextEditingController(text: record.value.toStringAsFixed(1));
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Edit ${def.name}'),
+        content: TextField(
+          controller: valueController,
+          keyboardType:
+              const TextInputType.numberWithOptions(decimal: true),
+          decoration: InputDecoration(
+            labelText: 'Value',
+            suffixText: def.unit,
+            hintText: 'Optimal: ${def.optimalLow}–${def.optimalHigh}',
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: valueController.text.isEmpty
+                ? null
+                : () async {
+                    final value =
+                        double.tryParse(valueController.text);
+                    if (value != null) {
+                      final ds = locator<BiomarkerDataSource>();
+                      // Re-use same ObjectBox id → upsert (update in place)
+                      await ds.addRecord(BiomarkerRecordOB(
+                        id: record.id,
+                        type: record.type,
+                        value: value,
+                        unit: record.unit,
+                        dateTime: record.dateTime,
+                        source: record.source,
+                      ));
+                      if (ctx.mounted) Navigator.of(ctx).pop();
+                      _load();
+                    }
+                  },
+            child: const Text('Update'),
           ),
         ],
       ),
@@ -309,7 +371,7 @@ class _BiomarkerCardState extends State<BiomarkerCard> {
                             dateTime: DateTime.now(),
                             source: 0,
                           ));
-                          Navigator.of(ctx).pop();
+                          if (ctx.mounted) Navigator.of(ctx).pop();
                           _load();
                         }
                       },
