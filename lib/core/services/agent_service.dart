@@ -57,6 +57,34 @@ class AgentService {
     // Cross-agent observation engine — finds contradictions and correlations
     try { suggestions.addAll(await ObservationAgent.observe()); } catch (_) {}
 
+    // Priority order: observations first, then reminders, then informational
+    const typePriority = {
+      'observation': 0,
+      'nutrient_gap': 1,
+      'peptide_reminder': 2,
+      'supplement_reminder': 3,
+      'hydration': 4,
+      'sedentary': 5,
+      'meal_pattern': 6,
+      'eco_score': 7,
+      'biomarker_stale': 8,
+      'biomarker_wellness': 9,
+      'fasting_adapt': 10,
+      'gym_frequency': 11,
+      'outdoor_time': 12,
+    };
+
+    suggestions.sort((a, b) {
+      final pa = typePriority[a.type] ?? 99;
+      final pb = typePriority[b.type] ?? 99;
+      return pa.compareTo(pb);
+    });
+
+    // Cap at 3 to avoid notification fatigue
+    if (suggestions.length > 3) {
+      suggestions.removeRange(3, suggestions.length);
+    }
+
     _log.info('AgentService generated ${suggestions.length} suggestions');
     return suggestions;
   }

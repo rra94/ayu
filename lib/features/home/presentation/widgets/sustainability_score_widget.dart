@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:opennutritracker/core/db/data_sources/config_data_source_ob.dart';
 import 'package:opennutritracker/core/db/data_sources/eco_score_data_source.dart';
 import 'package:opennutritracker/core/domain/entity/intake_entity.dart';
-import 'package:opennutritracker/core/styles/color_schemes.dart';
 import 'package:opennutritracker/core/utils/locator.dart';
 
 /// Compact card showing the daily average eco-score derived from
@@ -61,26 +60,7 @@ class SustainabilityScoreWidget extends StatelessWidget {
         final scores = snapshot.data ?? [];
 
         if (scores.isEmpty) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-            child: Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  children: [
-                    Icon(Icons.eco, color: ayuGold),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        'No eco-score data today',
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
+          return const SizedBox.shrink();
         }
 
         final avgScore =

@@ -11,8 +11,9 @@ class AgentSuggestionsWidget extends StatefulWidget {
 
 class _AgentSuggestionsWidgetState extends State<AgentSuggestionsWidget> {
   List<AgentSuggestion> _suggestions = [];
-  // Static so dismissed state persists across widget rebuilds/scrolls
-  static final _dismissed = <String>{};
+  // Static so dismissed state persists across widget rebuilds/scrolls.
+  // Maps dismiss key → time dismissed; suggestions re-appear after 24h.
+  static final Map<String, DateTime> _dismissed = {};
 
   @override
   void initState() {
@@ -27,9 +28,15 @@ class _AgentSuggestionsWidgetState extends State<AgentSuggestionsWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final visible = _suggestions
-        .where((s) => !_dismissed.contains('${s.type}_${s.title}'))
-        .toList();
+    final visible = <AgentSuggestion>[];
+    for (final s in _suggestions) {
+      final key = '${s.type}_${s.title}';
+      final dismissedAt = _dismissed[key];
+      if (dismissedAt != null && DateTime.now().difference(dismissedAt).inHours < 24) {
+        continue; // still in cooldown
+      }
+      visible.add(s);
+    }
 
     if (visible.isEmpty) return const SizedBox();
 
@@ -42,7 +49,7 @@ class _AgentSuggestionsWidgetState extends State<AgentSuggestionsWidget> {
         final dismissKey = '${s.type}_${s.title}';
         return Dismissible(
           key: ValueKey(dismissKey),
-          onDismissed: (_) => setState(() => _dismissed.add(dismissKey)),
+          onDismissed: (_) => setState(() => _dismissed[dismissKey] = DateTime.now()),
           child: Card(
             color: gold.withValues(alpha: 0.08),
             child: Padding(

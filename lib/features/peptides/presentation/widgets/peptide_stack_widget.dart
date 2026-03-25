@@ -44,42 +44,7 @@ class _PeptideStackWidgetState extends State<PeptideStackWidget> {
     if (_loading) return const SizedBox();
 
     if (_peptides.isEmpty) {
-      return Card(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                children: [
-                  Icon(Icons.vaccines_outlined, color: goldColor),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Peptides',
-                    style: theme.textTheme.titleMedium
-                        ?.copyWith(fontWeight: FontWeight.w600),
-                  ),
-                  const Spacer(),
-                  TextButton.icon(
-                    onPressed: () => _showAddDialog(context),
-                    icon: const Icon(Icons.add, size: 18),
-                    label: const Text('Add'),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'No peptides. Add one to track your stack.',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color:
-                      theme.textTheme.bodySmall?.color?.withValues(alpha: 0.6),
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
+      return const SizedBox.shrink();
     }
 
     final dosedCount = _todayLoggedIds.length;

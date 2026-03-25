@@ -146,6 +146,14 @@ class _ActivityDashboardWidgetState extends State<ActivityDashboardWidget> {
   Widget build(BuildContext context) {
     if (!_loaded) return const SizedBox();
 
+    // Hide entirely when there is no sensor data at all (first-time user or
+    // HealthKit / CoreMotion not yet seeded).
+    final hasNoData = _steps == 0 &&
+        (_activity == 'unknown' || _activity.isEmpty) &&
+        _gymCount == 0 &&
+        !_hasHrData;
+    if (hasNoData) return const SizedBox.shrink();
+
     final theme = Theme.of(context);
     final isLight = theme.brightness == Brightness.light;
     final gold = isLight ? ayuGoldMuted : ayuGoldLight;
