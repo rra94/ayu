@@ -1531,9 +1531,48 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "31:809104814203709671",
+      "lastPropertyId": "6:8409510654558441581",
+      "name": "SearchHistoryOB",
+      "properties": [
+        {
+          "id": "1:6854966238187351342",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:3080722790271010457",
+          "name": "searchTerm",
+          "type": 9
+        },
+        {
+          "id": "3:6903565599436336011",
+          "name": "chosenMealName",
+          "type": 9
+        },
+        {
+          "id": "4:6128307269360541414",
+          "name": "chosenMealCode",
+          "type": 9
+        },
+        {
+          "id": "5:2208202562192442790",
+          "name": "count",
+          "type": 6
+        },
+        {
+          "id": "6:8409510654558441581",
+          "name": "lastUsed",
+          "type": 10
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "30:8907965053874012058",
+  "lastEntityId": "31:809104814203709671",
   "lastIndexId": "2:7319863865959781371",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",

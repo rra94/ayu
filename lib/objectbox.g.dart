@@ -34,6 +34,7 @@ import 'core/db/entities/physical_activity_ob.dart';
 import 'core/db/entities/pressure_reading_ob.dart';
 import 'core/db/entities/product_inventory_ob.dart';
 import 'core/db/entities/saved_location_ob.dart';
+import 'core/db/entities/search_history_ob.dart';
 import 'core/db/entities/sleep_record_ob.dart';
 import 'core/db/entities/stool_log_ob.dart';
 import 'core/db/entities/supplement_ob.dart';
@@ -1855,6 +1856,52 @@ final _entities = <obx_int.ModelEntity>[
     relations: <obx_int.ModelRelation>[],
     backlinks: <obx_int.ModelBacklink>[],
   ),
+  obx_int.ModelEntity(
+    id: const obx_int.IdUid(31, 809104814203709671),
+    name: 'SearchHistoryOB',
+    lastPropertyId: const obx_int.IdUid(6, 8409510654558441581),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(1, 6854966238187351342),
+        name: 'id',
+        type: 6,
+        flags: 1,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(2, 3080722790271010457),
+        name: 'searchTerm',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 6903565599436336011),
+        name: 'chosenMealName',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(4, 6128307269360541414),
+        name: 'chosenMealCode',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(5, 2208202562192442790),
+        name: 'count',
+        type: 6,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(6, 8409510654558441581),
+        name: 'lastUsed',
+        type: 10,
+        flags: 0,
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[],
+    backlinks: <obx_int.ModelBacklink>[],
+  ),
 ];
 
 /// Shortcut for [obx.Store.new] that passes [getObjectBoxModel] and for Flutter
@@ -1895,7 +1942,7 @@ Future<obx.Store> openStore({
 obx_int.ModelDefinition getObjectBoxModel() {
   final model = obx_int.ModelInfo(
     entities: _entities,
-    lastEntityId: const obx_int.IdUid(30, 8907965053874012058),
+    lastEntityId: const obx_int.IdUid(31, 809104814203709671),
     lastIndexId: const obx_int.IdUid(2, 7319863865959781371),
     lastRelationId: const obx_int.IdUid(0, 0),
     lastSequenceId: const obx_int.IdUid(0, 0),
@@ -4360,6 +4407,69 @@ obx_int.ModelDefinition getObjectBoxModel() {
         return object;
       },
     ),
+    SearchHistoryOB: obx_int.EntityDefinition<SearchHistoryOB>(
+      model: _entities[30],
+      toOneRelations: (SearchHistoryOB object) => [],
+      toManyRelations: (SearchHistoryOB object) => {},
+      getId: (SearchHistoryOB object) => object.id,
+      setId: (SearchHistoryOB object, int id) {
+        object.id = id;
+      },
+      objectToFB: (SearchHistoryOB object, fb.Builder fbb) {
+        final searchTermOffset = fbb.writeString(object.searchTerm);
+        final chosenMealNameOffset = fbb.writeString(object.chosenMealName);
+        final chosenMealCodeOffset = object.chosenMealCode == null
+            ? null
+            : fbb.writeString(object.chosenMealCode!);
+        fbb.startTable(7);
+        fbb.addInt64(0, object.id);
+        fbb.addOffset(1, searchTermOffset);
+        fbb.addOffset(2, chosenMealNameOffset);
+        fbb.addOffset(3, chosenMealCodeOffset);
+        fbb.addInt64(4, object.count);
+        fbb.addInt64(5, object.lastUsed.millisecondsSinceEpoch);
+        fbb.finish(fbb.endTable());
+        return object.id;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
+        final idParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          4,
+          0,
+        );
+        final searchTermParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 6, '');
+        final chosenMealNameParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 8, '');
+        final chosenMealCodeParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 10);
+        final countParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          12,
+          0,
+        );
+        final lastUsedParam = DateTime.fromMillisecondsSinceEpoch(
+          const fb.Int64Reader().vTableGet(buffer, rootOffset, 14, 0),
+        );
+        final object = SearchHistoryOB(
+          id: idParam,
+          searchTerm: searchTermParam,
+          chosenMealName: chosenMealNameParam,
+          chosenMealCode: chosenMealCodeParam,
+          count: countParam,
+          lastUsed: lastUsedParam,
+        );
+
+        return object;
+      },
+    ),
   };
 
   return obx_int.ModelDefinition(model, bindings);
@@ -5706,5 +5816,38 @@ class EcoScoreOB_ {
   /// See [EcoScoreOB.updatedAt].
   static final updatedAt = obx.QueryDateProperty<EcoScoreOB>(
     _entities[29].properties[7],
+  );
+}
+
+/// [SearchHistoryOB] entity fields to define ObjectBox queries.
+class SearchHistoryOB_ {
+  /// See [SearchHistoryOB.id].
+  static final id = obx.QueryIntegerProperty<SearchHistoryOB>(
+    _entities[30].properties[0],
+  );
+
+  /// See [SearchHistoryOB.searchTerm].
+  static final searchTerm = obx.QueryStringProperty<SearchHistoryOB>(
+    _entities[30].properties[1],
+  );
+
+  /// See [SearchHistoryOB.chosenMealName].
+  static final chosenMealName = obx.QueryStringProperty<SearchHistoryOB>(
+    _entities[30].properties[2],
+  );
+
+  /// See [SearchHistoryOB.chosenMealCode].
+  static final chosenMealCode = obx.QueryStringProperty<SearchHistoryOB>(
+    _entities[30].properties[3],
+  );
+
+  /// See [SearchHistoryOB.count].
+  static final count = obx.QueryIntegerProperty<SearchHistoryOB>(
+    _entities[30].properties[4],
+  );
+
+  /// See [SearchHistoryOB.lastUsed].
+  static final lastUsed = obx.QueryDateProperty<SearchHistoryOB>(
+    _entities[30].properties[5],
   );
 }

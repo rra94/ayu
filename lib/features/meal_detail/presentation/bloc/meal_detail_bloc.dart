@@ -8,8 +8,10 @@ import 'package:opennutritracker/core/domain/usecase/add_intake_usecase.dart';
 import 'package:opennutritracker/core/domain/usecase/add_tracked_day_usecase.dart';
 import 'package:opennutritracker/core/domain/usecase/get_kcal_goal_usecase.dart';
 import 'package:opennutritracker/core/domain/usecase/get_macro_goal_usecase.dart';
+import 'package:opennutritracker/core/db/data_sources/search_history_data_source.dart';
 import 'package:opennutritracker/core/utils/calc/unit_calc.dart';
 import 'package:opennutritracker/core/utils/id_generator.dart';
+import 'package:opennutritracker/core/utils/locator.dart';
 import 'package:opennutritracker/features/add_meal/domain/entity/meal_entity.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
@@ -88,6 +90,27 @@ class MealDetailBloc extends Bloc<MealDetailEvent, MealDetailState> {
         dateTime: day);
     await _addIntakeUseCase.addIntake(intakeEntity);
     _updateTrackedDay(intakeEntity, day);
+
+    // Record meal choice so future searches surface preferred items first
+    try {
+      final historyDs = locator<SearchHistoryDataSource>();
+      final name = meal.name;
+      if (name != null && name.isNotEmpty) {
+        await historyDs.recordChoice(
+          searchTerm: name.toLowerCase(),
+          mealName: name,
+          mealCode: meal.code,
+        );
+        for (final word in name.split(' ').where((w) => w.length > 2)) {
+          await historyDs.recordChoice(
+            searchTerm: word.toLowerCase(),
+            mealName: name,
+            mealCode: meal.code,
+          );
+        }
+      }
+    } catch (_) {}
+
     return intakeEntity;
   }
 

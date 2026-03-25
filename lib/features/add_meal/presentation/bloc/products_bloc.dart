@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logging/logging.dart';
 import 'package:opennutritracker/core/db/data_sources/eco_score_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/search_history_data_source.dart';
 import 'package:opennutritracker/core/db/entities/eco_score_ob.dart';
 import 'package:opennutritracker/core/domain/usecase/get_config_usecase.dart';
 import 'package:opennutritracker/core/domain/usecase/get_intake_usecase.dart';
@@ -110,6 +111,27 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
       results.addAll(localMatches);
     } catch (e) {
       log.info('Local search failed: $e');
+    }
+
+    // Boost user's preferred choices to top
+    try {
+      final historyDs = locator<SearchHistoryDataSource>();
+      final topChoices = await historyDs.getTopChoices(query);
+      if (topChoices.isNotEmpty) {
+        final topChoiceNames =
+            topChoices.map((c) => c.chosenMealName.toLowerCase()).toSet();
+        results.sort((a, b) {
+          final aIsPreferred =
+              topChoiceNames.contains(a.name?.toLowerCase());
+          final bIsPreferred =
+              topChoiceNames.contains(b.name?.toLowerCase());
+          if (aIsPreferred && !bIsPreferred) return -1;
+          if (!aIsPreferred && bIsPreferred) return 1;
+          return 0;
+        });
+      }
+    } catch (e) {
+      log.info('Search history boost failed: $e');
     }
 
     return results;

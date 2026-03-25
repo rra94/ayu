@@ -3,6 +3,7 @@ import 'package:opennutritracker/core/db/data_sources/activity_snapshot_data_sou
 import 'package:opennutritracker/core/db/data_sources/eco_score_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/location_visit_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/pressure_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/search_history_data_source.dart';
 import 'package:opennutritracker/core/utils/locator.dart';
 
 class DataRetentionService {
@@ -20,6 +21,7 @@ class DataRetentionService {
       await locator<EcoScoreDataSource>().pruneStale(
         DateTime.now().subtract(const Duration(days: 180)),
       );
+      await locator<SearchHistoryDataSource>().prune();
 
       _log.info('Data retention pruning complete');
     } catch (e) {
