@@ -48,6 +48,8 @@ class AgentContext {
   bool pressureDrop = false;
   bool highCaffeine = false;
   bool lowProtein = false;
+  String? currentPlace; // coffee_shop, grocery, restaurant, gym, pharmacy
+  String? currentPlaceName;
   final Set<String> observationTypes = {};
 
   /// Observations already covered these topics — agents should skip them
@@ -72,6 +74,16 @@ class AgentService {
 
     // Phase 1: Observations run first — build shared context
     final ctx = AgentContext();
+
+    // Check current place for context
+    try {
+      final place = locator<LocationInferenceService>().lastDetectedPlace;
+      if (place != null) {
+        ctx.currentPlace = place['category'] as String?;
+        ctx.currentPlaceName = place['name'] as String?;
+      }
+    } catch (_) {}
+
     try {
       final obs = await ObservationAgent.observe(ctx);
       suggestions.addAll(obs);

@@ -4,6 +4,7 @@ import Vision
 import CoreMotion
 import CoreLocation
 import EventKit
+import MapKit
 
 @main
 @objc class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate, UNUserNotificationCenterDelegate {
@@ -72,6 +73,14 @@ import EventKit
           result(["lat": loc.coordinate.latitude, "lon": loc.coordinate.longitude])
         } else {
           result(nil)
+        }
+      } else if call.method == "identifyCurrentPlace" {
+        guard let loc = self.lastKnownLocation else {
+          result(nil)
+          return
+        }
+        self.identifyPlace(lat: loc.coordinate.latitude, lon: loc.coordinate.longitude) { place in
+          DispatchQueue.main.async { result(place) }
         }
       } else {
         result(FlutterMethodNotImplemented)
@@ -461,6 +470,15 @@ import EventKit
       "lat": loc.coordinate.latitude,
       "lon": loc.coordinate.longitude
     ])
+
+    // Identify nearby place of interest and notify Flutter
+    self.identifyPlace(lat: loc.coordinate.latitude, lon: loc.coordinate.longitude) { place in
+      if let place = place {
+        DispatchQueue.main.async {
+          self.locationChannel?.invokeMethod("onPlaceDetected", arguments: place)
+        }
+      }
+    }
   }
 
   // MARK: - UNUserNotificationCenterDelegate
@@ -480,6 +498,70 @@ import EventKit
   // Show notifications even when app is in foreground
   func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNPresentationOptions) -> Void) {
     completionHandler([.banner, .sound, .badge])
+  }
+
+  // MARK: - MapKit Place Detection
+
+  private func identifyPlace(lat: Double, lon: Double, completion: @escaping ([String: Any]?) -> Void) {
+    let location = CLLocation(latitude: lat, longitude: lon)
+    let request = MKLocalSearch.Request()
+    request.naturalLanguageQuery = "food coffee grocery restaurant"
+    request.region = MKCoordinateRegion(center: location.coordinate, latitudinalMeters: 100, longitudinalMeters: 100)
+
+    let search = MKLocalSearch(request: request)
+    search.start { response, error in
+      guard let response = response, let item = response.mapItems.first else {
+        completion(nil)
+        return
+      }
+
+      let category = self.classifyPlace(item: item)
+      completion([
+        "name": item.name ?? "",
+        "category": category,
+        "lat": item.placemark.coordinate.latitude,
+        "lon": item.placemark.coordinate.longitude,
+      ])
+    }
+  }
+
+  private func classifyPlace(item: MKMapItem) -> String {
+    let name = (item.name ?? "").lowercased()
+    let categories = item.pointOfInterestCategory
+
+    // Check MapKit category first
+    if let cat = categories {
+      if cat == .cafe { return "coffee_shop" }
+      if cat == .restaurant || cat == .foodMarket { return "restaurant" }
+      if cat == .store { return "grocery" }
+      if cat == .fitnessCenter { return "gym" }
+      if cat == .pharmacy { return "pharmacy" }
+    }
+
+    // Fallback to name-based detection
+    if name.contains("starbucks") || name.contains("coffee") || name.contains("cafe") ||
+       name.contains("dunkin") || name.contains("peet") || name.contains("tim horton") {
+      return "coffee_shop"
+    }
+    if name.contains("grocery") || name.contains("market") || name.contains("whole foods") ||
+       name.contains("trader joe") || name.contains("safeway") || name.contains("kroger") ||
+       name.contains("walmart") || name.contains("costco") || name.contains("target") ||
+       name.contains("aldi") || name.contains("publix") || name.contains("wegman") {
+      return "grocery"
+    }
+    if name.contains("restaurant") || name.contains("grill") || name.contains("kitchen") ||
+       name.contains("bistro") || name.contains("sushi") || name.contains("pizza") ||
+       name.contains("burger") || name.contains("taco") || name.contains("chipotle") {
+      return "restaurant"
+    }
+    if name.contains("gym") || name.contains("fitness") || name.contains("crossfit") ||
+       name.contains("yoga") || name.contains("equinox") {
+      return "gym"
+    }
+    if name.contains("pharmacy") || name.contains("cvs") || name.contains("walgreens") {
+      return "pharmacy"
+    }
+    return "unknown"
   }
 
   // MARK: - Barometer helpers
