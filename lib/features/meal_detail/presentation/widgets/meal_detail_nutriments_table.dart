@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:opennutritracker/core/services/nutrient_synergy_service.dart';
 import 'package:opennutritracker/core/utils/extensions.dart';
 import 'package:opennutritracker/features/add_meal/domain/entity/meal_entity.dart';
 import 'package:opennutritracker/generated/l10n.dart';
@@ -185,6 +186,29 @@ class MealDetailNutrimentsTable extends StatelessWidget {
           textStyleNormal));
     }
 
+    // Build synergy tips
+    final presenceMap = NutrientSynergyService.buildPresenceMap(
+      iron: n.iron100,
+      calcium: n.calcium100,
+      vitaminC: n.vitaminC100,
+      vitaminD: n.vitaminD100,
+      vitaminA: n.vitaminA100,
+      vitaminE: n.vitaminE100,
+      vitaminK: n.vitaminK100,
+      zinc: n.zinc100,
+      magnesium: n.magnesium100,
+      potassium: n.potassium100,
+      fiber: n.fiber100,
+      fat: n.fat100,
+      protein: n.proteins100,
+      vitaminB12: n.vitaminB12100,
+      folate: n.folate100,
+      copper: n.copper100,
+      phosphorus: n.phosphorus100,
+      omega3: n.omega3100,
+    );
+    final synergyTips = NutrientSynergyService.checkSynergies(presenceMap);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -241,8 +265,56 @@ class MealDetailNutrimentsTable extends StatelessWidget {
               _getNutrimentsTableRow('Other', '', textStyleBold),
             ...otherRows,
           ],
-        )
+        ),
+        if (synergyTips.isNotEmpty) ...[
+          const SizedBox(height: 24.0),
+          Text('Nutrient Synergies',
+              style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: 8.0),
+          ...synergyTips.map((tip) => _buildSynergyRow(context, tip)),
+        ],
       ],
+    );
+  }
+
+  Widget _buildSynergyRow(BuildContext context, SynergyTip tip) {
+    final isEnhancer = tip.type == 'enhancer';
+    final color = isEnhancer ? Colors.green.shade700 : Colors.orange.shade800;
+    final icon = isEnhancer ? Icons.check_circle_outline : Icons.warning_amber_outlined;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: color, size: 18.0),
+          const SizedBox(width: 8.0),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  tip.message,
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodySmall
+                      ?.copyWith(color: color),
+                ),
+                if (tip.source != null)
+                  Text(
+                    tip.source!,
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withValues(alpha: 0.5),
+                        ),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
