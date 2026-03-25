@@ -31,6 +31,29 @@ class CaffeineDataSource {
     return results.fold<double>(0, (sum, l) => sum + l.amountMg);
   }
 
+  /// Get today's individual logs for display/deletion
+  Future<List<CaffeineLogOB>> getTodayLogs() async {
+    final now = DateTime.now();
+    final start = DateTime(now.year, now.month, now.day);
+    final end = start.add(const Duration(days: 1));
+    final query = _box
+        .query(CaffeineLogOB_.dateTime.betweenDate(start, end))
+        .order(CaffeineLogOB_.dateTime, flags: Order.descending)
+        .build();
+    final results = query.find();
+    query.close();
+    return results;
+  }
+
+  Future<void> deleteLog(int id) async {
+    _box.remove(id);
+  }
+
+  /// Clear all caffeine logs
+  Future<void> clearAll() async {
+    _box.removeAll();
+  }
+
   /// Hours since last caffeine intake
   Future<double?> hoursSinceLastCaffeine() async {
     final last = await getLastCaffeine();

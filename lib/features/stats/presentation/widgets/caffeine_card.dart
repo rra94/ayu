@@ -78,6 +78,68 @@ class _CaffeineCardState extends State<CaffeineCard> {
               icon: const Icon(Icons.add, size: 20),
               onPressed: () => _showLogDialog(context),
             ),
+            if (_todayMg > 0)
+              IconButton(
+                icon: Icon(Icons.history, size: 18,
+                    color: theme.colorScheme.onSurfaceVariant),
+                onPressed: () => _showHistoryDialog(context),
+                tooltip: 'View & delete logs',
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showHistoryDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          title: const Text('Today\'s Caffeine'),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: FutureBuilder<List<CaffeineLogOB>>(
+              future: locator<CaffeineDataSource>().getTodayLogs(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Text('No logs today');
+                }
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: snapshot.data!.map((log) => ListTile(
+                    dense: true,
+                    title: Text('${log.source} — ${log.amountMg.round()}mg'),
+                    subtitle: Text(
+                      '${log.dateTime.hour}:${log.dateTime.minute.toString().padLeft(2, '0')}',
+                    ),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.delete_outline, size: 18),
+                      onPressed: () async {
+                        await locator<CaffeineDataSource>().deleteLog(log.id);
+                        setDialogState(() {}); // rebuild dialog
+                        _load(); // refresh card
+                      },
+                    ),
+                  )).toList(),
+                );
+              },
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Close'),
+            ),
+            TextButton(
+              onPressed: () async {
+                await locator<CaffeineDataSource>().clearAll();
+                if (ctx.mounted) Navigator.pop(ctx);
+                _load();
+              },
+              style: TextButton.styleFrom(foregroundColor: Colors.red),
+              child: const Text('Clear All'),
+            ),
           ],
         ),
       ),
