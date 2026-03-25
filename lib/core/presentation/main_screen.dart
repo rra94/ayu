@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:opennutritracker/features/diary/diary_page.dart';
 import 'package:opennutritracker/core/presentation/widgets/home_appbar.dart';
@@ -26,6 +27,7 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   int _selectedPageIndex = 0;
+  Timer? _midnightTimer;
 
   late List<Widget> _bodyPages;
   late List<PreferredSizeWidget> _appbarPages;
@@ -36,12 +38,28 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     DataRetentionService.pruneOldData();
     _onAppResumed();
+    _scheduleMidnightRefresh();
   }
 
   @override
   void dispose() {
+    _midnightTimer?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  /// Schedule a refresh at midnight so daily data resets automatically.
+  void _scheduleMidnightRefresh() {
+    _midnightTimer?.cancel();
+    final now = DateTime.now();
+    final midnight = DateTime(now.year, now.month, now.day + 1);
+    final duration = midnight.difference(now);
+    _midnightTimer = Timer(duration, () {
+      // Day changed — reload all data
+      _onAppResumed();
+      // Schedule next midnight
+      _scheduleMidnightRefresh();
+    });
   }
 
   @override

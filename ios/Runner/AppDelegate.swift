@@ -196,11 +196,23 @@ import CoreLocation
   // MARK: - CoreLocation helpers
 
   private func startSignificantLocationMonitoring(result: @escaping FlutterResult) {
-    let mgr = CLLocationManager()
-    mgr.delegate = self
-    self.locationManager = mgr
-    mgr.requestWhenInUseAuthorization()
-    mgr.startMonitoringSignificantLocationChanges()
+    // Reuse existing manager if already created
+    if self.locationManager == nil {
+      let mgr = CLLocationManager()
+      mgr.delegate = self
+      self.locationManager = mgr
+    }
+    let mgr = self.locationManager!
+
+    // Only request permission if not yet determined
+    let status = mgr.authorizationStatus
+    if status == .notDetermined {
+      mgr.requestWhenInUseAuthorization()
+    }
+
+    if status == .authorizedWhenInUse || status == .authorizedAlways {
+      mgr.startMonitoringSignificantLocationChanges()
+    }
     result("started")
   }
 
