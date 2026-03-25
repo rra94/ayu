@@ -110,7 +110,7 @@ class _PeptideLogDialogState extends State<PeptideLogDialog> {
       ),
       actions: [
         TextButton(
-          onPressed: _saving ? null : () => Navigator.of(context).pop(false),
+          onPressed: _saving ? null : () => Navigator.of(context).pop(null),
           child: const Text('Cancel'),
         ),
         FilledButton(
@@ -130,7 +130,7 @@ class _PeptideLogDialogState extends State<PeptideLogDialog> {
   Future<void> _confirmLog(BuildContext context) async {
     setState(() => _saving = true);
     final ds = locator<PeptideDataSource>();
-    await ds.addLog(PeptideLogOB(
+    final logId = await ds.addLog(PeptideLogOB(
       peptideId: widget.peptide.id,
       doseUnits: widget.peptide.doseUnits,
       doseMcg: widget.peptide.doseMcg,
@@ -138,7 +138,8 @@ class _PeptideLogDialogState extends State<PeptideLogDialog> {
       dateTime: DateTime.now(),
     ));
     if (context.mounted) {
-      Navigator.of(context).pop(true);
+      // Return the log ID so the caller can offer an undo snackbar
+      Navigator.of(context).pop(logId);
     }
   }
 }

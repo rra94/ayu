@@ -74,8 +74,9 @@ class MealDetailBloc extends Bloc<MealDetailEvent, MealDetailState> {
     });
   }
 
-  void addIntake(BuildContext context, String unit, String amountText,
-      IntakeTypeEntity type, MealEntity meal, DateTime day) async {
+  Future<IntakeEntity> addIntake(BuildContext context, String unit,
+      String amountText, IntakeTypeEntity type, MealEntity meal,
+      DateTime day) async {
     final quantity = double.parse(amountText.replaceAll(',', '.'));
 
     final intakeEntity = IntakeEntity(
@@ -87,6 +88,7 @@ class MealDetailBloc extends Bloc<MealDetailEvent, MealDetailState> {
         dateTime: day);
     await _addIntakeUseCase.addIntake(intakeEntity);
     _updateTrackedDay(intakeEntity, day);
+    return intakeEntity;
   }
 
   Future<void> _updateTrackedDay(

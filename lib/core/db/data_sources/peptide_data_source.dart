@@ -30,8 +30,12 @@ class PeptideDataSource {
     return results;
   }
 
-  Future<void> addLog(PeptideLogOB log) async {
-    _logBox.put(log);
+  Future<int> addLog(PeptideLogOB log) async {
+    return _logBox.put(log);
+  }
+
+  Future<void> deleteLog(int id) async {
+    _logBox.remove(id);
   }
 
   Future<List<PeptideLogOB>> getLogsForDate(DateTime date) async {
