@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:opennutritracker/core/presentation/widgets/add_item_bottom_sheet.dart';
 import 'package:opennutritracker/features/diary/diary_page.dart';
 import 'package:opennutritracker/core/presentation/widgets/home_appbar.dart';
 import 'package:opennutritracker/features/home/home_page.dart';
@@ -130,16 +129,4 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
-  void _onFabPressed(BuildContext context) async {
-    showModalBottomSheet(
-        context: context,
-        isScrollControlled: true,
-        shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(16.0),
-                topRight: Radius.circular(16.0))),
-        builder: (BuildContext context) {
-          return AddItemBottomSheet(day: DateTime.now());
-        });
-  }
 }

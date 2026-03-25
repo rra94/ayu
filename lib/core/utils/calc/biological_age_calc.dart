@@ -38,7 +38,7 @@ class BiologicalAgeCalc {
     }
 
     // Simplified estimate with partial data
-    return _simplifiedEstimate(values, chronologicalAge, available);
+    return _simplifiedEstimate(values, chronologicalAge, available, values.keys.toSet());
   }
 
   static PhenoAgeResult _fullPhenoAge(
@@ -75,6 +75,7 @@ class BiologicalAgeCalc {
     Map<String, double> v,
     double age,
     List<String> available,
+    Set<String> availableKeys,
   ) {
     // Simplified: average the deviation from optimal for each available marker
     // and offset from chronological age
@@ -135,6 +136,7 @@ class BiologicalAgeCalc {
       markersUsed: 0,
       markersTotal: 9,
       isFullCalculation: false,
+      availableKeys: availableKeys,
     );
 
     final avgDeviation = deviationScore / count;
@@ -145,6 +147,7 @@ class BiologicalAgeCalc {
       markersUsed: available.length,
       markersTotal: 9,
       isFullCalculation: false,
+      availableKeys: availableKeys,
     );
   }
 }
@@ -154,18 +157,20 @@ class PhenoAgeResult {
   final int markersUsed;
   final int markersTotal;
   final bool isFullCalculation;
+  final Set<String> _availableKeys;
 
   PhenoAgeResult({
     required this.phenotypicAge,
     required this.markersUsed,
     required this.markersTotal,
     required this.isFullCalculation,
-  });
+    Set<String> availableKeys = const {},
+  }) : _availableKeys = availableKeys;
 
   List<String> get missingMarkers {
     if (isFullCalculation) return [];
     return BiologicalAgeCalc.requiredMarkers
-        .where((k) => markersUsed < markersTotal)
+        .where((k) => !_availableKeys.contains(k))
         .toList();
   }
 }

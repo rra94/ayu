@@ -112,8 +112,21 @@ class _ScannerScreenState extends State<ScannerScreen> {
     );
   }
 
+  MobileScannerController? _cameraController;
+
+  MobileScannerController get _camera {
+    _cameraController ??= MobileScannerController();
+    return _cameraController!;
+  }
+
+  @override
+  void dispose() {
+    _cameraController?.dispose();
+    super.dispose();
+  }
+
   Scaffold _getScannerContent(BuildContext context) {
-    final cameraController = MobileScannerController();
+    final cameraController = _camera;
     return Scaffold(
       appBar: AppBar(
         title: Text(S.of(context).scanProductLabel),

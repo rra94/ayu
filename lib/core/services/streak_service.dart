@@ -111,17 +111,22 @@ class StreakService {
   static int _computeFastingStreak(List<FastingSessionOB> sessions) {
     final completed = sessions
         .where((s) => s.endTime != null && s.elapsedHours >= s.targetHours)
-        .map((s) => _dayKey(s.startTime))
-        .toSet()
+        .map((s) => s.startTime)
         .toList()
-      ..sort();
+      ..sort((a, b) => b.compareTo(a)); // newest first
+
     if (completed.isEmpty) return 0;
 
     int streak = 1;
-    // Count backwards from most recent
-    for (int i = completed.length - 1; i > 0; i--) {
-      // Simple consecutive day check (not perfect but good enough)
-      streak++;
+    for (int i = 0; i < completed.length - 1; i++) {
+      final current = DateTime(completed[i].year, completed[i].month, completed[i].day);
+      final previous = DateTime(completed[i + 1].year, completed[i + 1].month, completed[i + 1].day);
+      final diff = current.difference(previous).inDays;
+      if (diff <= 1) {
+        streak++;
+      } else {
+        break; // gap found, streak ends
+      }
     }
     return streak;
   }

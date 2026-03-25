@@ -1,3 +1,4 @@
+import 'package:opennutritracker/core/db/entities/habit_log_ob.dart';
 import 'package:opennutritracker/core/db/data_sources/gut_health_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/habit_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/mindfulness_data_source.dart';
@@ -68,7 +69,7 @@ class DailySummaryService {
     final habits = await habitDs.getAllActiveHabits();
     final habitLogs = await habitDs.getLogsForDate(date);
     final habitsCompleted = habitLogs
-        .where((l) => (l as dynamic).completed == true)
+        .where((l) => (l as HabitLogOB).completed == true)
         .length;
 
     // Sleep (last night = wake date matches)

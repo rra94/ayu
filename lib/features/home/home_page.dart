@@ -1,3 +1,4 @@
+import 'package:opennutritracker/core/db/entities/habit_log_ob.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logging/logging.dart';
@@ -295,14 +296,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           ],
         ),
 
-        // Activity tracked via HealthKit — steps card in Tracking section
-        const CollapsibleSection(
-          title: 'Activity',
-          icon: Icons.directions_run,
-          storageKey: 'home_activity',
-          initiallyExpanded: false,
-          children: [],
-        ),
+        // Activity tracked via HealthKit (steps card in Tracking section)
 
         const SizedBox(height: 48.0)
       ]),
@@ -445,8 +439,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         final logs = snapshot.data![1] as List;
         final completedIds = <int>{};
         for (final log in logs) {
-          if ((log as dynamic).completed) {
-            completedIds.add((log as dynamic).habitId);
+          if ((log as HabitLogOB).completed) {
+            completedIds.add((log as HabitLogOB).habitId);
           }
         }
         return HabitsChecklistWidget(
