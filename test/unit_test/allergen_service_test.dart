@@ -5,47 +5,47 @@ import 'package:opennutritracker/features/add_meal/domain/entity/meal_nutriments
 
 void main() {
   group('AllergenService', () {
-    setUp(() {
-      AllergenService.setUserAllergens({'Dairy', 'Gluten', 'Peanuts'});
+    setUp(() async {
+      await AllergenService.setUserAllergens({'Dairy', 'Gluten', 'Peanuts'});
     });
 
-    test('no alerts when no allergens configured', () {
-      AllergenService.setUserAllergens({});
+    test('no alerts when no allergens configured', () async {
+      await AllergenService.setUserAllergens({});
       final meal = _createMeal('Cheese Pizza', 'Contains milk, wheat flour');
-      expect(AllergenService.checkMeal(meal), isEmpty);
+      final alerts = await AllergenService.checkMeal(meal);
+      expect(alerts, isEmpty);
     });
 
-    test('detects dairy from ingredients', () {
+    test('detects dairy from ingredients', () async {
       final meal = _createMeal('Protein Bar', 'whey protein, milk chocolate');
-      final alerts = AllergenService.checkMeal(meal);
+      final alerts = await AllergenService.checkMeal(meal);
       expect(alerts.any((a) => a.displayName == 'Dairy'), isTrue);
     });
 
-    test('detects gluten from ingredients', () {
+    test('detects gluten from ingredients', () async {
       final meal = _createMeal('Bread', 'wheat flour, water, yeast');
-      final alerts = AllergenService.checkMeal(meal);
+      final alerts = await AllergenService.checkMeal(meal);
       expect(alerts.any((a) => a.displayName.contains('Wheat') ||
           a.displayName.contains('Gluten')), isTrue);
     });
 
-    test('detects peanuts from product name', () {
+    test('detects peanuts from product name', () async {
       final meal = _createMeal('Peanut Butter Cups', '');
-      final alerts = AllergenService.checkMeal(meal);
+      final alerts = await AllergenService.checkMeal(meal);
       expect(alerts.any((a) => a.displayName == 'Peanuts'), isTrue);
     });
 
-    test('no duplicate alerts for same allergen', () {
+    test('no duplicate alerts for same allergen', () async {
       final meal = _createMeal('Milk Chocolate Shake', 'milk, cream, lactose');
-      final alerts = AllergenService.checkMeal(meal);
+      final alerts = await AllergenService.checkMeal(meal);
       final dairyAlerts = alerts.where((a) => a.displayName == 'Dairy');
-      // Should be exactly 1 despite multiple dairy keywords matching
       expect(dairyAlerts.length, 1);
     });
 
-    test('ignores allergens not in user list', () {
-      AllergenService.setUserAllergens({'Gluten'}); // only gluten
+    test('ignores allergens not in user list', () async {
+      await AllergenService.setUserAllergens({'Gluten'});
       final meal = _createMeal('Shrimp Tempura', 'shrimp, wheat flour');
-      final alerts = AllergenService.checkMeal(meal);
+      final alerts = await AllergenService.checkMeal(meal);
       expect(alerts.any((a) => a.displayName == 'Shellfish'), isFalse);
       expect(alerts.any((a) => a.displayName == 'Gluten'), isTrue);
     });
