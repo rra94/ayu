@@ -842,7 +842,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(9, 3446880705750154736),
     name: 'HabitOB',
-    lastPropertyId: const obx_int.IdUid(10, 5422166084123251698),
+    lastPropertyId: const obx_int.IdUid(11, 3990488014887907717),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -903,6 +903,12 @@ final _entities = <obx_int.ModelEntity>[
         id: const obx_int.IdUid(10, 5422166084123251698),
         name: 'monthlyDay',
         type: 6,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(11, 3990488014887907717),
+        name: 'calendarEventId',
+        type: 9,
         flags: 0,
       ),
     ],
@@ -3086,7 +3092,10 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final scheduleDaysOffset = object.scheduleDays == null
             ? null
             : fbb.writeString(object.scheduleDays!);
-        fbb.startTable(11);
+        final calendarEventIdOffset = object.calendarEventId == null
+            ? null
+            : fbb.writeString(object.calendarEventId!);
+        fbb.startTable(12);
         fbb.addInt64(0, object.id);
         fbb.addOffset(1, nameOffset);
         fbb.addOffset(2, categoryOffset);
@@ -3097,6 +3106,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
         fbb.addInt64(7, object.frequencyDay);
         fbb.addOffset(8, scheduleDaysOffset);
         fbb.addInt64(9, object.monthlyDay);
+        fbb.addOffset(10, calendarEventIdOffset);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -3151,6 +3161,9 @@ obx_int.ModelDefinition getObjectBoxModel() {
           rootOffset,
           22,
         );
+        final calendarEventIdParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 24);
         final object = HabitOB(
           id: idParam,
           name: nameParam,
@@ -3162,6 +3175,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           frequencyDay: frequencyDayParam,
           scheduleDays: scheduleDaysParam,
           monthlyDay: monthlyDayParam,
+          calendarEventId: calendarEventIdParam,
         );
 
         return object;
@@ -5353,6 +5367,11 @@ class HabitOB_ {
   /// See [HabitOB.monthlyDay].
   static final monthlyDay = obx.QueryIntegerProperty<HabitOB>(
     _entities[8].properties[9],
+  );
+
+  /// See [HabitOB.calendarEventId].
+  static final calendarEventId = obx.QueryStringProperty<HabitOB>(
+    _entities[8].properties[10],
   );
 }
 

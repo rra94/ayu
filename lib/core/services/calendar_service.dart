@@ -92,4 +92,40 @@ class CalendarService {
     final medical = events.where((e) => e.inferredType == 'medical');
     return medical.isNotEmpty ? medical.first : null;
   }
+
+  /// Create a recurring calendar event for a habit.
+  /// Returns the event ID (for deletion later) or null.
+  static Future<String?> createHabitEvent({
+    required String title,
+    required int hourMinute, // minutes from midnight
+    required String frequency, // 'daily', 'weekly', 'monthly'
+    List<int>? days, // for weekly: [1,3,5]; for monthly: [15]
+  }) async {
+    try {
+      final result = await _channel.invokeMethod<String>('createRecurringEvent', {
+        'title': title,
+        'hourMinute': hourMinute,
+        'frequency': frequency,
+        'days': days,
+      });
+      _log.info('Created calendar event: $result');
+      return result;
+    } catch (e) {
+      _log.warning('Failed to create calendar event: $e');
+      return null;
+    }
+  }
+
+  /// Delete a calendar event by ID.
+  static Future<bool> deleteHabitEvent(String eventId) async {
+    try {
+      final result = await _channel.invokeMethod<bool>('deleteEvent', {
+        'eventId': eventId,
+      });
+      return result ?? false;
+    } catch (e) {
+      _log.warning('Failed to delete calendar event: $e');
+      return false;
+    }
+  }
 }

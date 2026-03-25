@@ -30,6 +30,9 @@ class HabitOB {
   /// Defaults to 1 (first of month) when null.
   int? monthlyDay;
 
+  /// iOS calendar event identifier (for deletion when habit is removed)
+  String? calendarEventId;
+
   HabitOB({
     this.id = 0,
     required this.name,
@@ -41,6 +44,7 @@ class HabitOB {
     this.frequencyDay,
     this.scheduleDays,
     this.monthlyDay,
+    this.calendarEventId,
   });
 
   bool get isDaily => frequency == 0;

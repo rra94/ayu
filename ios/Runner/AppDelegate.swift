@@ -85,6 +85,23 @@ import EventKit
     calendarChannel.setMethodCallHandler { (call, result) in
       if call.method == "getTodayEvents" {
         self.getTodayEvents(result: result)
+      } else if call.method == "createRecurringEvent" {
+        guard let args = call.arguments as? [String: Any],
+              let title = args["title"] as? String,
+              let hourMinute = args["hourMinute"] as? Int,
+              let frequency = args["frequency"] as? String else {
+          result(FlutterError(code: "INVALID_ARGS", message: "Missing args", details: nil))
+          return
+        }
+        let days = args["days"] as? [Int] // for weekly: [1,3,5] = Mon,Wed,Fri
+        self.createRecurringEvent(title: title, hourMinute: hourMinute, frequency: frequency, days: days, result: result)
+      } else if call.method == "deleteEvent" {
+        guard let args = call.arguments as? [String: Any],
+              let eventId = args["eventId"] as? String else {
+          result(FlutterError(code: "INVALID_ARGS", message: "Missing eventId", details: nil))
+          return
+        }
+        self.deleteCalendarEvent(eventId: eventId, result: result)
       } else {
         result(FlutterMethodNotImplemented)
       }
@@ -133,6 +150,82 @@ import EventKit
         ]
       }
       DispatchQueue.main.async { result(mapped) }
+    }
+  }
+
+  private func createRecurringEvent(title: String, hourMinute: Int, frequency: String, days: [Int]?, result: @escaping FlutterResult) {
+    let store = EKEventStore()
+    store.requestFullAccessToEvents { granted, error in
+      guard granted else {
+        result(nil)
+        return
+      }
+
+      let event = EKEvent(eventStore: store)
+      event.title = "Ayu: \(title)"
+      event.calendar = store.defaultCalendarForNewEvents
+
+      // Set start time from hourMinute (minutes from midnight)
+      let hour = hourMinute / 60
+      let minute = hourMinute % 60
+      var comps = Calendar.current.dateComponents([.year, .month, .day], from: Date())
+      comps.hour = hour
+      comps.minute = minute
+      event.startDate = Calendar.current.date(from: comps)!
+      event.endDate = event.startDate.addingTimeInterval(900) // 15 min default
+
+      // Set recurrence
+      var rule: EKRecurrenceRule?
+      switch frequency {
+      case "daily":
+        rule = EKRecurrenceRule(recurrenceWith: .daily, interval: 1, end: nil)
+      case "weekly":
+        if let weekdays = days {
+          let ekDays = weekdays.compactMap { day -> EKRecurrenceDayOfWeek? in
+            // iOS: 1=Sun, 2=Mon... but our app uses 1=Mon, 7=Sun
+            let iosDay = day == 7 ? 1 : day + 1
+            return EKRecurrenceDayOfWeek(EKWeekday(rawValue: iosDay)!)
+          }
+          rule = EKRecurrenceRule(recurrenceWith: .weekly, interval: 1, daysOfTheWeek: ekDays, daysOfTheMonth: nil, monthsOfTheYear: nil, weeksOfTheYear: nil, daysOfTheYear: nil, setPositions: nil, end: nil)
+        } else {
+          rule = EKRecurrenceRule(recurrenceWith: .weekly, interval: 1, end: nil)
+        }
+      case "monthly":
+        let dayOfMonth = days?.first ?? 1
+        rule = EKRecurrenceRule(recurrenceWith: .monthly, interval: 1, daysOfTheWeek: nil, daysOfTheMonth: [NSNumber(value: dayOfMonth)], monthsOfTheYear: nil, weeksOfTheYear: nil, daysOfTheYear: nil, setPositions: nil, end: nil)
+      default:
+        rule = EKRecurrenceRule(recurrenceWith: .daily, interval: 1, end: nil)
+      }
+
+      if let rule = rule {
+        event.recurrenceRules = [rule]
+      }
+
+      // Add alert 5 min before
+      event.addAlarm(EKAlarm(relativeOffset: -300))
+
+      do {
+        try store.save(event, span: .futureEvents)
+        DispatchQueue.main.async { result(event.eventIdentifier) }
+      } catch {
+        DispatchQueue.main.async { result(nil) }
+      }
+    }
+  }
+
+  private func deleteCalendarEvent(eventId: String, result: @escaping FlutterResult) {
+    let store = EKEventStore()
+    store.requestFullAccessToEvents { granted, error in
+      guard granted, let event = store.event(withIdentifier: eventId) else {
+        result(false)
+        return
+      }
+      do {
+        try store.remove(event, span: .futureEvents)
+        DispatchQueue.main.async { result(true) }
+      } catch {
+        DispatchQueue.main.async { result(false) }
+      }
     }
   }
 

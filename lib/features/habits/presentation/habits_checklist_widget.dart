@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:opennutritracker/core/db/data_sources/habit_data_source.dart';
 import 'package:opennutritracker/core/db/entities/habit_ob.dart';
+import 'package:opennutritracker/core/services/calendar_service.dart';
 import 'package:opennutritracker/core/services/habit_notification_service.dart';
 import 'package:opennutritracker/core/utils/locator.dart';
 
@@ -120,7 +121,11 @@ class HabitsChecklistWidget extends StatelessWidget {
                         return await _confirmDelete(context, habit.name);
                       },
                       onDismissed: (direction) async {
+                        final calEventId = habit.calendarEventId;
                         await locator<HabitDataSource>().deleteHabit(habit.id);
+                        if (calEventId != null) {
+                          await CalendarService.deleteHabitEvent(calEventId);
+                        }
                         if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
@@ -137,8 +142,12 @@ class HabitsChecklistWidget extends StatelessWidget {
                           final confirmed =
                               await _confirmDelete(context, habit.name);
                           if (confirmed == true) {
+                            final calEventId = habit.calendarEventId;
                             await locator<HabitDataSource>()
                                 .deleteHabit(habit.id);
+                            if (calEventId != null) {
+                              await CalendarService.deleteHabitEvent(calEventId);
+                            }
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
@@ -268,6 +277,7 @@ class HabitsChecklistWidget extends StatelessWidget {
     int frequency = 0;
     Set<int> selectedWeekdays = {};
     int monthlyDay = 1;
+    bool addToCalendar = false;
 
     const categories = [
       'skincare', 'dental', 'grooming', 'wellness', 'exercise', 'custom'
@@ -371,6 +381,15 @@ class HabitsChecklistWidget extends StatelessWidget {
                         setDialogState(() => monthlyDay = v ?? 1),
                   ),
                 ],
+                const SizedBox(height: 8),
+                SwitchListTile(
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text('Add to Calendar'),
+                  subtitle: const Text('Creates a recurring event with reminder'),
+                  value: addToCalendar,
+                  onChanged: (v) => setDialogState(() => addToCalendar = v),
+                ),
               ],
             ),
           ),
@@ -387,13 +406,42 @@ class HabitsChecklistWidget extends StatelessWidget {
                 final scheduleDaysStr = frequency == 1 && selectedWeekdays.isNotEmpty
                     ? (scheduledWeekdaysSorted(selectedWeekdays))
                     : null;
-                await ds.addHabit(HabitOB(
+                final habit = HabitOB(
                   name: name,
                   category: category,
                   frequency: frequency,
                   scheduleDays: scheduleDaysStr,
                   monthlyDay: frequency == 3 ? monthlyDay : null,
-                ));
+                );
+                final habitId = await ds.addHabit(habit);
+
+                // Optionally create a recurring calendar event
+                if (addToCalendar) {
+                  final freqStr = frequency == 1
+                      ? 'weekly'
+                      : frequency == 3
+                          ? 'monthly'
+                          : 'daily';
+                  final List<int>? days = frequency == 1 && selectedWeekdays.isNotEmpty
+                      ? (selectedWeekdays.toList()..sort())
+                      : frequency == 3
+                          ? [monthlyDay]
+                          : null;
+                  // Use noon (720 min) as default time if no reminder set
+                  final hourMinute = habit.reminderMinutes ?? 720;
+                  final eventId = await CalendarService.createHabitEvent(
+                    title: name,
+                    hourMinute: hourMinute,
+                    frequency: freqStr,
+                    days: days,
+                  );
+                  if (eventId != null) {
+                    habit.id = habitId;
+                    habit.calendarEventId = eventId;
+                    await ds.updateHabit(habit);
+                  }
+                }
+
                 if (ctx.mounted) Navigator.of(ctx).pop();
                 // Trigger parent rebuild via toggle with a dummy call
                 // (parent listens to onToggle to refresh)
@@ -478,8 +526,12 @@ class HabitsChecklistWidget extends StatelessWidget {
                           ),
                         );
                         if (confirmed == true) {
+                          final calEventId = h.calendarEventId;
                           await locator<HabitDataSource>()
                               .deleteHabit(h.id);
+                          if (calEventId != null) {
+                            await CalendarService.deleteHabitEvent(calEventId);
+                          }
                           setDialogState(() {});
                           // Notify parent to refresh
                           onToggle(-1, false);
