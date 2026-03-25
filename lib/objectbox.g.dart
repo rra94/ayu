@@ -27,6 +27,8 @@ import 'core/db/entities/habit_ob.dart';
 import 'core/db/entities/intake_ob.dart';
 import 'core/db/entities/location_visit_ob.dart';
 import 'core/db/entities/mindfulness_session_ob.dart';
+import 'core/db/entities/peptide_log_ob.dart';
+import 'core/db/entities/peptide_ob.dart';
 import 'core/db/entities/physical_activity_ob.dart';
 import 'core/db/entities/pressure_reading_ob.dart';
 import 'core/db/entities/product_inventory_ob.dart';
@@ -1624,6 +1626,152 @@ final _entities = <obx_int.ModelEntity>[
     relations: <obx_int.ModelRelation>[],
     backlinks: <obx_int.ModelBacklink>[],
   ),
+  obx_int.ModelEntity(
+    id: const obx_int.IdUid(28, 6430898856620975951),
+    name: 'PeptideLogOB',
+    lastPropertyId: const obx_int.IdUid(7, 8918684554699584278),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(1, 95963888949789402),
+        name: 'id',
+        type: 6,
+        flags: 1,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(2, 3293544644710642424),
+        name: 'peptideId',
+        type: 6,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 2241132713012695443),
+        name: 'doseUnits',
+        type: 8,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(4, 7586496901264011267),
+        name: 'doseMcg',
+        type: 8,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(5, 2685847313075896532),
+        name: 'injectionSite',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(6, 5080729246179159723),
+        name: 'dateTime',
+        type: 10,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(7, 8918684554699584278),
+        name: 'notes',
+        type: 9,
+        flags: 0,
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[],
+    backlinks: <obx_int.ModelBacklink>[],
+  ),
+  obx_int.ModelEntity(
+    id: const obx_int.IdUid(29, 1298758183074159118),
+    name: 'PeptideOB',
+    lastPropertyId: const obx_int.IdUid(14, 3853781338877639870),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(1, 1360936791951905323),
+        name: 'id',
+        type: 6,
+        flags: 1,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(2, 7405380373380406931),
+        name: 'name',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 3466866359632447601),
+        name: 'brand',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(4, 8086272806844654388),
+        name: 'peptideMg',
+        type: 8,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(5, 5495934380347139230),
+        name: 'bacWaterMl',
+        type: 8,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(6, 6759061371088974792),
+        name: 'doseUnits',
+        type: 8,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(7, 1585606582888789234),
+        name: 'frequency',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(8, 4834718831439697842),
+        name: 'cycleDays',
+        type: 6,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(9, 110334479529836660),
+        name: 'restDays',
+        type: 6,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(10, 297796137647576506),
+        name: 'startDate',
+        type: 10,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(11, 7667847756718377450),
+        name: 'endDate',
+        type: 10,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(12, 2596827737126597224),
+        name: 'isActive',
+        type: 1,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(13, 6936520817538177385),
+        name: 'route',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(14, 3853781338877639870),
+        name: 'notes',
+        type: 9,
+        flags: 0,
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[],
+    backlinks: <obx_int.ModelBacklink>[],
+  ),
 ];
 
 /// Shortcut for [obx.Store.new] that passes [getObjectBoxModel] and for Flutter
@@ -1664,7 +1812,7 @@ Future<obx.Store> openStore({
 obx_int.ModelDefinition getObjectBoxModel() {
   final model = obx_int.ModelInfo(
     entities: _entities,
-    lastEntityId: const obx_int.IdUid(27, 4365770835936123041),
+    lastEntityId: const obx_int.IdUid(29, 1298758183074159118),
     lastIndexId: const obx_int.IdUid(2, 7319863865959781371),
     lastRelationId: const obx_int.IdUid(0, 0),
     lastSequenceId: const obx_int.IdUid(0, 0),
@@ -3823,6 +3971,206 @@ obx_int.ModelDefinition getObjectBoxModel() {
         return object;
       },
     ),
+    PeptideLogOB: obx_int.EntityDefinition<PeptideLogOB>(
+      model: _entities[27],
+      toOneRelations: (PeptideLogOB object) => [],
+      toManyRelations: (PeptideLogOB object) => {},
+      getId: (PeptideLogOB object) => object.id,
+      setId: (PeptideLogOB object, int id) {
+        object.id = id;
+      },
+      objectToFB: (PeptideLogOB object, fb.Builder fbb) {
+        final injectionSiteOffset = fbb.writeString(object.injectionSite);
+        final notesOffset = object.notes == null
+            ? null
+            : fbb.writeString(object.notes!);
+        fbb.startTable(8);
+        fbb.addInt64(0, object.id);
+        fbb.addInt64(1, object.peptideId);
+        fbb.addFloat64(2, object.doseUnits);
+        fbb.addFloat64(3, object.doseMcg);
+        fbb.addOffset(4, injectionSiteOffset);
+        fbb.addInt64(5, object.dateTime.millisecondsSinceEpoch);
+        fbb.addOffset(6, notesOffset);
+        fbb.finish(fbb.endTable());
+        return object.id;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
+        final idParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          4,
+          0,
+        );
+        final peptideIdParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          6,
+          0,
+        );
+        final doseUnitsParam = const fb.Float64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          8,
+          0,
+        );
+        final doseMcgParam = const fb.Float64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          10,
+          0,
+        );
+        final injectionSiteParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 12, '');
+        final dateTimeParam = DateTime.fromMillisecondsSinceEpoch(
+          const fb.Int64Reader().vTableGet(buffer, rootOffset, 14, 0),
+        );
+        final notesParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 16);
+        final object = PeptideLogOB(
+          id: idParam,
+          peptideId: peptideIdParam,
+          doseUnits: doseUnitsParam,
+          doseMcg: doseMcgParam,
+          injectionSite: injectionSiteParam,
+          dateTime: dateTimeParam,
+          notes: notesParam,
+        );
+
+        return object;
+      },
+    ),
+    PeptideOB: obx_int.EntityDefinition<PeptideOB>(
+      model: _entities[28],
+      toOneRelations: (PeptideOB object) => [],
+      toManyRelations: (PeptideOB object) => {},
+      getId: (PeptideOB object) => object.id,
+      setId: (PeptideOB object, int id) {
+        object.id = id;
+      },
+      objectToFB: (PeptideOB object, fb.Builder fbb) {
+        final nameOffset = fbb.writeString(object.name);
+        final brandOffset = object.brand == null
+            ? null
+            : fbb.writeString(object.brand!);
+        final frequencyOffset = fbb.writeString(object.frequency);
+        final routeOffset = fbb.writeString(object.route);
+        final notesOffset = object.notes == null
+            ? null
+            : fbb.writeString(object.notes!);
+        fbb.startTable(15);
+        fbb.addInt64(0, object.id);
+        fbb.addOffset(1, nameOffset);
+        fbb.addOffset(2, brandOffset);
+        fbb.addFloat64(3, object.peptideMg);
+        fbb.addFloat64(4, object.bacWaterMl);
+        fbb.addFloat64(5, object.doseUnits);
+        fbb.addOffset(6, frequencyOffset);
+        fbb.addInt64(7, object.cycleDays);
+        fbb.addInt64(8, object.restDays);
+        fbb.addInt64(9, object.startDate.millisecondsSinceEpoch);
+        fbb.addInt64(10, object.endDate?.millisecondsSinceEpoch);
+        fbb.addBool(11, object.isActive);
+        fbb.addOffset(12, routeOffset);
+        fbb.addOffset(13, notesOffset);
+        fbb.finish(fbb.endTable());
+        return object.id;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
+        final endDateValue = const fb.Int64Reader().vTableGetNullable(
+          buffer,
+          rootOffset,
+          24,
+        );
+        final idParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          4,
+          0,
+        );
+        final nameParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 6, '');
+        final brandParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 8);
+        final peptideMgParam = const fb.Float64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          10,
+          0,
+        );
+        final bacWaterMlParam = const fb.Float64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          12,
+          0,
+        );
+        final doseUnitsParam = const fb.Float64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          14,
+          0,
+        );
+        final frequencyParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 16, '');
+        final cycleDaysParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          18,
+          0,
+        );
+        final restDaysParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          20,
+          0,
+        );
+        final startDateParam = DateTime.fromMillisecondsSinceEpoch(
+          const fb.Int64Reader().vTableGet(buffer, rootOffset, 22, 0),
+        );
+        final endDateParam = endDateValue == null
+            ? null
+            : DateTime.fromMillisecondsSinceEpoch(endDateValue);
+        final isActiveParam = const fb.BoolReader().vTableGet(
+          buffer,
+          rootOffset,
+          26,
+          false,
+        );
+        final routeParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 28, '');
+        final notesParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 30);
+        final object = PeptideOB(
+          id: idParam,
+          name: nameParam,
+          brand: brandParam,
+          peptideMg: peptideMgParam,
+          bacWaterMl: bacWaterMlParam,
+          doseUnits: doseUnitsParam,
+          frequency: frequencyParam,
+          cycleDays: cycleDaysParam,
+          restDays: restDaysParam,
+          startDate: startDateParam,
+          endDate: endDateParam,
+          isActive: isActiveParam,
+          route: routeParam,
+          notes: notesParam,
+        );
+
+        return object;
+      },
+    ),
   };
 
   return obx_int.ModelDefinition(model, bindings);
@@ -4995,5 +5343,116 @@ class SavedLocationOB_ {
   /// See [SavedLocationOB.visitCount].
   static final visitCount = obx.QueryIntegerProperty<SavedLocationOB>(
     _entities[26].properties[5],
+  );
+}
+
+/// [PeptideLogOB] entity fields to define ObjectBox queries.
+class PeptideLogOB_ {
+  /// See [PeptideLogOB.id].
+  static final id = obx.QueryIntegerProperty<PeptideLogOB>(
+    _entities[27].properties[0],
+  );
+
+  /// See [PeptideLogOB.peptideId].
+  static final peptideId = obx.QueryIntegerProperty<PeptideLogOB>(
+    _entities[27].properties[1],
+  );
+
+  /// See [PeptideLogOB.doseUnits].
+  static final doseUnits = obx.QueryDoubleProperty<PeptideLogOB>(
+    _entities[27].properties[2],
+  );
+
+  /// See [PeptideLogOB.doseMcg].
+  static final doseMcg = obx.QueryDoubleProperty<PeptideLogOB>(
+    _entities[27].properties[3],
+  );
+
+  /// See [PeptideLogOB.injectionSite].
+  static final injectionSite = obx.QueryStringProperty<PeptideLogOB>(
+    _entities[27].properties[4],
+  );
+
+  /// See [PeptideLogOB.dateTime].
+  static final dateTime = obx.QueryDateProperty<PeptideLogOB>(
+    _entities[27].properties[5],
+  );
+
+  /// See [PeptideLogOB.notes].
+  static final notes = obx.QueryStringProperty<PeptideLogOB>(
+    _entities[27].properties[6],
+  );
+}
+
+/// [PeptideOB] entity fields to define ObjectBox queries.
+class PeptideOB_ {
+  /// See [PeptideOB.id].
+  static final id = obx.QueryIntegerProperty<PeptideOB>(
+    _entities[28].properties[0],
+  );
+
+  /// See [PeptideOB.name].
+  static final name = obx.QueryStringProperty<PeptideOB>(
+    _entities[28].properties[1],
+  );
+
+  /// See [PeptideOB.brand].
+  static final brand = obx.QueryStringProperty<PeptideOB>(
+    _entities[28].properties[2],
+  );
+
+  /// See [PeptideOB.peptideMg].
+  static final peptideMg = obx.QueryDoubleProperty<PeptideOB>(
+    _entities[28].properties[3],
+  );
+
+  /// See [PeptideOB.bacWaterMl].
+  static final bacWaterMl = obx.QueryDoubleProperty<PeptideOB>(
+    _entities[28].properties[4],
+  );
+
+  /// See [PeptideOB.doseUnits].
+  static final doseUnits = obx.QueryDoubleProperty<PeptideOB>(
+    _entities[28].properties[5],
+  );
+
+  /// See [PeptideOB.frequency].
+  static final frequency = obx.QueryStringProperty<PeptideOB>(
+    _entities[28].properties[6],
+  );
+
+  /// See [PeptideOB.cycleDays].
+  static final cycleDays = obx.QueryIntegerProperty<PeptideOB>(
+    _entities[28].properties[7],
+  );
+
+  /// See [PeptideOB.restDays].
+  static final restDays = obx.QueryIntegerProperty<PeptideOB>(
+    _entities[28].properties[8],
+  );
+
+  /// See [PeptideOB.startDate].
+  static final startDate = obx.QueryDateProperty<PeptideOB>(
+    _entities[28].properties[9],
+  );
+
+  /// See [PeptideOB.endDate].
+  static final endDate = obx.QueryDateProperty<PeptideOB>(
+    _entities[28].properties[10],
+  );
+
+  /// See [PeptideOB.isActive].
+  static final isActive = obx.QueryBooleanProperty<PeptideOB>(
+    _entities[28].properties[11],
+  );
+
+  /// See [PeptideOB.route].
+  static final route = obx.QueryStringProperty<PeptideOB>(
+    _entities[28].properties[12],
+  );
+
+  /// See [PeptideOB.notes].
+  static final notes = obx.QueryStringProperty<PeptideOB>(
+    _entities[28].properties[13],
   );
 }

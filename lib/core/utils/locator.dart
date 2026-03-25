@@ -66,6 +66,7 @@ import 'package:opennutritracker/core/db/data_sources/mindfulness_data_source.da
 import 'package:opennutritracker/core/db/data_sources/sleep_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/grocery_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/supplement_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/peptide_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/stool_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/symptom_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/weight_data_source.dart';
@@ -245,6 +246,9 @@ Future<void> initLocator() async {
       () => PressureDataSource(objectBoxProvider.pressureReadingBox));
   locator.registerLazySingleton<SavedLocationDataSource>(
       () => SavedLocationDataSource(objectBoxProvider.savedLocationBox));
+  locator.registerLazySingleton<PeptideDataSource>(
+      () => PeptideDataSource(
+          objectBoxProvider.peptideBox, objectBoxProvider.peptideLogBox));
 
   // Store (for direct box access where needed)
   locator.registerLazySingleton<Store>(() => objectBoxProvider.store);
