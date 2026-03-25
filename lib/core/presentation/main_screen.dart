@@ -109,19 +109,6 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
           ? Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Only show photo FAB if user opted in
-                if (_photoAnalysisEnabled) ...[
-                  FloatingActionButton.small(
-                    heroTag: 'photo',
-                    onPressed: () {
-                      Navigator.of(context)
-                          .pushNamed(NavigationOptions.photoMealRoute);
-                    },
-                    tooltip: 'Photo meal',
-                    child: const Icon(Icons.photo_camera, size: 20),
-                  ),
-                  const SizedBox(height: 8),
-                ],
                 FloatingActionButton.small(
                   heroTag: 'search',
                   onPressed: () {
@@ -143,22 +130,9 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
                 ),
                 const SizedBox(height: 8),
                 FloatingActionButton(
-                  heroTag: 'scan',
-                  onPressed: () {
-                    final hour = DateTime.now().hour;
-                    final intakeType = hour < 11
-                        ? IntakeTypeEntity.breakfast
-                        : hour < 15
-                            ? IntakeTypeEntity.lunch
-                            : hour < 21
-                                ? IntakeTypeEntity.dinner
-                                : IntakeTypeEntity.snack;
-                    Navigator.of(context).pushNamed(
-                      NavigationOptions.scannerRoute,
-                      arguments: ScannerScreenArguments(DateTime.now(), intakeType),
-                    );
-                  },
-                  tooltip: 'Scan',
+                  heroTag: 'camera',
+                  onPressed: () => _showCameraOptions(context),
+                  tooltip: 'Camera',
                   child: const Icon(Icons.camera_alt),
                 ),
               ],
@@ -199,4 +173,61 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     });
   }
 
+  void _showCameraOptions(BuildContext context) {
+    final hour = DateTime.now().hour;
+    final intakeType = hour < 11
+        ? IntakeTypeEntity.breakfast
+        : hour < 15
+            ? IntakeTypeEntity.lunch
+            : hour < 21
+                ? IntakeTypeEntity.dinner
+                : IntakeTypeEntity.snack;
+
+    showModalBottomSheet(
+      context: context,
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.qr_code_scanner),
+              title: const Text('Scan Barcode'),
+              subtitle: const Text('Scan a product barcode'),
+              onTap: () {
+                Navigator.pop(ctx);
+                Navigator.of(context).pushNamed(
+                  NavigationOptions.scannerRoute,
+                  arguments: ScannerScreenArguments(DateTime.now(), intakeType),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.receipt_long),
+              title: const Text('Scan Receipt'),
+              subtitle: const Text('Photo of grocery or restaurant receipt'),
+              onTap: () {
+                Navigator.pop(ctx);
+                Navigator.of(context).pushNamed(
+                  NavigationOptions.receiptScannerRoute,
+                );
+              },
+            ),
+            if (_photoAnalysisEnabled)
+              ListTile(
+                leading: const Icon(Icons.restaurant),
+                title: const Text('Photo Meal'),
+                subtitle: const Text('Take a photo — AI identifies food & calories'),
+                onTap: () {
+                  Navigator.pop(ctx);
+                  Navigator.of(context).pushNamed(
+                    NavigationOptions.photoMealRoute,
+                  );
+                },
+              ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+  }
 }
