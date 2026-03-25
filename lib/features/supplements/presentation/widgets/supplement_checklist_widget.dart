@@ -112,25 +112,9 @@ class _SupplementChecklistWidgetState extends State<SupplementChecklistWidget> {
             const Divider(),
             ..._supplements.map((supp) {
               final taken = _takenIds.contains(supp.id);
-              return CheckboxListTile(
-                dense: true,
-                visualDensity: VisualDensity.compact,
-                contentPadding: EdgeInsets.zero,
-                title: Text(
-                  '${supp.name} ${supp.dosage}${supp.unit}',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    decoration: taken ? TextDecoration.lineThrough : null,
-                    color: taken
-                        ? theme.textTheme.bodyMedium?.color
-                            ?.withValues(alpha: 0.5)
-                        : null,
-                  ),
-                ),
-                subtitle: Text(supp.category,
-                    style: theme.textTheme.labelSmall),
-                value: taken,
-                onChanged: (val) async {
-                  final nowTaken = val ?? false;
+              return InkWell(
+                onTap: () async {
+                  final nowTaken = !taken;
                   final ds = locator<SupplementDataSource>();
                   await ds.toggleLog(supp.id, DateTime.now(), nowTaken);
                   if (nowTaken) {
@@ -143,6 +127,7 @@ class _SupplementChecklistWidgetState extends State<SupplementChecklistWidget> {
                       SnackBar(
                         content: Text(
                             '${supp.name} marked as ${nowTaken ? "taken" : "skipped"}'),
+                        duration: const Duration(seconds: 4),
                         action: SnackBarAction(
                           label: 'Undo',
                           onPressed: () async {
@@ -151,12 +136,44 @@ class _SupplementChecklistWidgetState extends State<SupplementChecklistWidget> {
                             _load();
                           },
                         ),
-                        duration: const Duration(seconds: 4),
                       ),
                     );
                   }
                 },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: Row(
+                    children: [
+                      Checkbox(
+                        value: taken,
+                        onChanged: null, // handled by InkWell onTap
+                      ),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '${supp.name} ${supp.dosage}${supp.unit}',
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                decoration: taken ? TextDecoration.lineThrough : null,
+                                color: taken
+                                    ? theme.textTheme.bodyMedium?.color
+                                        ?.withValues(alpha: 0.5)
+                                    : null,
+                              ),
+                            ),
+                            Text(supp.category,
+                                style: theme.textTheme.labelSmall),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               );
+              // Original onChanged code removed — now handled in InkWell.onTap above
+              // This is a workaround for CheckboxListTile not receiving taps
+              // inside CollapsibleSection > Card > ListView scroll context
             }),
           ],
         ),
