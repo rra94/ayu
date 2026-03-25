@@ -76,7 +76,7 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
     }
 
     // 2. If OFF returned few results, supplement with USDA FDC
-    if (results.length < 3) {
+    if (results.length < 5) {
       try {
         final fdcResults = await _searchProductUseCase.searchFDCFoodByString(query);
         // Deduplicate by name (case-insensitive)
