@@ -32,6 +32,7 @@ import 'package:opennutritracker/features/home/presentation/widgets/agent_sugges
 import 'package:opennutritracker/features/stats/presentation/widgets/mood_energy_card.dart';
 import 'package:opennutritracker/features/home/presentation/widgets/collapsible_section.dart';
 import 'package:opennutritracker/features/home/presentation/widgets/quick_action_bar.dart';
+import 'package:opennutritracker/features/home/presentation/widgets/activity_dashboard_widget.dart';
 import 'package:opennutritracker/features/home/presentation/widgets/today_view_card.dart';
 import 'package:opennutritracker/features/mindfulness/presentation/widgets/mindfulness_timer_widget.dart';
 import 'package:opennutritracker/features/add_meal/presentation/add_meal_type.dart';
@@ -191,6 +192,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             _buildWaterTracker(),
             const CaffeineCard(),
             const StepsCard(),
+            const ActivityDashboardWidget(),
           ],
         ),
 
