@@ -29,6 +29,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
   final log = Logger('ScannerScreen');
 
   String? _scannedBarcode;
+  Rect? _detectedBarcodeRect;
   late IntakeTypeEntity _intakeTypeEntity;
   late DateTime _day;
 
@@ -134,6 +135,15 @@ class _ScannerScreenState extends State<ScannerScreen> {
         title: Text(S.of(context).scanProductLabel),
         actions: [
           IconButton(
+            icon: const Icon(Icons.receipt_long),
+            tooltip: 'Scan Receipt',
+            onPressed: () {
+              Navigator.of(context).pushReplacementNamed(
+                NavigationOptions.receiptScannerRoute,
+              );
+            },
+          ),
+          IconButton(
             icon: ValueListenableBuilder(
               valueListenable: cameraController,
               builder: (context, state, child) {
@@ -154,23 +164,72 @@ class _ScannerScreenState extends State<ScannerScreen> {
           ),
         ],
       ),
-      body: MobileScanner(
-          controller: cameraController,
-          onDetect: (capture) {
-            final List<Barcode> barcodes = capture.barcodes;
-            for (final barcode in barcodes) {
-              if (barcode.rawValue != null &&
-                  barcode.type == BarcodeType.product) {
-                final barcodeResult = barcode.rawValue;
-                if (barcodeResult != null) {
-                  _scannedBarcode = barcodeResult;
-                  log.fine('Barcode found: $barcodeResult');
-                  _scannerBloc
-                      .add(ScannerLoadProductEvent(barcode: barcodeResult));
+      body: Stack(
+        children: [
+          MobileScanner(
+            controller: cameraController,
+            onDetect: (capture) {
+              final List<Barcode> barcodes = capture.barcodes;
+              for (final barcode in barcodes) {
+                if (barcode.rawValue != null &&
+                    barcode.type == BarcodeType.product) {
+                  final barcodeResult = barcode.rawValue;
+                  if (barcodeResult != null) {
+                    // Visual feedback: highlight detected barcode location
+                    final corners = barcode.corners;
+                    if (corners.length >= 3) {
+                      setState(() {
+                        _detectedBarcodeRect = Rect.fromPoints(
+                          Offset(corners.first.dx, corners.first.dy),
+                          Offset(corners[2].dx, corners[2].dy),
+                        );
+                      });
+                      Future.delayed(const Duration(milliseconds: 500), () {
+                        if (mounted) {
+                          setState(() => _detectedBarcodeRect = null);
+                        }
+                      });
+                    }
+                    _scannedBarcode = barcodeResult;
+                    log.fine('Barcode found: $barcodeResult');
+                    _scannerBloc
+                        .add(ScannerLoadProductEvent(barcode: barcodeResult));
+                  }
                 }
               }
-            }
-          }),
+            },
+          ),
+          // Scan area guide overlay
+          _buildScanOverlay(context),
+          // Barcode detection highlight
+          if (_detectedBarcodeRect != null)
+            Positioned(
+              left: _detectedBarcodeRect!.left,
+              top: _detectedBarcodeRect!.top,
+              width: _detectedBarcodeRect!.width,
+              height: _detectedBarcodeRect!.height,
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.green, width: 3),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildScanOverlay(BuildContext context) {
+    return CustomPaint(
+      painter: _ScanOverlayPainter(),
+      child: const Align(
+        alignment: Alignment(0, 0.6),
+        child: Text(
+          'Point at a barcode',
+          style: TextStyle(color: Colors.white70, fontSize: 14),
+        ),
+      ),
     );
   }
 
@@ -375,6 +434,85 @@ class _ScannerScreenState extends State<ScannerScreen> {
       ),
     );
   }
+}
+
+class _ScanOverlayPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final scanRRect = RRect.fromRectAndRadius(
+      Rect.fromCenter(
+        center: Offset(size.width / 2, size.height / 2 - 40),
+        width: size.width * 0.8,
+        height: 200,
+      ),
+      const Radius.circular(16),
+    );
+
+    // Dark overlay with cutout
+    final overlayPath = Path()
+      ..addRect(Rect.fromLTWH(0, 0, size.width, size.height))
+      ..addRRect(scanRRect);
+    overlayPath.fillType = PathFillType.evenOdd;
+    canvas.drawPath(overlayPath, Paint()..color = Colors.black45);
+
+    // Gold corner brackets
+    final gold = Paint()
+      ..color = const Color(0xFFD4A843)
+      ..strokeWidth = 3
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+
+    final rect = scanRRect.outerRect;
+    const double len = 30.0;
+    const double r = 16.0;
+
+    // Top-left
+    canvas.drawPath(
+      Path()
+        ..moveTo(rect.left, rect.top + len)
+        ..lineTo(rect.left, rect.top + r)
+        ..arcToPoint(Offset(rect.left + r, rect.top),
+            radius: const Radius.circular(r))
+        ..lineTo(rect.left + len, rect.top),
+      gold,
+    );
+
+    // Top-right
+    canvas.drawPath(
+      Path()
+        ..moveTo(rect.right - len, rect.top)
+        ..lineTo(rect.right - r, rect.top)
+        ..arcToPoint(Offset(rect.right, rect.top + r),
+            radius: const Radius.circular(r))
+        ..lineTo(rect.right, rect.top + len),
+      gold,
+    );
+
+    // Bottom-left
+    canvas.drawPath(
+      Path()
+        ..moveTo(rect.left, rect.bottom - len)
+        ..lineTo(rect.left, rect.bottom - r)
+        ..arcToPoint(Offset(rect.left + r, rect.bottom),
+            radius: const Radius.circular(r))
+        ..lineTo(rect.left + len, rect.bottom),
+      gold,
+    );
+
+    // Bottom-right
+    canvas.drawPath(
+      Path()
+        ..moveTo(rect.right - len, rect.bottom)
+        ..lineTo(rect.right - r, rect.bottom)
+        ..arcToPoint(Offset(rect.right, rect.bottom - r),
+            radius: const Radius.circular(r))
+        ..lineTo(rect.right, rect.bottom - len),
+      gold,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 class ScannerScreenArguments {
