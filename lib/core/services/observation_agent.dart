@@ -8,6 +8,7 @@ import 'package:opennutritracker/core/domain/usecase/get_intake_usecase.dart';
 import 'package:opennutritracker/core/domain/usecase/get_user_usecase.dart';
 import 'package:opennutritracker/core/services/agent_service.dart';
 import 'package:opennutritracker/core/services/barometer_service.dart';
+import 'package:opennutritracker/core/services/hrv_analysis_service.dart';
 import 'package:opennutritracker/core/utils/locator.dart';
 
 /// Cross-agent observation engine. Reads data from multiple sources
@@ -56,6 +57,10 @@ class ObservationAgent {
     try {
       final r = await _gymProteinCorrelation();
       if (r.isNotEmpty) { ctx.gymToday = true; ctx.lowProtein = true; ctx.observationTypes.add('gym_protein'); }
+      observations.addAll(r);
+    } catch (_) {}
+    try {
+      final r = await _hrvNutritionCorrelation();
       observations.addAll(r);
     } catch (_) {}
 
@@ -333,6 +338,65 @@ class ObservationAgent {
         ),
       ];
     }
+    return [];
+  }
+
+  // ── HRV + Nutrition correlation ──
+
+  /// "Your HRV is declining and protein is low / caffeine is late — correlate."
+  static Future<List<AgentSuggestion>> _hrvNutritionCorrelation() async {
+    final trend = await HRVAnalysisService.analyzeTrend();
+    if (trend == null) return [];
+
+    // If HRV is declining, check nutrition patterns
+    if (trend.trend == 'declining') {
+      final getIntake = locator<GetIntakeUsecase>();
+      final now = DateTime.now();
+
+      // Check last 3 days average protein
+      double totalProtein = 0;
+      int days = 0;
+      for (int d = 0; d < 3; d++) {
+        final day = now.subtract(Duration(days: d));
+        final intakes = [
+          ...await getIntake.getBreakfastIntakeByDay(day),
+          ...await getIntake.getLunchIntakeByDay(day),
+          ...await getIntake.getDinnerIntakeByDay(day),
+          ...await getIntake.getSnackIntakeByDay(day),
+        ];
+        if (intakes.isNotEmpty) {
+          totalProtein += intakes.fold<double>(0, (sum, i) => sum + i.totalProteinsGram);
+          days++;
+        }
+      }
+
+      if (days > 0) {
+        final avgProtein = totalProtein / days;
+        if (avgProtein < 80) {
+          return [
+            AgentSuggestion(
+              type: 'observation',
+              title: 'HRV declining + low protein',
+              message: 'Your HRV dropped ${((1 - trend.currentHRV / trend.monthAvg) * 100).round()}% and protein averages ${avgProtein.round()}g/day. Protein supports recovery.',
+            ),
+          ];
+        }
+      }
+
+      // Check caffeine
+      final caffeineDs = locator<CaffeineDataSource>();
+      final hoursSinceCaffeine = await caffeineDs.hoursSinceLastCaffeine();
+      if (hoursSinceCaffeine != null && hoursSinceCaffeine < 8) {
+        return [
+          AgentSuggestion(
+            type: 'observation',
+            title: 'HRV declining — check caffeine',
+            message: 'Your HRV trend is down and last caffeine was ${hoursSinceCaffeine.round()}h ago. Try cutting off caffeine earlier.',
+          ),
+        ];
+      }
+    }
+
     return [];
   }
 }

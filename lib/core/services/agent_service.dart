@@ -8,7 +8,9 @@ import 'package:opennutritracker/core/db/data_sources/location_visit_data_source
 import 'package:opennutritracker/core/db/data_sources/peptide_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/supplement_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/water_data_source.dart';
+import 'package:opennutritracker/core/services/circadian_service.dart';
 import 'package:opennutritracker/core/services/core_motion_service.dart';
+import 'package:opennutritracker/core/services/hrv_analysis_service.dart';
 import 'package:opennutritracker/core/services/location_inference_service.dart';
 import 'package:opennutritracker/core/services/observation_agent.dart';
 import 'package:opennutritracker/core/domain/usecase/get_user_usecase.dart';
@@ -75,11 +77,15 @@ class AgentService {
     } catch (_) {}
 
     // Phase 2: Agents run informed by observation context
+    // Stress agent runs early — it sets ctx.lowMood for downstream agents
+    try { suggestions.addAll(await _stressAgent(ctx)); } catch (_) {}
+
     // Skip agents whose topic is already covered by an observation
     try { if (!ctx.isAlreadyCovered('meal_pattern')) suggestions.addAll(await _mealPatternAgent()); } catch (_) {}
     try { if (!ctx.isAlreadyCovered('nutrient_gap')) suggestions.addAll(await _nutrientGapAgent(ctx)); } catch (_) {}
     try { suggestions.addAll(await _fastingAdaptAgent()); } catch (_) {}
-    try { suggestions.addAll(await _supplementReminderAgent()); } catch (_) {}
+    try { suggestions.addAll(await _supplementTimingAgent()); } catch (_) {}
+    try { suggestions.addAll(await _circadianAgent()); } catch (_) {}
     try { suggestions.addAll(await _hydrationAgent(ctx)); } catch (_) {}
     try { suggestions.addAll(await _biomarkerAgent()); } catch (_) {}
     try { if (!ctx.isAlreadyCovered('sedentary')) suggestions.addAll(await _sedentaryAgent()); } catch (_) {}
@@ -90,19 +96,22 @@ class AgentService {
 
     // Priority order: observations first, then reminders, then informational
     const typePriority = {
-      'observation': 0,
-      'nutrient_gap': 1,
-      'peptide_reminder': 2,
-      'supplement_reminder': 3,
-      'hydration': 4,
-      'sedentary': 5,
-      'meal_pattern': 6,
-      'eco_score': 7,
-      'biomarker_stale': 8,
-      'biomarker_wellness': 9,
-      'fasting_adapt': 10,
-      'gym_frequency': 11,
-      'outdoor_time': 12,
+      'stress': 0,
+      'observation': 1,
+      'circadian': 2,
+      'supplement_timing': 3,
+      'nutrient_gap': 4,
+      'peptide_reminder': 5,
+      'supplement_reminder': 6,
+      'hydration': 7,
+      'sedentary': 8,
+      'meal_pattern': 9,
+      'eco_score': 10,
+      'biomarker_stale': 11,
+      'biomarker_wellness': 12,
+      'fasting_adapt': 13,
+      'gym_frequency': 14,
+      'outdoor_time': 15,
     };
 
     suggestions.sort((a, b) {
@@ -255,34 +264,6 @@ class AgentService {
           type: 'fasting_adapt',
           title: 'Ready for $nextProtocol?',
           message: 'You\'ve averaged ${avgHours.toStringAsFixed(1)}h fasts — try $nextProtocol',
-        ),
-      ];
-    }
-
-    return [];
-  }
-
-  // ── Supplement Reminder Agent ──
-
-  /// Reminds about supplements not yet taken today.
-  static Future<List<AgentSuggestion>> _supplementReminderAgent() async {
-    final now = DateTime.now();
-    if (now.hour < 8 || now.hour > 20) return [];
-
-    final suppDs = locator<SupplementDataSource>();
-    final all = await suppDs.getAllActive();
-    final taken = await suppDs.getTakenIdsForDate(now);
-
-    final remaining = all.length - taken.length;
-    if (remaining <= 0 || all.isEmpty) return [];
-
-    // Only suggest if more than half not taken and it's past 10 AM
-    if (now.hour >= 10 && remaining > all.length ~/ 2) {
-      return [
-        AgentSuggestion(
-          type: 'supplement_reminder',
-          title: '$remaining supplements pending',
-          message: 'Don\'t forget your supplements today',
         ),
       ];
     }
@@ -527,6 +508,165 @@ class AgentService {
           message: 'Add eco-scores to improve your sustainability tracking',
         ),
       ];
+    }
+
+    return [];
+  }
+
+  // ── Stress Agent ──
+
+  /// Passive stress detection via HRV analysis.
+  /// Runs early so it can set ctx.lowMood for downstream agents.
+  static Future<List<AgentSuggestion>> _stressAgent(AgentContext ctx) async {
+    final stressLevel = await HRVAnalysisService.getStressLevel();
+    if (stressLevel <= 2) return []; // low stress, no action needed
+
+    ctx.lowMood = true; // inform other agents
+
+    if (stressLevel >= 4) {
+      return [
+        AgentSuggestion(
+          type: 'stress',
+          title: 'High stress detected',
+          message: 'Your HRV is below baseline — consider: deep breathing, magnesium, reduce caffeine, short walk.',
+        ),
+      ];
+    }
+    if (stressLevel == 3) {
+      return [
+        AgentSuggestion(
+          type: 'stress',
+          title: 'Moderate stress',
+          message: 'HRV is slightly below your average. Prioritize sleep tonight.',
+        ),
+      ];
+    }
+    return [];
+  }
+
+  // ── Circadian Agent ──
+
+  /// Monitors eating schedule relative to circadian profile and nudges
+  /// the user to close their eating window or maintain meal consistency.
+  static Future<List<AgentSuggestion>> _circadianAgent() async {
+    final profile = await CircadianService.buildProfile();
+    if (profile == null) return [];
+
+    final now = DateTime.now();
+    final currentHour = now.hour + now.minute / 60.0;
+
+    // Check if eating later than usual
+    final getIntake = locator<GetIntakeUsecase>();
+    final todayIntakes = [
+      ...await getIntake.getBreakfastIntakeByDay(now),
+      ...await getIntake.getLunchIntakeByDay(now),
+      ...await getIntake.getDinnerIntakeByDay(now),
+      ...await getIntake.getSnackIntakeByDay(now),
+    ];
+
+    if (todayIntakes.isNotEmpty) {
+      final lastMealHour = todayIntakes
+          .map((i) => i.dateTime.hour + i.dateTime.minute / 60.0)
+          .reduce((a, b) => a > b ? a : b);
+      final hoursBeforeBed = profile.avgBedHour - lastMealHour;
+      if (hoursBeforeBed < 2 && hoursBeforeBed > 0) {
+        return [
+          AgentSuggestion(
+            type: 'circadian',
+            title: 'Close your eating window',
+            message: 'You usually sleep at ${CircadianProfile.formatHour(profile.avgBedHour)} — stop eating now for better sleep.',
+          ),
+        ];
+      }
+    }
+
+    // Morning: if no food logged 1h past usual first meal
+    if (todayIntakes.isEmpty && currentHour > profile.avgFirstMealHour + 1 && currentHour < 14) {
+      return [
+        AgentSuggestion(
+          type: 'circadian',
+          title: 'Late first meal today',
+          message: 'You usually eat by ${CircadianProfile.formatHour(profile.avgFirstMealHour)} — a consistent schedule supports circadian rhythm.',
+        ),
+      ];
+    }
+
+    return [];
+  }
+
+  // ── Supplement Timing Agent ──
+
+  /// Smart supplement timing based on circadian profile.
+  /// Knows when specific supplements are best absorbed and reminds
+  /// during the optimal window.
+  static Future<List<AgentSuggestion>> _supplementTimingAgent() async {
+    final now = DateTime.now();
+    final currentHour = now.hour + now.minute / 60.0;
+    if (currentHour < 7 || currentHour > 22) return [];
+
+    final profile = await CircadianService.buildProfile();
+    final suppDs = locator<SupplementDataSource>();
+    final all = await suppDs.getAllActive();
+    final taken = await suppDs.getTakenIdsForDate(now);
+
+    if (all.isEmpty) return [];
+    final remaining = all.where((s) => !taken.contains(s.id)).toList();
+    if (remaining.isEmpty) return [];
+
+    // If we have a circadian profile, give specific timing advice
+    if (profile != null) {
+      final timing = profile.optimalSupplementTiming;
+
+      // Check if any supplement names match timing windows
+      for (final supp in remaining) {
+        final nameLower = supp.name.toLowerCase();
+
+        if (nameLower.contains('magnesium') && currentHour >= profile.avgBedHour - 1.5 && currentHour < profile.avgBedHour) {
+          return [
+            AgentSuggestion(
+              type: 'supplement_timing',
+              title: 'Take magnesium now',
+              message: '${timing['magnesium']} — you haven\'t taken it yet.',
+            ),
+          ];
+        }
+        if (nameLower.contains('vitamin d') && currentHour >= profile.avgFirstMealHour - 0.5 && currentHour < profile.avgFirstMealHour + 1) {
+          return [
+            AgentSuggestion(
+              type: 'supplement_timing',
+              title: 'Take Vitamin D with breakfast',
+              message: '${timing['vitamin_d']} — fat-soluble, needs food.',
+            ),
+          ];
+        }
+        if (nameLower.contains('iron') && currentHour >= profile.avgFirstMealHour - 1.5 && currentHour < profile.avgFirstMealHour) {
+          return [
+            AgentSuggestion(
+              type: 'supplement_timing',
+              title: 'Take iron on empty stomach',
+              message: '${timing['iron']} — best absorbed alone.',
+            ),
+          ];
+        }
+        if (nameLower.contains('zinc') && currentHour >= profile.avgBedHour - 2.5 && currentHour < profile.avgBedHour - 1) {
+          return [
+            AgentSuggestion(
+              type: 'supplement_timing',
+              title: 'Take zinc now',
+              message: '${timing['zinc']}',
+            ),
+          ];
+        }
+        if ((nameLower.contains('omega') || nameLower.contains('fish oil')) && currentHour >= profile.avgLastMealHour - 0.5 && currentHour < profile.avgLastMealHour + 1) {
+          return [
+            AgentSuggestion(
+              type: 'supplement_timing',
+              title: 'Take omega-3 with dinner',
+              message: '${timing['omega3']}',
+            ),
+          ];
+        }
+      }
     }
 
     return [];
