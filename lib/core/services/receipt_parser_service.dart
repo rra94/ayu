@@ -98,4 +98,53 @@ class ReceiptParserService {
         .replaceAll(RegExp(r'\s+'), ' ')
         .trim();
   }
+
+  /// Detect if receipt is from a restaurant (vs grocery store).
+  /// Returns restaurant name if detected, null otherwise.
+  static String? detectRestaurant(String rawText) {
+    final lines = rawText.split('\n').map((l) => l.trim()).toList();
+
+    // Common restaurant chains
+    const chains = [
+      'mcdonald', 'burger king', 'wendy', 'chick-fil-a', 'chipotle',
+      'subway', 'taco bell', 'panera', 'panda express', 'five guys',
+      'shake shack', 'in-n-out', 'popeyes', 'kfc', 'domino',
+      'pizza hut', 'papa john', 'olive garden', 'applebee', 'chili',
+      'ihop', 'denny', 'waffle house', 'starbucks', 'dunkin',
+      'sweetgreen', 'cava', 'nando', 'wingstop', 'raising cane',
+      'jersey mike', 'firehouse sub', 'jimmy john', 'potbelly',
+      'cheesecake factory', 'outback', 'red lobster', 'buffalo wild',
+      'ruth chris', 'morton', 'nobu', 'benihana',
+    ];
+
+    // Check first 5 lines for restaurant name (usually at top of receipt)
+    for (final line in lines.take(5)) {
+      final lower = line.toLowerCase();
+      for (final chain in chains) {
+        if (lower.contains(chain)) {
+          return line; // Return the actual line as restaurant name
+        }
+      }
+    }
+
+    // Heuristics for non-chain restaurants:
+    // Receipt has "server", "table", "tip", "gratuity" = likely restaurant
+    final fullText = rawText.toLowerCase();
+    const restaurantKeywords = [
+      'server:', 'table #', 'table:', 'tip:', 'gratuity',
+      'dine in', 'take out', 'takeout', 'drive thru',
+    ];
+    final hasRestaurantKeywords =
+        restaurantKeywords.where((k) => fullText.contains(k)).length >= 2;
+
+    if (hasRestaurantKeywords) {
+      // Return first non-empty line as restaurant name (usually the business name)
+      return lines.firstWhere(
+        (l) => l.length > 3 && !RegExp(r'^\d').hasMatch(l),
+        orElse: () => '',
+      );
+    }
+
+    return null;
+  }
 }
