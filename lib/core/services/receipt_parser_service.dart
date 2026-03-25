@@ -136,6 +136,32 @@ class ReceiptParserService {
   // ── Gemini parsing ──
 
   static Future<List<ReceiptItem>> _geminiParse(String rawText) async {
+    // Pre-analyze OCR text to give Gemini context
+    final lines = rawText.split('\n').where((l) => l.trim().isNotEmpty).toList();
+    final lineCount = lines.length;
+    final hasPrice = RegExp(r'\$?\d+\.\d{2}').hasMatch(rawText);
+    final lowerText = rawText.toLowerCase();
+    final looksLikeRestaurant = lowerText.contains('server') ||
+        lowerText.contains('table') ||
+        lowerText.contains('tip') ||
+        lowerText.contains('gratuity') ||
+        lowerText.contains('dine in');
+    final looksLikeGrocery = lowerText.contains('grocery') ||
+        lowerText.contains('supermarket') ||
+        lowerText.contains('produce') ||
+        lowerText.contains('organic') ||
+        lowerText.contains('lb') ||
+        lowerText.contains('qty');
+
+    final receiptType = looksLikeRestaurant
+        ? 'restaurant bill'
+        : looksLikeGrocery
+            ? 'grocery store receipt'
+            : 'receipt (type unknown)';
+
+    // First few lines often have store name
+    final headerLines = lines.take(3).join(', ');
+
     final uri = Uri.parse(
       'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${Env.geminiApiKey}',
     );
@@ -145,31 +171,41 @@ class ReceiptParserService {
         {
           'parts': [
             {
-              'text': '''Parse this receipt/bill text and extract all FOOD and DRINK items.
+              'text': '''You are parsing OCR text from a $receiptType.
+The OCR text may have errors, abbreviations, and formatting issues.
+Header lines: "$headerLines"
+Total lines: $lineCount. Has prices: $hasPrice.
+
+TASK: Extract all FOOD and DRINK items from this receipt.
 
 Rules:
-- Include only food and drink items (ignore bags, tax, tips, discounts, non-food items)
-- For restaurant receipts: identify the restaurant name and each menu item
-- For grocery receipts: identify each food product
-- Clean up abbreviations (e.g., "CHKN BRST" → "Chicken Breast", "ORG BAN" → "Organic Banana")
-- If an item looks like a food item but you're not sure, include it with category "unknown"
-- Estimate quantity from the receipt (e.g., "2x" or "QTY 3")
+- ONLY include food/drink items — ignore tax, tips, totals, discounts, bags, non-food
+- Clean up OCR errors and abbreviations:
+  "CHKN BRST" → "Chicken Breast"
+  "ORG BAN" → "Organic Banana"
+  "VIT D MLK" → "Vitamin D Milk"
+  "GRK YGRT" → "Greek Yogurt"
+- For restaurant bills: identify the restaurant name from the header
+- For grocery receipts: identify individual food products
+- If a line has a weight (e.g., "1.5 lb"), include it in the name
+- Estimate quantity from "2x", "QTY 3", or repeated items
 
-Receipt text:
+OCR text:
 """
 $rawText
 """
 
-Return ONLY valid JSON (no markdown):
+Return ONLY valid JSON (no markdown, no code blocks):
 {
   "restaurant": "restaurant name or null",
+  "type": "$receiptType",
   "items": [
-    {"name": "cleaned food name", "price": 4.99, "quantity": 1, "category": "food"},
-    {"name": "Coca Cola", "price": 2.49, "quantity": 1, "category": "drink"}
+    {"name": "full cleaned food name", "price": 4.99, "quantity": 1, "category": "food"}
   ]
 }
 
-Categories: food, drink, supplement, unknown'''
+Categories: food, drink, supplement, unknown
+If no food items found, return: {"restaurant": null, "type": "$receiptType", "items": []}'''
             }
           ]
         }
