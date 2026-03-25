@@ -3,6 +3,7 @@ import 'package:opennutritracker/core/db/data_sources/activity_snapshot_data_sou
 import 'package:opennutritracker/core/db/data_sources/biomarker_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/fasting_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/location_visit_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/peptide_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/supplement_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/water_data_source.dart';
 import 'package:opennutritracker/core/services/core_motion_service.dart';
@@ -48,6 +49,7 @@ class AgentService {
     try { suggestions.addAll(await _sedentaryAgent()); } catch (_) {}
     try { suggestions.addAll(await _gymFrequencyAgent()); } catch (_) {}
     try { suggestions.addAll(await _outdoorTimeAgent()); } catch (_) {}
+    try { suggestions.addAll(await _peptideReminderAgent()); } catch (_) {}
 
     // Cross-agent observation engine — finds contradictions and correlations
     try { suggestions.addAll(await ObservationAgent.observe()); } catch (_) {}
@@ -372,5 +374,27 @@ class AgentService {
     }
 
     return [];
+  }
+
+  // ── Peptide Reminder Agent ──
+  static Future<List<AgentSuggestion>> _peptideReminderAgent() async {
+    final now = DateTime.now();
+    if (now.hour < 8 || now.hour > 22) return [];
+
+    final ds = locator<PeptideDataSource>();
+    final active = await ds.getAllActive();
+    final todayLogged = await ds.getTodayLoggedIds();
+
+    final pending = active.where((p) => p.isDoseDay && !todayLogged.contains(p.id)).toList();
+    if (pending.isEmpty) return [];
+
+    final names = pending.map((p) => p.name).join(', ');
+    return [
+      AgentSuggestion(
+        type: 'peptide_reminder',
+        title: '${pending.length} peptide${pending.length > 1 ? 's' : ''} due',
+        message: '$names — don\'t forget today\'s dose',
+      ),
+    ];
   }
 }

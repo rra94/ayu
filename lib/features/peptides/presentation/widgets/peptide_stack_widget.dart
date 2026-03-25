@@ -3,6 +3,7 @@ import 'package:opennutritracker/core/db/data_sources/peptide_data_source.dart';
 import 'package:opennutritracker/core/db/entities/peptide_ob.dart';
 import 'package:opennutritracker/core/styles/color_schemes.dart';
 import 'package:opennutritracker/core/utils/locator.dart';
+import 'injection_site_tracker.dart';
 import 'peptide_log_dialog.dart';
 
 class PeptideStackWidget extends StatefulWidget {
@@ -212,6 +213,14 @@ class _PeptideStackWidgetState extends State<PeptideStackWidget> {
           const SizedBox(width: 8),
           // Cycle badge
           _buildCycleBadge(cycleText, isResting, goldColor, theme),
+          // Site map button
+          IconButton(
+            icon: Icon(Icons.map_outlined, size: 18, color: goldColor),
+            tooltip: 'Site Map',
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+            onPressed: () => showInjectionSiteSheet(context, p.id),
+          ),
         ],
       ),
     );
