@@ -32,6 +32,9 @@ class MealDBO {
 
   final String? ingredientsText;
 
+  final String? ecoscoreGrade;
+  final double? ecoscoreScore;
+
   MealDBO(
       {required this.code,
       required this.name,
@@ -47,7 +50,9 @@ class MealDBO {
       required this.nutriments,
       required this.source,
       this.additivesTags,
-      this.ingredientsText});
+      this.ingredientsText,
+      this.ecoscoreGrade,
+      this.ecoscoreScore});
 
   factory MealDBO.fromMealEntity(MealEntity mealEntity) => MealDBO(
       code: mealEntity.code,
@@ -66,6 +71,8 @@ class MealDBO {
       source: MealSourceDBO.fromMealSourceEntity(mealEntity.source),
       additivesTags: mealEntity.additivesTags,
       ingredientsText: mealEntity.ingredientsText,
+      ecoscoreGrade: mealEntity.ecoscoreGrade,
+      ecoscoreScore: mealEntity.ecoscoreScore,
   );
 
   factory MealDBO.fromJson(Map<String, dynamic> json) =>

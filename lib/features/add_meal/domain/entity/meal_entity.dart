@@ -41,6 +41,9 @@ class MealEntity extends Equatable {
   final List<String>? additivesTags;
   final String? ingredientsText;
 
+  final String? ecoscoreGrade; // a, b, c, d, e
+  final double? ecoscoreScore; // 0-100
+
   final MealSourceEntity source;
 
   final MealNutrimentsEntity nutriments;
@@ -63,6 +66,8 @@ class MealEntity extends Equatable {
       required this.servingSize,
       this.additivesTags,
       this.ingredientsText,
+      this.ecoscoreGrade,
+      this.ecoscoreScore,
       required this.nutriments,
       required this.source});
 
@@ -92,6 +97,8 @@ class MealEntity extends Equatable {
       servingSize: mealDBO.servingSize,
       additivesTags: mealDBO.additivesTags,
       ingredientsText: mealDBO.ingredientsText,
+      ecoscoreGrade: mealDBO.ecoscoreGrade,
+      ecoscoreScore: mealDBO.ecoscoreScore,
       nutriments:
           MealNutrimentsEntity.fromMealNutrimentsDBO(mealDBO.nutriments),
       source: MealSourceEntity.fromMealSourceDBO(mealDBO.source));
@@ -112,6 +119,8 @@ class MealEntity extends Equatable {
         servingSize: offProduct.serving_size,
         additivesTags: offProduct.additives_tags?.cast<String>(),
         ingredientsText: offProduct.ingredients_text,
+        ecoscoreGrade: offProduct.ecoscore_grade,
+        ecoscoreScore: offProduct.ecoscore_score,
         nutriments:
             MealNutrimentsEntity.fromOffNutriments(offProduct.nutriments),
         source: MealSourceEntity.off);
@@ -189,7 +198,7 @@ class MealEntity extends Equatable {
   }
 
   @override
-  List<Object?> get props => [code, name, additivesTags, ingredientsText];
+  List<Object?> get props => [code, name, additivesTags, ingredientsText, ecoscoreGrade, ecoscoreScore];
 }
 
 enum MealSourceEntity {

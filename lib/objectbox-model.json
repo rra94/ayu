@@ -5,7 +5,7 @@
   "entities": [
     {
       "id": "1:6477492202799954719",
-      "lastPropertyId": "18:772813461993618442",
+      "lastPropertyId": "19:7249192552959657294",
       "name": "ConfigOB",
       "properties": [
         {
@@ -97,6 +97,11 @@
         {
           "id": "18:772813461993618442",
           "name": "blueprintMode",
+          "type": 1
+        },
+        {
+          "id": "19:7249192552959657294",
+          "name": "showSustainability",
           "type": 1
         }
       ],

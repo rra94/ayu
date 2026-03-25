@@ -150,6 +150,16 @@ class ConfigDataSourceOB {
     ob.blueprintMode = enabled;
     _configBox.put(ob);
   }
+
+  /// Get Sustainability Score visibility flag.
+  bool getShowSustainability() => _getOrCreateConfig().showSustainability;
+
+  /// Persist Sustainability Score visibility flag.
+  Future<void> setShowSustainability(bool enabled) async {
+    final ob = _getOrCreateConfig();
+    ob.showSustainability = enabled;
+    _configBox.put(ob);
+  }
 }
 
 // ---------------------------------------------------------------------------

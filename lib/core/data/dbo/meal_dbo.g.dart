@@ -25,6 +25,8 @@ MealDBO _$MealDBOFromJson(Map<String, dynamic> json) => MealDBO(
           ?.map((e) => e as String)
           .toList(),
       ingredientsText: json['ingredientsText'] as String?,
+      ecoscoreGrade: json['ecoscoreGrade'] as String?,
+      ecoscoreScore: (json['ecoscoreScore'] as num?)?.toDouble(),
     );
 
 Map<String, dynamic> _$MealDBOToJson(MealDBO instance) => <String, dynamic>{
@@ -43,6 +45,8 @@ Map<String, dynamic> _$MealDBOToJson(MealDBO instance) => <String, dynamic>{
       'nutriments': instance.nutriments,
       'additivesTags': instance.additivesTags,
       'ingredientsText': instance.ingredientsText,
+      'ecoscoreGrade': instance.ecoscoreGrade,
+      'ecoscoreScore': instance.ecoscoreScore,
     };
 
 const _$MealSourceDBOEnumMap = {

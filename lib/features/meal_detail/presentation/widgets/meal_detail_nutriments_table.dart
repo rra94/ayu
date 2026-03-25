@@ -212,6 +212,39 @@ class MealDetailNutrimentsTable extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        if (product.ecoscoreGrade != null)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 12.0),
+            child: Row(
+              children: [
+                const Icon(Icons.eco, size: 18),
+                const SizedBox(width: 6),
+                Text('Eco Score: ',
+                    style: Theme.of(context).textTheme.bodyMedium),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: _ecoGradeColor(product.ecoscoreGrade!)
+                        .withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    product.ecoscoreGrade!.toUpperCase(),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: _ecoGradeColor(product.ecoscoreGrade!),
+                    ),
+                  ),
+                ),
+                if (product.ecoscoreScore != null) ...[
+                  const SizedBox(width: 8),
+                  Text('(${product.ecoscoreScore!.round()}/100)',
+                      style: Theme.of(context).textTheme.bodySmall),
+                ],
+              ],
+            ),
+          ),
         Text(S.of(context).nutritionInfoLabel,
             style: Theme.of(context).textTheme.titleLarge),
         const SizedBox(height: 16.0),
@@ -316,6 +349,23 @@ class MealDetailNutrimentsTable extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  static Color _ecoGradeColor(String grade) {
+    switch (grade.toLowerCase()) {
+      case 'a':
+        return const Color(0xFF1B5E20);
+      case 'b':
+        return const Color(0xFF4CAF50);
+      case 'c':
+        return const Color(0xFFFFD600);
+      case 'd':
+        return const Color(0xFFFF9800);
+      case 'e':
+        return const Color(0xFFE53935);
+      default:
+        return Colors.grey;
+    }
   }
 
   double _adjustValueForServing(double value) {

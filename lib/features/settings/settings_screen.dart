@@ -28,6 +28,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:opennutritracker/core/db/data_sources/config_data_source_ob.dart';
 import 'package:opennutritracker/core/services/blueprint_service.dart';
 import 'package:opennutritracker/features/settings/presentation/widgets/calculations_dialog.dart';
 
@@ -46,6 +47,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   late CalendarDayBloc _calendarDayBloc;
 
   bool _blueprintMode = false;
+  bool _showSustainability = false;
 
   @override
   void initState() {
@@ -58,6 +60,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
     BlueprintService.isEnabled().then((v) {
       if (mounted) setState(() => _blueprintMode = v);
     });
+    _loadSustainabilitySetting();
+  }
+
+  void _loadSustainabilitySetting() {
+    try {
+      final configDs = locator<ConfigDataSourceOB>();
+      final enabled = configDs.getShowSustainability();
+      if (mounted) setState(() => _showSustainability = enabled);
+    } catch (_) {}
   }
 
   @override
@@ -137,6 +148,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   onChanged: (v) async {
                     await BlueprintService.setEnabled(v);
                     setState(() => _blueprintMode = v);
+                  },
+                ),
+                SwitchListTile(
+                  secondary: const Icon(Icons.eco_outlined),
+                  title: const Text('Sustainability Score'),
+                  subtitle: const Text('Show daily eco-score from Open Food Facts'),
+                  value: _showSustainability,
+                  onChanged: (v) async {
+                    final configDs = locator<ConfigDataSourceOB>();
+                    await configDs.setShowSustainability(v);
+                    setState(() => _showSustainability = v);
                   },
                 ),
                 ListTile(

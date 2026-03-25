@@ -28,6 +28,8 @@ OFFProductDTO _$OFFProductDTOFromJson(Map<String, dynamic> json) =>
           json['nutriments'] as Map<String, dynamic>),
       additives_tags: json['additives_tags'] as List<dynamic>?,
       ingredients_text: json['ingredients_text'] as String?,
+      ecoscore_grade: json['ecoscore_grade'] as String?,
+      ecoscore_score: (json['ecoscore_score'] as num?)?.toDouble(),
     );
 
 Map<String, dynamic> _$OFFProductDTOToJson(OFFProductDTO instance) =>
@@ -51,4 +53,6 @@ Map<String, dynamic> _$OFFProductDTOToJson(OFFProductDTO instance) =>
       'nutriments': instance.nutriments,
       'additives_tags': instance.additives_tags,
       'ingredients_text': instance.ingredients_text,
+      'ecoscore_grade': instance.ecoscore_grade,
+      'ecoscore_score': instance.ecoscore_score,
     };

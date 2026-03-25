@@ -40,6 +40,7 @@ import 'package:opennutritracker/features/home/presentation/widgets/collapsible_
 import 'package:opennutritracker/features/home/presentation/widgets/quick_action_bar.dart';
 import 'package:opennutritracker/features/home/presentation/widgets/activity_dashboard_widget.dart';
 import 'package:opennutritracker/features/home/presentation/widgets/plant_tracker_widget.dart';
+import 'package:opennutritracker/features/home/presentation/widgets/sustainability_score_widget.dart';
 import 'package:opennutritracker/features/home/presentation/widgets/today_view_card.dart';
 import 'package:opennutritracker/features/mindfulness/presentation/widgets/mindfulness_timer_widget.dart';
 import 'package:opennutritracker/features/add_meal/presentation/add_meal_type.dart';
@@ -244,6 +245,14 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           children: [
             const MoodEnergyCard(),
             const PlantTrackerWidget(),
+            SustainabilityScoreWidget(
+              allIntakes: [
+                ...breakfastIntakeList,
+                ...lunchIntakeList,
+                ...dinnerIntakeList,
+                ...snackIntakeList,
+              ],
+            ),
             _buildMicronutrientButton(context, breakfastIntakeList,
                 lunchIntakeList, dinnerIntakeList, snackIntakeList),
             _buildGutHealthAndSummary(

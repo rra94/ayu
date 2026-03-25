@@ -41,6 +41,9 @@ class ConfigOB {
   /// Whether Bryan Johnson's Blueprint longevity protocol is enabled
   bool blueprintMode;
 
+  /// Whether to show sustainability eco-score from Open Food Facts
+  bool showSustainability;
+
   ConfigOB({
     this.id = 0,
     this.hasAcceptedDisclaimer = false,
@@ -60,5 +63,6 @@ class ConfigOB {
     this.ayuOnboardingComplete = false,
     this.allergenJson,
     this.blueprintMode = false,
+    this.showSustainability = false,
   });
 }
