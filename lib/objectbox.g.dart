@@ -842,7 +842,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(9, 3446880705750154736),
     name: 'HabitOB',
-    lastPropertyId: const obx_int.IdUid(8, 6065818025679882694),
+    lastPropertyId: const obx_int.IdUid(10, 5422166084123251698),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -890,6 +890,18 @@ final _entities = <obx_int.ModelEntity>[
       obx_int.ModelProperty(
         id: const obx_int.IdUid(8, 6065818025679882694),
         name: 'frequencyDay',
+        type: 6,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(9, 3388427240463440883),
+        name: 'scheduleDays',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(10, 5422166084123251698),
+        name: 'monthlyDay',
         type: 6,
         flags: 0,
       ),
@@ -3071,7 +3083,10 @@ obx_int.ModelDefinition getObjectBoxModel() {
       objectToFB: (HabitOB object, fb.Builder fbb) {
         final nameOffset = fbb.writeString(object.name);
         final categoryOffset = fbb.writeString(object.category);
-        fbb.startTable(9);
+        final scheduleDaysOffset = object.scheduleDays == null
+            ? null
+            : fbb.writeString(object.scheduleDays!);
+        fbb.startTable(11);
         fbb.addInt64(0, object.id);
         fbb.addOffset(1, nameOffset);
         fbb.addOffset(2, categoryOffset);
@@ -3080,6 +3095,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
         fbb.addInt64(5, object.reminderMinutes);
         fbb.addInt64(6, object.frequency);
         fbb.addInt64(7, object.frequencyDay);
+        fbb.addOffset(8, scheduleDaysOffset);
+        fbb.addInt64(9, object.monthlyDay);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -3126,6 +3143,14 @@ obx_int.ModelDefinition getObjectBoxModel() {
           rootOffset,
           18,
         );
+        final scheduleDaysParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 20);
+        final monthlyDayParam = const fb.Int64Reader().vTableGetNullable(
+          buffer,
+          rootOffset,
+          22,
+        );
         final object = HabitOB(
           id: idParam,
           name: nameParam,
@@ -3135,6 +3160,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
           reminderMinutes: reminderMinutesParam,
           frequency: frequencyParam,
           frequencyDay: frequencyDayParam,
+          scheduleDays: scheduleDaysParam,
+          monthlyDay: monthlyDayParam,
         );
 
         return object;
@@ -5316,6 +5343,16 @@ class HabitOB_ {
   /// See [HabitOB.frequencyDay].
   static final frequencyDay = obx.QueryIntegerProperty<HabitOB>(
     _entities[8].properties[7],
+  );
+
+  /// See [HabitOB.scheduleDays].
+  static final scheduleDays = obx.QueryStringProperty<HabitOB>(
+    _entities[8].properties[8],
+  );
+
+  /// See [HabitOB.monthlyDay].
+  static final monthlyDay = obx.QueryIntegerProperty<HabitOB>(
+    _entities[8].properties[9],
   );
 }
 

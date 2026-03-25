@@ -195,7 +195,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           caloriesConsumed: totalKcalSupplied,
           calorieGoal: totalKcalDaily,
         ),
-        QuickActionBar(onActionComplete: () => setState(() {})),
+        QuickActionBar(onActionComplete: () => setState(() { _refreshCachedFutures(); })),
 
         // ── Agent suggestions (dismissible, non-invasive) ──
         const AgentSuggestionsWidget(),
@@ -478,7 +478,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           completedHabitIds: completedIds,
           onToggle: (habitId, completed) async {
             await habitDs.toggleHabitLog(habitId, DateTime.now(), completed);
-            setState(() {});
+            setState(() { _refreshCachedFutures(); });
           },
           onSetReminder: (habit, reminderMinutes) async {
             habit.reminderMinutes = reminderMinutes;
@@ -489,7 +489,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             } else {
               await HabitNotificationService.cancelHabitReminder(habit.id);
             }
-            setState(() {});
+            setState(() { _refreshCachedFutures(); });
           },
         );
       },

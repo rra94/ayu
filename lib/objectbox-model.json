@@ -671,7 +671,7 @@
     },
     {
       "id": "9:3446880705750154736",
-      "lastPropertyId": "8:6065818025679882694",
+      "lastPropertyId": "10:5422166084123251698",
       "name": "HabitOB",
       "properties": [
         {
@@ -713,6 +713,16 @@
         {
           "id": "8:6065818025679882694",
           "name": "frequencyDay",
+          "type": 6
+        },
+        {
+          "id": "9:3388427240463440883",
+          "name": "scheduleDays",
+          "type": 9
+        },
+        {
+          "id": "10:5422166084123251698",
+          "name": "monthlyDay",
           "type": 6
         }
       ],
