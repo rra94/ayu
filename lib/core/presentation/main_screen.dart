@@ -41,7 +41,9 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     NotificationActionService.init();
-    DataRetentionService.pruneOldData();
+    DataRetentionService.pruneOldData().catchError((e) {
+      debugPrint('DataRetention prune error: $e');
+    });
     _onAppResumed();
     _scheduleMidnightRefresh();
   }
@@ -60,9 +62,11 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     final midnight = DateTime(now.year, now.month, now.day + 1);
     final duration = midnight.difference(now);
     _midnightTimer = Timer(duration, () {
-      // Day changed — reload all data
-      _onAppResumed();
-      // Schedule next midnight
+      try {
+        // Day changed — reload all data
+        _onAppResumed();
+      } catch (_) {}
+      // Always reschedule next midnight
       _scheduleMidnightRefresh();
     });
   }
@@ -76,20 +80,20 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
   Future<void> _onAppResumed() async {
     // Record sensor data on each foreground
-    try { await locator<CoreMotionService>().recordSnapshot(); } catch (_) {}
-    try { await locator<BarometerService>().recordReading(); } catch (_) {}
-    try { await locator<LocationInferenceService>().startMonitoring(); } catch (_) {}
+    try { await locator<CoreMotionService>().recordSnapshot(); } catch (e) { debugPrint('CoreMotion: $e'); }
+    try { await locator<BarometerService>().recordReading(); } catch (e) { debugPrint('Barometer: $e'); }
+    try { await locator<LocationInferenceService>().startMonitoring(); } catch (e) { debugPrint('LocationInference: $e'); }
     // Auto-sync HealthKit data on each foreground (lightweight, just last day)
     try {
       if (await HealthKitService.hasPermissions()) {
         await HealthKitService.sync(days: 1);
       }
-    } catch (_) {}
+    } catch (e) { debugPrint('HealthKit sync: $e'); }
     // Load photo analysis opt-in setting
     try {
       final enabled = locator<ConfigDataSourceOB>().getShowPhotoAnalysis();
       if (mounted) setState(() => _photoAnalysisEnabled = enabled);
-    } catch (_) {}
+    } catch (e) { debugPrint('Config load: $e'); }
   }
 
   @override

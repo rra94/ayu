@@ -39,6 +39,7 @@ class _DiaryPageState extends State<DiaryPage> with WidgetsBindingObserver {
     _diaryBloc = locator<DiaryBloc>();
     _calendarDayBloc = locator<CalendarDayBloc>();
     _mealDetailBloc = locator<MealDetailBloc>();
+    _calendarDayBloc.add(LoadCalendarDayEvent(_selectedDate));
     super.initState();
   }
 
@@ -94,9 +95,7 @@ class _DiaryPageState extends State<DiaryPage> with WidgetsBindingObserver {
         BlocBuilder<CalendarDayBloc, CalendarDayState>(
           bloc: _calendarDayBloc,
           builder: (context, state) {
-            if (state is CalendarDayInitial) {
-              _calendarDayBloc.add(LoadCalendarDayEvent(_selectedDate));
-            } else if (state is CalendarDayLoading) {
+            if (state is CalendarDayInitial || state is CalendarDayLoading) {
               return _getLoadingContent();
             } else if (state is CalendarDayLoaded) {
               return DayInfoWidget(

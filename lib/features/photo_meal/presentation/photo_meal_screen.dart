@@ -124,23 +124,35 @@ class _PhotoMealScreenState extends State<PhotoMealScreen> {
 
     // Enrich identified foods with verified nutrition from databases
     setState(() { _statusText = 'Looking up nutrition...'; });
-    final enrichedItems =
-        await PhotoEnrichmentService.enrichItems(result.items);
+    try {
+      final enrichedItems =
+          await PhotoEnrichmentService.enrichItems(result.items);
 
-    if (!mounted) return;
+      if (!mounted) return;
 
-    result = FoodPhotoResult(
-      dishName: result.dishName,
-      items: enrichedItems,
-      totalKcal: enrichedItems
-          .where((i) => i.selected)
-          .fold(0.0, (s, i) => s + i.kcal),
-    );
+      result = FoodPhotoResult(
+        dishName: result.dishName,
+        items: enrichedItems,
+        totalKcal: enrichedItems
+            .where((i) => i.selected)
+            .fold(0.0, (s, i) => s + i.kcal),
+      );
 
-    setState(() {
-      _isAnalyzing = false;
-      _result = result;
-    });
+      setState(() {
+        _isAnalyzing = false;
+        _result = result;
+      });
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _showManualInput = true;
+          _isAnalyzing = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Lookup failed — describe your meal instead')),
+        );
+      }
+    }
   }
 
   Future<void> _onManualSubmit(String text) async {

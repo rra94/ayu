@@ -109,7 +109,9 @@ class MealDetailBloc extends Bloc<MealDetailEvent, MealDetailState> {
           );
         }
       }
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('Search history record failed: $e');
+    }
 
     return intakeEntity;
   }

@@ -27,6 +27,7 @@ class _SupplementChecklistWidgetState extends State<SupplementChecklistWidget> {
     final ds = locator<SupplementDataSource>();
     final supplements = await ds.getAllActive();
     final takenIds = await ds.getTakenIdsForDate(DateTime.now());
+    if (!mounted) return;
     setState(() {
       _supplements = supplements;
       _takenIds = takenIds;
@@ -114,6 +115,7 @@ class _SupplementChecklistWidgetState extends State<SupplementChecklistWidget> {
               final taken = _takenIds.contains(supp.id);
               return InkWell(
                 onTap: () async {
+                  try {
                   final nowTaken = !taken;
                   final ds = locator<SupplementDataSource>();
                   await ds.toggleLog(supp.id, DateTime.now(), nowTaken);
@@ -138,6 +140,13 @@ class _SupplementChecklistWidgetState extends State<SupplementChecklistWidget> {
                         ),
                       ),
                     );
+                  }
+                  } catch (e) {
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Failed to update: $e')),
+                      );
+                    }
                   }
                 },
                 child: Padding(

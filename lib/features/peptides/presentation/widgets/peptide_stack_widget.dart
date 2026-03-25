@@ -29,6 +29,7 @@ class _PeptideStackWidgetState extends State<PeptideStackWidget> {
     final ds = locator<PeptideDataSource>();
     final peptides = await ds.getAllActive();
     final todayLogged = await ds.getTodayLoggedIds();
+    if (!mounted) return;
     setState(() {
       _peptides = peptides;
       _todayLoggedIds = todayLogged;

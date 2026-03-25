@@ -31,6 +31,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
 
   String? _scannedBarcode;
   Rect? _detectedBarcodeRect;
+  bool _dialogShowing = false;
   late IntakeTypeEntity _intakeTypeEntity;
   late DateTime _day;
 
@@ -65,6 +66,8 @@ class _ScannerScreenState extends State<ScannerScreen> {
         } else if (state is ScannerLoadedState) {
           Future.microtask(() {
             if (!context.mounted) return;
+            if (_dialogShowing) return;
+            _dialogShowing = true;
 
             // Supplements: skip meal detail, show confirmation
             if (state.isSupplement) {
@@ -74,6 +77,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
                 )),
               );
               Navigator.of(context).pop();
+              _dialogShowing = false;
               return;
             }
 
@@ -345,7 +349,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
           ],
         ),
       ),
-    );
+    ).whenComplete(() => _dialogShowing = false);
   }
 
   Future<void> _quickAdd(BuildContext context, ScannerLoadedState state) async {
@@ -455,7 +459,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
           ),
         ],
       ),
-    );
+    ).whenComplete(() => _dialogShowing = false);
   }
 }
 
