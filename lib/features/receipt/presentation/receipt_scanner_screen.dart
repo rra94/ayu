@@ -43,23 +43,23 @@ class _ReceiptScannerScreenState extends State<ReceiptScannerScreen> {
       if (rawText != null && rawText.isNotEmpty) {
         items = ReceiptParserService.parseText(rawText);
         if (items.isEmpty) {
-          _debugError = 'OCR found text but no items matched.\nRaw text:\n${rawText.substring(0, rawText.length.clamp(0, 500))}';
+          debugError = 'OCR found text but no items matched.\nRaw text:\n${rawText.substring(0, rawText.length.clamp(0, 500))}';
         }
       } else {
         items = [];
-        _debugError = 'OCR returned no text. Check camera focus and lighting.';
+        debugError = 'OCR returned no text. Check camera focus and lighting.';
       }
     } catch (e) {
       items = [];
       rawText = null;
-      _debugError = 'OCR error: $e';
+      debugError = 'OCR error: $e';
     }
 
     if (debugError != null && items.isEmpty) {
       setState(() => _processing = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(_debugError), duration: const Duration(seconds: 6)),
+          SnackBar(content: Text(debugError), duration: const Duration(seconds: 6)),
         );
       }
     }
