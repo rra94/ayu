@@ -10,6 +10,7 @@ import 'package:opennutritracker/core/utils/locator.dart';
 import 'package:opennutritracker/core/data/common_foods_db.dart';
 import 'package:opennutritracker/core/data/government_foods_db.dart';
 import 'package:opennutritracker/features/add_meal/domain/entity/meal_entity.dart';
+import 'package:opennutritracker/features/add_meal/data/data_sources/calorie_ninja_data_source.dart';
 import 'package:opennutritracker/features/add_meal/domain/usecase/search_products_usecase.dart';
 
 part 'products_event.dart';
@@ -67,6 +68,17 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
       final govResults = await GovernmentFoodsDB.search(query);
       final existingNames = commonMatches.map((r) => r.name?.toLowerCase()).toSet();
       for (final r in govResults) {
+        if (!existingNames.contains(r.name?.toLowerCase())) {
+          commonMatches.add(r);
+        }
+      }
+    } catch (_) {}
+
+    // 0.7. CalorieNinjas API (fast, supports natural language like "2 eggs and toast")
+    try {
+      final ninjaResults = await CalorieNinjaDataSource.search(query);
+      final existingNames = commonMatches.map((r) => r.name?.toLowerCase()).toSet();
+      for (final r in ninjaResults) {
         if (!existingNames.contains(r.name?.toLowerCase())) {
           commonMatches.add(r);
         }

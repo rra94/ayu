@@ -14,4 +14,6 @@ abstract class Env {
   static final String supabaseProjectAnonKey = _Env.supabaseProjectAnonKey;
   @EnviedField(varName: 'GEMINI_API_KEY', obfuscate: true)
   static final String geminiApiKey = _Env.geminiApiKey;
+  @EnviedField(varName: 'CALORIE_NINJA_API_KEY', obfuscate: true)
+  static final String calorieNinjaApiKey = _Env.calorieNinjaApiKey;
 }
