@@ -30,6 +30,7 @@ Originally forked from [OpenNutriTracker](https://github.com/simonoppowa/OpenNut
 - Food allergen alerts (user-configured, persisted)
 - Custom food entry for items not in database
 - 30 Plants a Week tracker for gut microbiome diversity
+- Sustainability eco-score per meal and daily average (optional, from OFF)
 
 ### Daily Dashboard
 - Today View — calories, water, supplements, sleep, streak at a glance
