@@ -115,19 +115,9 @@ class ReceiptParserService {
         }
       }
 
-      // Pattern 3: plain capitalized food name (no price) — restaurant receipts
-      final match3 = _plainItemPattern.firstMatch(trimmed);
-      if (match3 != null) {
-        final name = match3.group(1)?.trim() ?? '';
-        // Only include if looks like a food name (at least 2 words or >= 5 chars)
-        if (name.length >= 5 && !_isNonFoodKeyword(name)) {
-          items.add(ReceiptItem(
-            name: _cleanItemName(name),
-            price: null,
-            quantity: 1,
-          ));
-        }
-      }
+      // Pattern 3 (plain names without prices) is intentionally NOT used in
+      // regex fallback — too many false positives (store names, headers, random text).
+      // Plain-name items are handled by the Gemini smart parse path instead.
     }
 
     return items;
