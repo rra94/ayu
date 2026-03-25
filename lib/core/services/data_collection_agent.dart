@@ -8,6 +8,7 @@ import 'package:opennutritracker/core/db/data_sources/water_data_source.dart';
 import 'package:opennutritracker/core/domain/usecase/get_intake_usecase.dart';
 import 'package:opennutritracker/core/services/agent_context.dart';
 import 'package:opennutritracker/core/services/hrv_analysis_service.dart';
+import 'package:opennutritracker/core/services/smart_notification_service.dart';
 import 'package:opennutritracker/core/utils/calc/optimal_range_calc.dart';
 import 'package:opennutritracker/core/utils/locator.dart';
 
@@ -210,6 +211,13 @@ class DataCollectionAgent {
   /// Send the most important data request as a notification.
   /// Cooldown: max once per hour, and not the same type within 4 hours.
   static Future<void> sendDataRequest(AgentContext ctx) async {
+    // Don't send if SmartNotificationService already sent one recently
+    final lastSmart = SmartNotificationService.lastNotificationSent;
+    if (lastSmart != null &&
+        DateTime.now().difference(lastSmart).inMinutes < 30) {
+      return; // Smart notifications already handling this
+    }
+
     // Cooldown: don't spam
     if (_lastSent != null && DateTime.now().difference(_lastSent!).inMinutes < 60) {
       return;

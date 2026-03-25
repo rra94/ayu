@@ -6,7 +6,9 @@ import 'package:opennutritracker/core/db/data_sources/symptom_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/water_data_source.dart';
 import 'package:opennutritracker/core/db/entities/fasting_session_ob.dart';
 import 'package:opennutritracker/core/db/entities/symptom_log_ob.dart';
+import 'package:opennutritracker/core/services/widget_service.dart';
 import 'package:opennutritracker/core/utils/locator.dart';
+import 'package:opennutritracker/features/home/presentation/bloc/home_bloc.dart';
 
 class NotificationActionService {
   static final _log = Logger('NotificationActionService');
@@ -35,9 +37,14 @@ class NotificationActionService {
       case 'WATER_250':
         await locator<WaterDataSource>().addWaterRecord(250, DateTime.now());
         _log.info('Quick water +250ml from notification');
+        WidgetService.refreshFromDB();
+        try { locator<HomeBloc>().add(const LoadItemsEvent()); } catch (_) {}
+
       case 'WATER_500':
         await locator<WaterDataSource>().addWaterRecord(500, DateTime.now());
         _log.info('Quick water +500ml from notification');
+        WidgetService.refreshFromDB();
+        try { locator<HomeBloc>().add(const LoadItemsEvent()); } catch (_) {}
 
       // Supplement actions
       case 'SUPPS_ALL_TAKEN':
@@ -48,6 +55,8 @@ class NotificationActionService {
           await ds.toggleLog(supp.id, now, true);
         }
         _log.info('Marked all supplements as taken from notification');
+        WidgetService.refreshFromDB();
+        try { locator<HomeBloc>().add(const LoadItemsEvent()); } catch (_) {}
 
       // Fasting actions
       case 'FAST_START_16':
@@ -61,6 +70,8 @@ class NotificationActionService {
           ));
           _log.info('Started 16:8 fast from notification');
         }
+        WidgetService.refreshFromDB();
+        try { locator<HomeBloc>().add(const LoadItemsEvent()); } catch (_) {}
 
       // Energy rating actions
       case 'ENERGY_1':

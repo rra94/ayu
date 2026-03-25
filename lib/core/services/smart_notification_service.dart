@@ -19,6 +19,11 @@ class SmartNotificationService {
   static final _log = Logger('SmartNotificationService');
   static final _plugin = FlutterLocalNotificationsPlugin();
 
+  /// Tracks the last notification sent — DataCollectionAgent reads this
+  /// to avoid double-notifying on the same topic.
+  static DateTime? lastNotificationSent;
+  static String? lastNotificationType;
+
   // Notification IDs (high range to avoid collision with habit IDs)
   static const _mealReminderId = 90001;
   static const _waterReminderId = 90002;
@@ -56,6 +61,10 @@ class SmartNotificationService {
       body: top.body,
       categoryIdentifier: top.categoryIdentifier,
     );
+
+    // Record so DataCollectionAgent can avoid double-notifying
+    lastNotificationSent = DateTime.now();
+    lastNotificationType = top.type;
   }
 
   /// Schedule evening check-in at 8 PM daily.

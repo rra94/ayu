@@ -9,6 +9,7 @@ import 'package:opennutritracker/core/domain/usecase/add_tracked_day_usecase.dar
 import 'package:opennutritracker/core/domain/usecase/get_kcal_goal_usecase.dart';
 import 'package:opennutritracker/core/domain/usecase/get_macro_goal_usecase.dart';
 import 'package:opennutritracker/core/db/data_sources/search_history_data_source.dart';
+import 'package:opennutritracker/core/services/widget_service.dart';
 import 'package:opennutritracker/core/utils/calc/unit_calc.dart';
 import 'package:opennutritracker/core/utils/id_generator.dart';
 import 'package:opennutritracker/core/utils/locator.dart';
@@ -90,6 +91,9 @@ class MealDetailBloc extends Bloc<MealDetailEvent, MealDetailState> {
         dateTime: day);
     await _addIntakeUseCase.addIntake(intakeEntity);
     _updateTrackedDay(intakeEntity, day);
+
+    // Update iOS home-screen widget with latest totals
+    WidgetService.refreshFromDB();
 
     // Record meal choice so future searches surface preferred items first
     try {

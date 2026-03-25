@@ -53,6 +53,18 @@ class AgentService {
     // Phase 1: Observations run first — build shared context
     final ctx = AgentContext();
 
+    // Load today's intakes ONCE — agents use ctx.todayIntakes to avoid 50+ queries
+    try {
+      final getIntake = locator<GetIntakeUsecase>();
+      final now = DateTime.now();
+      ctx.todayIntakes = [
+        ...await getIntake.getBreakfastIntakeByDay(now),
+        ...await getIntake.getLunchIntakeByDay(now),
+        ...await getIntake.getDinnerIntakeByDay(now),
+        ...await getIntake.getSnackIntakeByDay(now),
+      ];
+    } catch (_) {}
+
     // Check current place for context
     try {
       final place = locator<LocationInferenceService>().lastDetectedPlace;
@@ -76,14 +88,14 @@ class AgentService {
     try { if (!ctx.isAlreadyCovered('nutrient_gap')) suggestions.addAll(await _nutrientGapAgent(ctx)); } catch (_) {}
     try { suggestions.addAll(await _fastingAdaptAgent()); } catch (_) {}
     try { suggestions.addAll(await _supplementTimingAgent()); } catch (_) {}
-    try { suggestions.addAll(await _circadianAgent()); } catch (_) {}
+    try { suggestions.addAll(await _circadianAgent(ctx)); } catch (_) {}
     try { suggestions.addAll(await _hydrationAgent(ctx)); } catch (_) {}
     try { suggestions.addAll(await _biomarkerAgent()); } catch (_) {}
     try { if (!ctx.isAlreadyCovered('sedentary')) suggestions.addAll(await _sedentaryAgent()); } catch (_) {}
     try { suggestions.addAll(await _gymFrequencyAgent()); } catch (_) {}
     try { if (!ctx.isAlreadyCovered('outdoor_time')) suggestions.addAll(await _outdoorTimeAgent()); } catch (_) {}
     try { suggestions.addAll(await _peptideReminderAgent()); } catch (_) {}
-    try { suggestions.addAll(await _ecoScoreAgent()); } catch (_) {}
+    try { suggestions.addAll(await _ecoScoreAgent(ctx)); } catch (_) {}
     try { suggestions.addAll(await _calendarAgent()); } catch (_) {}
 
     // Phase 3: Data Collection Agent — sends targeted notification for missing data
@@ -176,19 +188,13 @@ class AgentService {
   /// After logging meals, suggests foods to fill nutrient gaps.
   /// Context-aware: if gym day detected, prioritize protein/magnesium.
   static Future<List<AgentSuggestion>> _nutrientGapAgent(AgentContext ctx) async {
-    final getIntake = locator<GetIntakeUsecase>();
     final user = await locator<GetUserUsecase>().getUserData();
     final now = DateTime.now();
 
     // Only suggest after noon (enough meals logged)
     if (now.hour < 12) return [];
 
-    final allIntakes = [
-      ...await getIntake.getBreakfastIntakeByDay(now),
-      ...await getIntake.getLunchIntakeByDay(now),
-      ...await getIntake.getDinnerIntakeByDay(now),
-      ...await getIntake.getSnackIntakeByDay(now),
-    ];
+    final allIntakes = ctx.todayIntakes;
 
     if (allIntakes.isEmpty) return [];
 
@@ -461,21 +467,15 @@ class AgentService {
 
   /// Prompts the user to fill in missing eco-scores when more than half of
   /// today's intakes are unscored.
-  static Future<List<AgentSuggestion>> _ecoScoreAgent() async {
+  static Future<List<AgentSuggestion>> _ecoScoreAgent(AgentContext ctx) async {
     final configDs = locator<ConfigDataSourceOB>();
     final showSustainability = configDs.getShowSustainability();
     if (!showSustainability) return [];
 
-    final getIntake = locator<GetIntakeUsecase>();
     final now = DateTime.now();
     if (now.hour < 12) return []; // only after noon
 
-    final allIntakes = [
-      ...await getIntake.getBreakfastIntakeByDay(now),
-      ...await getIntake.getLunchIntakeByDay(now),
-      ...await getIntake.getDinnerIntakeByDay(now),
-      ...await getIntake.getSnackIntakeByDay(now),
-    ];
+    final allIntakes = ctx.todayIntakes;
 
     if (allIntakes.isEmpty) return [];
 
@@ -615,21 +615,15 @@ class AgentService {
 
   /// Monitors eating schedule relative to circadian profile and nudges
   /// the user to close their eating window or maintain meal consistency.
-  static Future<List<AgentSuggestion>> _circadianAgent() async {
+  static Future<List<AgentSuggestion>> _circadianAgent(AgentContext ctx) async {
     final profile = await CircadianService.buildProfile();
     if (profile == null) return [];
 
     final now = DateTime.now();
     final currentHour = now.hour + now.minute / 60.0;
 
-    // Check if eating later than usual
-    final getIntake = locator<GetIntakeUsecase>();
-    final todayIntakes = [
-      ...await getIntake.getBreakfastIntakeByDay(now),
-      ...await getIntake.getLunchIntakeByDay(now),
-      ...await getIntake.getDinnerIntakeByDay(now),
-      ...await getIntake.getSnackIntakeByDay(now),
-    ];
+    // Use cached intakes from context
+    final todayIntakes = ctx.todayIntakes;
 
     if (todayIntakes.isNotEmpty) {
       final lastMealHour = todayIntakes

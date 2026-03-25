@@ -1,5 +1,9 @@
 import 'package:home_widget/home_widget.dart';
 import 'package:logging/logging.dart';
+import 'package:opennutritracker/core/db/data_sources/supplement_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/water_data_source.dart';
+import 'package:opennutritracker/core/domain/usecase/get_intake_usecase.dart';
+import 'package:opennutritracker/core/utils/locator.dart';
 
 /// Pushes data to the iOS WidgetKit extension (NutriWidget) via shared
 /// UserDefaults (App Group: group.com.opennutritracker.ayu).
@@ -112,6 +116,42 @@ class WidgetService {
     } catch (e) {
       _log.warning('Widget update failed: $e');
     }
+  }
+
+  // ── Convenience refresh from DB ───────────────────────────────────────────
+
+  /// Reads today's totals from DB and updates the widget.
+  /// Safe to call fire-and-forget from any service or bloc after a log action.
+  static Future<void> refreshFromDB() async {
+    try {
+      final now = DateTime.now();
+      final getIntake = locator<GetIntakeUsecase>();
+      final allIntakes = [
+        ...await getIntake.getBreakfastIntakeByDay(now),
+        ...await getIntake.getLunchIntakeByDay(now),
+        ...await getIntake.getDinnerIntakeByDay(now),
+        ...await getIntake.getSnackIntakeByDay(now),
+      ];
+      final consumed =
+          allIntakes.fold<double>(0, (s, i) => s + i.totalKcal);
+
+      final waterDs = locator<WaterDataSource>();
+      final waterMl = await waterDs.getTodayTotal();
+
+      final suppDs = locator<SupplementDataSource>();
+      final supps = await suppDs.getAllActive();
+      final taken = await suppDs.getTakenIdsForDate(now);
+
+      await updateWidget(
+        caloriesConsumed: consumed,
+        calorieGoal: 2000, // TODO: read from config
+        waterMl: waterMl,
+        waterTargetMl: 2500,
+        streak: 0,
+        supplementsTaken: taken.length,
+        supplementsTotal: supps.length,
+      );
+    } catch (_) {}
   }
 
   static Future<void> updateFasting({
