@@ -41,7 +41,7 @@ class _ReceiptScannerScreenState extends State<ReceiptScannerScreen> {
     try {
       rawText = await VisionOCRService.recognizeText(image.path);
       if (rawText != null && rawText.isNotEmpty) {
-        items = ReceiptParserService.parseText(rawText);
+        items = await ReceiptParserService.parseTextSmart(rawText);
         if (items.isEmpty) {
           debugError = 'OCR found text but no items matched.\nRaw text:\n${rawText.substring(0, rawText.length.clamp(0, 500))}';
         }
@@ -64,9 +64,9 @@ class _ReceiptScannerScreenState extends State<ReceiptScannerScreen> {
       }
     }
 
-    // Detect restaurant
-    String? restaurant;
-    if (rawText != null && rawText.isNotEmpty) {
+    // Use restaurant detected by smart parse (Gemini) or fall back to regex heuristic
+    String? restaurant = ReceiptParserService.lastDetectedRestaurant;
+    if (restaurant == null && rawText != null && rawText.isNotEmpty) {
       restaurant = ReceiptParserService.detectRestaurant(rawText);
     }
 
