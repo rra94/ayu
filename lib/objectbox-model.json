@@ -1477,9 +1477,58 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "30:8907965053874012058",
+      "lastPropertyId": "8:2076587408878767985",
+      "name": "EcoScoreOB",
+      "properties": [
+        {
+          "id": "1:311491961591258946",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:3988238428255865393",
+          "name": "productKey",
+          "type": 9
+        },
+        {
+          "id": "3:5265521983525613238",
+          "name": "productName",
+          "type": 9
+        },
+        {
+          "id": "4:4356387075476942956",
+          "name": "grade",
+          "type": 9
+        },
+        {
+          "id": "5:8028884020788467432",
+          "name": "score",
+          "type": 8
+        },
+        {
+          "id": "6:7490249268429945444",
+          "name": "source",
+          "type": 9
+        },
+        {
+          "id": "7:7512199257671119601",
+          "name": "highQuality",
+          "type": 1
+        },
+        {
+          "id": "8:2076587408878767985",
+          "name": "updatedAt",
+          "type": 10
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "29:1298758183074159118",
+  "lastEntityId": "30:8907965053874012058",
   "lastIndexId": "2:7319863865959781371",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",

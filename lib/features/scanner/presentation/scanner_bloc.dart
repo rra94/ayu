@@ -6,6 +6,9 @@ import 'package:opennutritracker/core/domain/usecase/get_config_usecase.dart';
 import 'package:opennutritracker/core/services/allergen_service.dart';
 import 'package:opennutritracker/core/services/supplement_detector.dart';
 import 'package:opennutritracker/features/add_meal/domain/entity/meal_entity.dart';
+import 'package:opennutritracker/core/db/data_sources/eco_score_data_source.dart';
+import 'package:opennutritracker/core/db/entities/eco_score_ob.dart';
+import 'package:opennutritracker/core/utils/locator.dart';
 import 'package:opennutritracker/features/scanner/data/product_not_found_exception.dart';
 import 'package:opennutritracker/features/scanner/domain/usecase/search_product_by_barcode_usecase.dart';
 
@@ -31,6 +34,20 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
         final isSupplement = SupplementDetector.isSupplement(result);
         if (isSupplement) {
           await SupplementDetector.autoAddIfSupplement(result);
+        }
+
+        // Auto-cache eco-score from OFF
+        if (result.ecoscoreGrade != null && result.ecoscoreScore != null) {
+          final ecoDs = locator<EcoScoreDataSource>();
+          await ecoDs.upsert(EcoScoreOB(
+            productKey: result.code ?? event.barcode,
+            productName: result.name ?? '',
+            grade: result.ecoscoreGrade!,
+            score: result.ecoscoreScore!,
+            source: 'off',
+            highQuality: true,
+            updatedAt: DateTime.now(),
+          ));
         }
 
         // Check for allergens

@@ -19,6 +19,7 @@ import 'core/db/entities/biomarker_record_ob.dart';
 import 'core/db/entities/caffeine_log_ob.dart';
 import 'core/db/entities/config_ob.dart';
 import 'core/db/entities/dexa_scan_ob.dart';
+import 'core/db/entities/eco_score_ob.dart';
 import 'core/db/entities/fasting_session_ob.dart';
 import 'core/db/entities/grocery_item_ob.dart';
 import 'core/db/entities/gut_health_item_ob.dart';
@@ -1790,6 +1791,64 @@ final _entities = <obx_int.ModelEntity>[
     relations: <obx_int.ModelRelation>[],
     backlinks: <obx_int.ModelBacklink>[],
   ),
+  obx_int.ModelEntity(
+    id: const obx_int.IdUid(30, 8907965053874012058),
+    name: 'EcoScoreOB',
+    lastPropertyId: const obx_int.IdUid(8, 2076587408878767985),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(1, 311491961591258946),
+        name: 'id',
+        type: 6,
+        flags: 1,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(2, 3988238428255865393),
+        name: 'productKey',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 5265521983525613238),
+        name: 'productName',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(4, 4356387075476942956),
+        name: 'grade',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(5, 8028884020788467432),
+        name: 'score',
+        type: 8,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(6, 7490249268429945444),
+        name: 'source',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(7, 7512199257671119601),
+        name: 'highQuality',
+        type: 1,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(8, 2076587408878767985),
+        name: 'updatedAt',
+        type: 10,
+        flags: 0,
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[],
+    backlinks: <obx_int.ModelBacklink>[],
+  ),
 ];
 
 /// Shortcut for [obx.Store.new] that passes [getObjectBoxModel] and for Flutter
@@ -1830,7 +1889,7 @@ Future<obx.Store> openStore({
 obx_int.ModelDefinition getObjectBoxModel() {
   final model = obx_int.ModelInfo(
     entities: _entities,
-    lastEntityId: const obx_int.IdUid(29, 1298758183074159118),
+    lastEntityId: const obx_int.IdUid(30, 8907965053874012058),
     lastIndexId: const obx_int.IdUid(2, 7319863865959781371),
     lastRelationId: const obx_int.IdUid(0, 0),
     lastSequenceId: const obx_int.IdUid(0, 0),
@@ -4213,6 +4272,81 @@ obx_int.ModelDefinition getObjectBoxModel() {
         return object;
       },
     ),
+    EcoScoreOB: obx_int.EntityDefinition<EcoScoreOB>(
+      model: _entities[29],
+      toOneRelations: (EcoScoreOB object) => [],
+      toManyRelations: (EcoScoreOB object) => {},
+      getId: (EcoScoreOB object) => object.id,
+      setId: (EcoScoreOB object, int id) {
+        object.id = id;
+      },
+      objectToFB: (EcoScoreOB object, fb.Builder fbb) {
+        final productKeyOffset = fbb.writeString(object.productKey);
+        final productNameOffset = fbb.writeString(object.productName);
+        final gradeOffset = fbb.writeString(object.grade);
+        final sourceOffset = fbb.writeString(object.source);
+        fbb.startTable(9);
+        fbb.addInt64(0, object.id);
+        fbb.addOffset(1, productKeyOffset);
+        fbb.addOffset(2, productNameOffset);
+        fbb.addOffset(3, gradeOffset);
+        fbb.addFloat64(4, object.score);
+        fbb.addOffset(5, sourceOffset);
+        fbb.addBool(6, object.highQuality);
+        fbb.addInt64(7, object.updatedAt.millisecondsSinceEpoch);
+        fbb.finish(fbb.endTable());
+        return object.id;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
+        final idParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          4,
+          0,
+        );
+        final productKeyParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 6, '');
+        final productNameParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 8, '');
+        final gradeParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 10, '');
+        final scoreParam = const fb.Float64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          12,
+          0,
+        );
+        final sourceParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 14, '');
+        final highQualityParam = const fb.BoolReader().vTableGet(
+          buffer,
+          rootOffset,
+          16,
+          false,
+        );
+        final updatedAtParam = DateTime.fromMillisecondsSinceEpoch(
+          const fb.Int64Reader().vTableGet(buffer, rootOffset, 18, 0),
+        );
+        final object = EcoScoreOB(
+          id: idParam,
+          productKey: productKeyParam,
+          productName: productNameParam,
+          grade: gradeParam,
+          score: scoreParam,
+          source: sourceParam,
+          highQuality: highQualityParam,
+          updatedAt: updatedAtParam,
+        );
+
+        return object;
+      },
+    ),
   };
 
   return obx_int.ModelDefinition(model, bindings);
@@ -5511,5 +5645,48 @@ class PeptideOB_ {
   /// See [PeptideOB.notes].
   static final notes = obx.QueryStringProperty<PeptideOB>(
     _entities[28].properties[13],
+  );
+}
+
+/// [EcoScoreOB] entity fields to define ObjectBox queries.
+class EcoScoreOB_ {
+  /// See [EcoScoreOB.id].
+  static final id = obx.QueryIntegerProperty<EcoScoreOB>(
+    _entities[29].properties[0],
+  );
+
+  /// See [EcoScoreOB.productKey].
+  static final productKey = obx.QueryStringProperty<EcoScoreOB>(
+    _entities[29].properties[1],
+  );
+
+  /// See [EcoScoreOB.productName].
+  static final productName = obx.QueryStringProperty<EcoScoreOB>(
+    _entities[29].properties[2],
+  );
+
+  /// See [EcoScoreOB.grade].
+  static final grade = obx.QueryStringProperty<EcoScoreOB>(
+    _entities[29].properties[3],
+  );
+
+  /// See [EcoScoreOB.score].
+  static final score = obx.QueryDoubleProperty<EcoScoreOB>(
+    _entities[29].properties[4],
+  );
+
+  /// See [EcoScoreOB.source].
+  static final source = obx.QueryStringProperty<EcoScoreOB>(
+    _entities[29].properties[5],
+  );
+
+  /// See [EcoScoreOB.highQuality].
+  static final highQuality = obx.QueryBooleanProperty<EcoScoreOB>(
+    _entities[29].properties[6],
+  );
+
+  /// See [EcoScoreOB.updatedAt].
+  static final updatedAt = obx.QueryDateProperty<EcoScoreOB>(
+    _entities[29].properties[7],
   );
 }

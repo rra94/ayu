@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:opennutritracker/core/db/data_sources/config_data_source_ob.dart';
+import 'package:opennutritracker/core/db/data_sources/eco_score_data_source.dart';
 import 'package:opennutritracker/core/domain/entity/intake_entity.dart';
 import 'package:opennutritracker/core/styles/color_schemes.dart';
 import 'package:opennutritracker/core/utils/locator.dart';
@@ -13,6 +14,34 @@ class SustainabilityScoreWidget extends StatelessWidget {
   final List<IntakeEntity> allIntakes;
 
   const SustainabilityScoreWidget({super.key, required this.allIntakes});
+
+  /// Collect eco-scores from meal entities first, then fall back to local DB.
+  Future<List<double>> _collectScores() async {
+    final scores = <double>[];
+    final ecoDs = locator<EcoScoreDataSource>();
+
+    // Gather codes that need a DB lookup
+    final codesToLookup = <String>[];
+    for (final intake in allIntakes) {
+      if (intake.meal.ecoscoreScore != null) {
+        scores.add(intake.meal.ecoscoreScore!);
+      } else if (intake.meal.code != null) {
+        codesToLookup.add(intake.meal.code!);
+      }
+    }
+
+    if (codesToLookup.isNotEmpty) {
+      final cached = await ecoDs.getByKeys(codesToLookup);
+      for (final code in codesToLookup) {
+        final record = cached[code];
+        if (record != null) {
+          scores.add(record.score);
+        }
+      }
+    }
+
+    return scores;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,100 +55,99 @@ class SustainabilityScoreWidget extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    // Collect scored items
-    final scored = allIntakes
-        .where((i) => i.meal.ecoscoreScore != null)
-        .toList();
+    return FutureBuilder<List<double>>(
+      future: _collectScores(),
+      builder: (context, snapshot) {
+        final scores = snapshot.data ?? [];
 
-    final double avgScore;
-    final String grade;
-
-    if (scored.isEmpty) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-        child: Card(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                Icon(Icons.eco, color: ayuGold),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    'No eco-score data today',
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-    }
-
-    avgScore = scored.fold<double>(
-            0, (sum, i) => sum + i.meal.ecoscoreScore!) /
-        scored.length;
-    grade = _scoreToGrade(avgScore);
-
-    final gradeColor = _gradeColor(grade);
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      child: Card(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              // Circular gauge
-              SizedBox(
-                width: 56,
-                height: 56,
-                child: CustomPaint(
-                  painter: _EcoGaugePainter(
-                    score: avgScore,
-                    color: gradeColor,
-                  ),
-                  child: Center(
-                    child: Text(
-                      grade.toUpperCase(),
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: gradeColor,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+        if (scores.isEmpty) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            child: Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
                   children: [
-                    Text(
-                      'Daily Eco Score: ${grade.toUpperCase()} (${avgScore.round()}/100)',
-                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '${scored.length} item${scored.length == 1 ? '' : 's'} scored',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSurface
-                                .withValues(alpha: 0.6),
-                          ),
+                    Icon(Icons.eco, color: ayuGold),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'No eco-score data today',
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
                     ),
                   ],
                 ),
               ),
-            ],
+            ),
+          );
+        }
+
+        final avgScore =
+            scores.fold<double>(0, (sum, s) => sum + s) / scores.length;
+        final grade = _scoreToGrade(avgScore);
+        final gradeColor = _gradeColor(grade);
+
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          child: Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  // Circular gauge
+                  SizedBox(
+                    width: 56,
+                    height: 56,
+                    child: CustomPaint(
+                      painter: _EcoGaugePainter(
+                        score: avgScore,
+                        color: gradeColor,
+                      ),
+                      child: Center(
+                        child: Text(
+                          grade.toUpperCase(),
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: gradeColor,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Daily Eco Score: ${grade.toUpperCase()} (${avgScore.round()}/100)',
+                          style:
+                              Theme.of(context).textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '${scores.length} item${scores.length == 1 ? '' : 's'} scored',
+                          style:
+                              Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withValues(alpha: 0.6),
+                                  ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 

@@ -1,6 +1,8 @@
 import 'package:logging/logging.dart';
 import 'package:opennutritracker/core/db/data_sources/activity_snapshot_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/biomarker_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/config_data_source_ob.dart';
+import 'package:opennutritracker/core/db/data_sources/eco_score_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/fasting_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/location_visit_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/peptide_data_source.dart';
@@ -50,6 +52,7 @@ class AgentService {
     try { suggestions.addAll(await _gymFrequencyAgent()); } catch (_) {}
     try { suggestions.addAll(await _outdoorTimeAgent()); } catch (_) {}
     try { suggestions.addAll(await _peptideReminderAgent()); } catch (_) {}
+    try { suggestions.addAll(await _ecoScoreAgent()); } catch (_) {}
 
     // Cross-agent observation engine — finds contradictions and correlations
     try { suggestions.addAll(await ObservationAgent.observe()); } catch (_) {}
@@ -396,5 +399,57 @@ class AgentService {
         message: '$names — don\'t forget today\'s dose',
       ),
     ];
+  }
+
+  // ── Eco-Score Agent ──
+
+  /// Prompts the user to fill in missing eco-scores when more than half of
+  /// today's intakes are unscored.
+  static Future<List<AgentSuggestion>> _ecoScoreAgent() async {
+    final configDs = locator<ConfigDataSourceOB>();
+    final showSustainability = configDs.getShowSustainability();
+    if (!showSustainability) return [];
+
+    final getIntake = locator<GetIntakeUsecase>();
+    final now = DateTime.now();
+    if (now.hour < 12) return []; // only after noon
+
+    final allIntakes = [
+      ...await getIntake.getBreakfastIntakeByDay(now),
+      ...await getIntake.getLunchIntakeByDay(now),
+      ...await getIntake.getDinnerIntakeByDay(now),
+      ...await getIntake.getSnackIntakeByDay(now),
+    ];
+
+    if (allIntakes.isEmpty) return [];
+
+    final ecoDs = locator<EcoScoreDataSource>();
+    int missing = 0;
+    final int total = allIntakes.length;
+
+    for (final intake in allIntakes) {
+      final hasScore = intake.meal.ecoscoreScore != null;
+      if (!hasScore) {
+        final code = intake.meal.code;
+        if (code != null) {
+          final cached = await ecoDs.getByProductKey(code);
+          if (cached == null) missing++;
+        } else {
+          missing++;
+        }
+      }
+    }
+
+    if (missing > 0 && missing > total ~/ 2) {
+      return [
+        AgentSuggestion(
+          type: 'eco_score',
+          title: '$missing items missing eco-score',
+          message: 'Add eco-scores to improve your sustainability tracking',
+        ),
+      ];
+    }
+
+    return [];
   }
 }
