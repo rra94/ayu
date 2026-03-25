@@ -25,7 +25,8 @@ Built on top of [OpenNutriTracker](https://github.com/simonoppowa/OpenNutriTrack
 - Glycemic load estimation (~200 food GI database)
 - Net carbs (total carbs - fiber)
 - Per-serving nutrient display
-- Food allergen alerts (user-configured allergens)
+- Nutrient synergy checker — 17 rules showing enhancers/inhibitors per meal (iron+C, calcium+iron, etc.)
+- Food allergen alerts (user-configured, persisted)
 - Custom food entry for items not in database
 
 ### Home Dashboard
@@ -33,8 +34,11 @@ Built on top of [OpenNutriTracker](https://github.com/simonoppowa/OpenNutriTrack
 - Daily habits checklist with smart time-based reminders
 - Gut health panel — auto-detects 64 harmful additives from OFF E-numbers
 - Today View card (calories, water, supplements, sleep, streak at a glance)
+- Activity Dashboard — 2-row card: steps, activity type, calories, outdoor time (today) + gym visits, workouts, avg HR (this week)
 - Quick action bar (water +250ml, scan, coffee, fast)
 - Supplement checklist with take/skip logging
+- Peptide tracker — dosing cycles, reconstitution calculator, injection site rotation
+- 30 Plants a Week tracker — counts unique plant foods for gut microbiome diversity
 - Fasting timer (16:8, 18:6, 20:4, OMAD presets)
 - NSDR / meditation countdown timer
 - Caffeine tracking
@@ -61,19 +65,28 @@ Built on top of [OpenNutriTracker](https://github.com/simonoppowa/OpenNutriTrack
 - Meal timing analysis
 - Clean eating streak calculator
 
+### Phone Sensors
+- CoreMotion activity detection (stationary, walking, running, cycling, automotive)
+- Sedentary alerts (3+ hours sitting)
+- CoreLocation gym detection (significant location changes, auto-labels after 3+ visits)
+- Outdoor time estimation for vitamin D correlation
+- Barometric pressure tracking for weather-mood correlation
+
 ### Integrations
 - Apple HealthKit sync (weight, sleep, HR, HRV, steps, workouts)
 - HRV vs. late-meal correlation analysis
 - Longevity insights engine (biomarker-based recommendations)
-- iOS WidgetKit data bridge (Lock Screen + Home Screen widgets)
+- iOS Lock Screen widget (calorie ring + streak) and Home Screen widget (calories, water, supplements, streak)
 
 ### Intelligence
-- 7 on-device agents: meal pattern, nutrient gap, fasting adapt, supplement, hydration, biomarker, cross-domain observation
-- Cross-agent observation engine (stress+HR contradiction, sleep+caffeine, mood+nutrition, sleep+eating window, weather+mood)
+- 11 on-device agents: meal pattern, nutrient gap, fasting adapt, supplement, hydration, biomarker, sedentary, gym frequency, outdoor time, peptide reminder, cross-domain observation
+- Cross-agent observation engine: stress+HR, sleep+caffeine, mood+nutrition, sleep+eating window, pressure+mood, sedentary+sleep, gym+protein
 - Smart notifications for missing entries (meals, water, supplements, sleep)
 - Auto-start fasting after meal logging gap
+- Data retention service — auto-prunes sensor data (90d snapshots, 30d locations)
 - DailySummaryEntity — aggregates all daily data
 - Weekly review service with automated wins/improvements detection
+- Blueprint Mode — Bryan Johnson's longevity protocol targets and supplement stack
 
 ### Smart Nutrition
 - **Bioavailability engine** — estimates real absorption for 10+ nutrients based on meal context
@@ -101,13 +114,14 @@ Built on top of [OpenNutriTracker](https://github.com/simonoppowa/OpenNutriTrack
 
 ```
 Flutter (iOS only — Android deprecated)
-ObjectBox (local DB, 23 entities)
+ObjectBox (local DB, 29 entities)
 BLoC (state management)
 fl_chart (charts)
 health (HealthKit)
 flutter_local_notifications
 home_widget (WidgetKit bridge)
 Apple Vision framework (on-device OCR)
+CoreMotion / CoreLocation / CMAltimeter (phone sensors)
 ```
 
 > **Note:** Android support is deprecated. Ayu is developed and tested exclusively for iOS.
@@ -124,6 +138,7 @@ Apple Vision framework (on-device OCR)
 
 - All data stored locally on device (ObjectBox)
 - HealthKit data never leaves the device
+- Location data never exported or synced (auto-pruned after 30 days)
 - On-device OCR (Apple Vision, no cloud)
 - No cloud dependency, no accounts, no tracking
 - Open source

@@ -26,10 +26,10 @@ theme: lotus (navy #0D1B2A + gold #D4A843, 16px card radius)
 | [M5: Integrations](m5-integrations/) | HealthKit, HRV correlation, longevity insights | Done |
 | [M6: Intelligence](m6-intelligence/) | Net carbs, GI/GL, weekly review, daily summary, agents | Done |
 | [M7: Smart Nutrition](m7-smart-nutrition/) | Bioavailability engine, nutrient recommendations | Done |
-| M8: Phone Sensors | CoreMotion, CoreLocation, Barometer, Activity Dashboard | Not started |
-| M9: Peptide Tracker | Peptide stack, reconstitution calc, injection site rotation, agent | Not started |
-| M10: Polishing | 30 plants tracker, nutrient synergy, allergen persistence | Not started |
-| M11: Widget & Extras | iOS Lock Screen widget, Blueprint Mode | Not started |
+| M8: Phone Sensors | CoreMotion, CoreLocation, Barometer, Activity Dashboard | Done |
+| M9: Peptide Tracker | Peptide stack, reconstitution calc, injection site rotation, agent | Done |
+| M10: Polishing | 30 plants tracker, nutrient synergy, allergen persistence | Done |
+| M11: Widget & Extras | iOS Lock Screen widget, Blueprint Mode | Done |
 
 **Implementation plan:** [`docs/superpowers/plans/2026-03-24-remaining-features.md`](../docs/superpowers/plans/2026-03-24-remaining-features.md)
 
