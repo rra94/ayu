@@ -16,8 +16,13 @@ import 'package:opennutritracker/core/db/data_sources/gut_health_data_source.dar
 import 'package:opennutritracker/core/db/entities/gut_health_item_ob.dart';
 import 'package:opennutritracker/core/db/data_sources/intake_data_source_ob.dart';
 import 'package:opennutritracker/core/services/gut_health_service.dart';
+// IntakeDataSourceOB kept for toggleFavorite used in onIntakeItemLongPressed
 import 'package:opennutritracker/core/services/habit_notification_service.dart';
 import 'package:opennutritracker/core/services/smart_notification_service.dart';
+import 'package:opennutritracker/core/services/streak_service.dart';
+import 'package:opennutritracker/core/services/widget_service.dart';
+import 'package:opennutritracker/core/db/data_sources/supplement_data_source.dart';
+import 'package:opennutritracker/core/domain/usecase/get_intake_usecase.dart';
 import 'package:opennutritracker/core/utils/locator.dart';
 import 'package:opennutritracker/features/water/presentation/water_tracker_widget.dart';
 import 'package:opennutritracker/features/habits/presentation/habits_checklist_widget.dart';
@@ -160,6 +165,13 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     if (showDisclaimerDialog) {
       _showDisclaimerDialog(context);
     }
+
+    // Push fresh snapshot to iOS WidgetKit (fire-and-forget)
+    _pushWidgetUpdate(
+      caloriesConsumed: totalKcalSupplied,
+      calorieGoal: totalKcalDaily,
+    );
+
     final hour = DateTime.now().hour;
 
     return Stack(children: [
@@ -566,5 +578,41 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     if (!DateUtils.isSameDay(_homeBloc.currentDay, DateTime.now())) {
       _homeBloc.add(const LoadItemsEvent());
     }
+  }
+
+  /// Push current health snapshot to the iOS WidgetKit extension.
+  /// Runs in the background — failures are swallowed inside WidgetService.
+  void _pushWidgetUpdate({
+    required double caloriesConsumed,
+    required double calorieGoal,
+  }) {
+    Future(() async {
+      // Water
+      final waterMl = await locator<WaterDataSource>().getTodayTotal();
+      const waterTargetMl = 2500.0;
+
+      // Supplements
+      final suppDs = locator<SupplementDataSource>();
+      final allSupps = await suppDs.getAllActive();
+      final takenIds = await suppDs.getTakenIdsForDate(DateTime.now());
+
+      // Streak — compute via StreakService using all historical intakes
+      int streak = 0;
+      try {
+        final allIntakes = await locator<GetIntakeUsecase>().getAllIntakes();
+        final result = StreakService.computeStreak(allIntakes);
+        streak = result.currentStreak;
+      } catch (_) {}
+
+      await WidgetService.updateWidget(
+        caloriesConsumed: caloriesConsumed,
+        calorieGoal: calorieGoal,
+        waterMl: waterMl,
+        waterTargetMl: waterTargetMl,
+        streak: streak,
+        supplementsTaken: takenIds.length,
+        supplementsTotal: allSupps.length,
+      );
+    });
   }
 }
