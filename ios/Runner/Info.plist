@@ -35,6 +35,10 @@
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>Camera permission is required for barcode scanning.</string>
+	<key>NSMotionUsageDescription</key>
+	<string>Ayu tracks your activity to detect sedentary periods and suggest movement.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Ayu detects gym visits and outdoor time to correlate with your health data.</string>
 	<key>NSHealthShareUsageDescription</key>
 	<string>Ayu reads your health data (weight, sleep, heart rate, HRV) to provide longevity insights and track progress.</string>
 	<key>NSHealthUpdateUsageDescription</key>
