@@ -36,15 +36,29 @@ class EcoScoreDataSource {
 
   /// Bulk lookup: return a map of productKey -> EcoScoreOB for the given keys.
   Future<Map<String, EcoScoreOB>> getByKeys(List<String> keys) async {
-    final map = <String, EcoScoreOB>{};
-    for (final key in keys) {
-      final query = _box.query(EcoScoreOB_.productKey.equals(key)).build();
-      final result = query.findFirst();
-      query.close();
-      if (result != null) {
-        map[key] = result;
+    if (keys.isEmpty) return {};
+
+    // Single query: get all records, filter in Dart (faster than N queries for small datasets)
+    final all = _box.getAll();
+    final keySet = keys.toSet();
+    final result = <String, EcoScoreOB>{};
+    for (final record in all) {
+      if (keySet.contains(record.productKey)) {
+        result[record.productKey] = record;
       }
     }
-    return map;
+    return result;
+  }
+
+  /// Remove eco-scores not accessed in over 180 days
+  Future<void> pruneStale(DateTime cutoff) async {
+    final query = _box
+        .query(EcoScoreOB_.updatedAt.lessThan(cutoff.millisecondsSinceEpoch))
+        .build();
+    final stale = query.find();
+    query.close();
+    if (stale.isNotEmpty) {
+      _box.removeMany(stale.map((e) => e.id).toList());
+    }
   }
 }
