@@ -1,10 +1,13 @@
 import 'package:logging/logging.dart';
 import 'package:opennutritracker/core/db/data_sources/biomarker_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/caffeine_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/location_visit_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/sleep_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/symptom_data_source.dart';
 import 'package:opennutritracker/core/domain/usecase/get_intake_usecase.dart';
+import 'package:opennutritracker/core/domain/usecase/get_user_usecase.dart';
 import 'package:opennutritracker/core/services/agent_service.dart';
+import 'package:opennutritracker/core/services/barometer_service.dart';
 import 'package:opennutritracker/core/utils/locator.dart';
 
 /// Cross-agent observation engine. Reads data from multiple sources
@@ -23,7 +26,9 @@ class ObservationAgent {
     try { observations.addAll(await _sleepCaffeineCorrelation()); } catch (_) {}
     try { observations.addAll(await _moodNutritionLink()); } catch (_) {}
     try { observations.addAll(await _sleepEatingWindow()); } catch (_) {}
-    try { observations.addAll(await _weatherMoodCorrelation()); } catch (_) {}
+    try { observations.addAll(await _pressureMoodCorrelation()); } catch (_) {}
+    try { observations.addAll(await _sedentarySleepCorrelation()); } catch (_) {}
+    try { observations.addAll(await _gymProteinCorrelation()); } catch (_) {}
 
     _log.info('ObservationAgent found ${observations.length} cross-domain insights');
     return observations;
@@ -220,51 +225,85 @@ class ObservationAgent {
     return [];
   }
 
-  // ── Weather + mood correlation ──
+  // ── Pressure + mood correlation ──
+  static Future<List<AgentSuggestion>> _pressureMoodCorrelation() async {
+    final barometerService = locator<BarometerService>();
+    final pressureChange = await barometerService.getPressureChange(const Duration(hours: 6));
+    if (pressureChange == null || pressureChange > -0.7) return []; // no significant drop
 
-  /// Uses free OpenMeteo API (no key needed) to get current conditions.
-  static Future<List<AgentSuggestion>> _weatherMoodCorrelation() async {
-    // OpenMeteo doesn't need an API key — just lat/lon
-    // For now, just check if mood is low and suggest light exposure
     final symptomDs = locator<SymptomDataSource>();
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final tomorrow = today.add(const Duration(days: 1));
     final todaySymptoms = await symptomDs.getLogsByDateRange(today, tomorrow);
-
     final moodLogs = todaySymptoms.where((s) => s.symptom == 8); // mood_low
     if (moodLogs.isEmpty) return [];
 
-    // severity: higher = worse mood (more severe low mood)
-    final moodSeverity = moodLogs.first.severity;
-    final hour = now.hour;
-
-    // Severe low mood + morning = suggest sunlight
-    if (moodSeverity >= 3 && hour < 12) {
+    if (moodLogs.first.severity >= 3) {
       return [
         AgentSuggestion(
           type: 'observation',
-          title: 'Low mood — try morning sunlight',
-          message:
-              '10-15 min of morning sunlight boosts serotonin and cortisol '
-              'awakening response. Step outside without sunglasses.',
+          title: 'Pressure drop + low mood',
+          message: 'Barometric pressure dropped today — this can trigger headaches and fatigue. Stay hydrated and rest.',
         ),
       ];
     }
+    return [];
+  }
 
-    // Severe low mood + afternoon = suggest movement
-    if (moodSeverity >= 3 && hour >= 12) {
+  // ── Sedentary + sleep correlation ──
+  static Future<List<AgentSuggestion>> _sedentarySleepCorrelation() async {
+    final sleepDs = locator<SleepDataSource>();
+    final lastSleep = await sleepDs.getLastNight();
+    if (lastSleep == null || lastSleep.qualityScore > 2) return [];
+
+    final bioDs = locator<BiomarkerDataSource>();
+    final stepRecords = await bioDs.getRecordsByType('steps');
+    if (stepRecords.isEmpty) return [];
+    final latestSteps = stepRecords.first.value;
+    if (latestSteps >= 2000) return [];
+
+    return [
+      AgentSuggestion(
+        type: 'observation',
+        title: 'Sedentary day + poor sleep',
+        message: 'You had fewer than 2,000 steps and sleep quality was ${lastSleep.qualityScore}/5. Even a 20 min walk improves deep sleep.',
+      ),
+    ];
+  }
+
+  // ── Gym + protein correlation ──
+  static Future<List<AgentSuggestion>> _gymProteinCorrelation() async {
+    final visitDs = locator<LocationVisitDataSource>();
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final todayGym = await visitDs.getVisitsByLabel('gym', days: 1);
+    final gymToday = todayGym.where((v) => v.arrivalTime.isAfter(today));
+    if (gymToday.isEmpty) return [];
+
+    final getIntake = locator<GetIntakeUsecase>();
+    final allIntakes = [
+      ...await getIntake.getBreakfastIntakeByDay(now),
+      ...await getIntake.getLunchIntakeByDay(now),
+      ...await getIntake.getDinnerIntakeByDay(now),
+      ...await getIntake.getSnackIntakeByDay(now),
+    ];
+    final totalProtein = allIntakes.fold<double>(0, (sum, i) => sum + i.totalProteinsGram);
+
+    // Get user weight for per-kg calculation
+    final user = await locator<GetUserUsecase>().getUserData();
+    final weightKg = user.weightKG > 0 ? user.weightKG : 70.0;
+    final proteinPerKg = totalProtein / weightKg;
+
+    if (proteinPerKg < 1.2 && now.hour >= 14) {
       return [
         AgentSuggestion(
           type: 'observation',
-          title: 'Low mood — try a short walk',
-          message:
-              'Even 10 min of walking increases endorphins and BDNF. '
-              'If indoors all day, light exposure helps too.',
+          title: 'Gym day — boost protein',
+          message: 'You trained today but protein is ${totalProtein.round()}g (${proteinPerKg.toStringAsFixed(1)}g/kg). Aim for 1.6g/kg on training days.',
         ),
       ];
     }
-
     return [];
   }
 }

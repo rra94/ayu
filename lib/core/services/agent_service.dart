@@ -1,8 +1,12 @@
 import 'package:logging/logging.dart';
+import 'package:opennutritracker/core/db/data_sources/activity_snapshot_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/biomarker_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/fasting_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/location_visit_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/supplement_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/water_data_source.dart';
+import 'package:opennutritracker/core/services/core_motion_service.dart';
+import 'package:opennutritracker/core/services/location_inference_service.dart';
 import 'package:opennutritracker/core/services/observation_agent.dart';
 import 'package:opennutritracker/core/domain/usecase/get_user_usecase.dart';
 import 'package:opennutritracker/core/utils/calc/optimal_range_calc.dart';
@@ -41,6 +45,9 @@ class AgentService {
     try { suggestions.addAll(await _supplementReminderAgent()); } catch (_) {}
     try { suggestions.addAll(await _hydrationAgent()); } catch (_) {}
     try { suggestions.addAll(await _biomarkerAgent()); } catch (_) {}
+    try { suggestions.addAll(await _sedentaryAgent()); } catch (_) {}
+    try { suggestions.addAll(await _gymFrequencyAgent()); } catch (_) {}
+    try { suggestions.addAll(await _outdoorTimeAgent()); } catch (_) {}
 
     // Cross-agent observation engine — finds contradictions and correlations
     try { suggestions.addAll(await ObservationAgent.observe()); } catch (_) {}
@@ -283,6 +290,83 @@ class AgentService {
           type: 'biomarker_wellness',
           title: 'Weekly wellness check',
           message: 'Rate your hair, skin, teeth, energy, and stress this week',
+        ),
+      ];
+    }
+
+    return [];
+  }
+
+  // ── Sedentary Agent ──
+  static Future<List<AgentSuggestion>> _sedentaryAgent() async {
+    final now = DateTime.now();
+    if (now.hour < 7 || now.hour >= 22) return []; // sleep hours
+
+    final motionService = locator<CoreMotionService>();
+    final stationaryMin = await motionService.getStationaryMinutes();
+    if (stationaryMin < 180) return []; // less than 3 hours
+
+    // Check if already active today
+    final snapshotDs = locator<ActivitySnapshotDataSource>();
+    final today = await snapshotDs.getTodaySnapshots();
+    final activeToday = today.where((s) =>
+        s.activityType == 'walking' || s.activityType == 'running').length;
+    if (activeToday > 3) return []; // been active enough
+
+    return [
+      AgentSuggestion(
+        type: 'sedentary',
+        title: 'Time to move',
+        message: 'You\'ve been sitting for ${stationaryMin ~/ 60}+ hours — even a 5 min walk helps.',
+      ),
+    ];
+  }
+
+  // ── Gym Frequency Agent ──
+  static Future<List<AgentSuggestion>> _gymFrequencyAgent() async {
+    final visitDs = locator<LocationVisitDataSource>();
+    final gymCount = await visitDs.getThisWeekGymCount();
+
+    // Only if user has gym visits (means they have a saved gym location)
+    if (gymCount == 0) {
+      final recentGym = await visitDs.getVisitsByLabel('gym', days: 30);
+      if (recentGym.isEmpty) return []; // no gym history at all
+      return [
+        AgentSuggestion(
+          type: 'gym_frequency',
+          title: 'No gym visits this week',
+          message: 'Schedule a session to stay on track.',
+        ),
+      ];
+    }
+
+    if (gymCount >= 3) {
+      return [
+        AgentSuggestion(
+          type: 'gym_frequency',
+          title: '$gymCount gym visits this week',
+          message: 'Great consistency! Keep it up.',
+        ),
+      ];
+    }
+
+    return [];
+  }
+
+  // ── Outdoor Time Agent ──
+  static Future<List<AgentSuggestion>> _outdoorTimeAgent() async {
+    final now = DateTime.now();
+    if (now.hour < 14) return []; // only suggest after 2pm
+
+    final locationService = locator<LocationInferenceService>();
+    final outdoorMin = await locationService.getOutdoorMinutesToday();
+
+    if (outdoorMin < 15) {
+      return [
+        AgentSuggestion(
+          type: 'outdoor_time',
+          title: 'Get some sun',
+          message: 'Only ${outdoorMin.round()} min outside today — sunlight boosts vitamin D and mood.',
         ),
       ];
     }
