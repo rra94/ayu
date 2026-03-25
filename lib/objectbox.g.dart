@@ -1201,7 +1201,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(18, 2992183107648926707),
     name: 'SleepRecordOB',
-    lastPropertyId: const obx_int.IdUid(6, 7442038126300950605),
+    lastPropertyId: const obx_int.IdUid(10, 4183114661903394658),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -1238,6 +1238,30 @@ final _entities = <obx_int.ModelEntity>[
         id: const obx_int.IdUid(6, 7442038126300950605),
         name: 'source',
         type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(7, 984860991098657325),
+        name: 'deepSleepMin',
+        type: 8,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(8, 1013098493073842205),
+        name: 'lightSleepMin',
+        type: 8,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(9, 3967635368200505764),
+        name: 'remSleepMin',
+        type: 8,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(10, 4183114661903394658),
+        name: 'awakeMin',
+        type: 8,
         flags: 0,
       ),
     ],
@@ -3504,13 +3528,17 @@ obx_int.ModelDefinition getObjectBoxModel() {
             ? null
             : fbb.writeString(object.notes!);
         final sourceOffset = fbb.writeString(object.source);
-        fbb.startTable(7);
+        fbb.startTable(11);
         fbb.addInt64(0, object.id);
         fbb.addInt64(1, object.bedTime.millisecondsSinceEpoch);
         fbb.addInt64(2, object.wakeTime.millisecondsSinceEpoch);
         fbb.addInt64(3, object.qualityScore);
         fbb.addOffset(4, notesOffset);
         fbb.addOffset(5, sourceOffset);
+        fbb.addFloat64(6, object.deepSleepMin);
+        fbb.addFloat64(7, object.lightSleepMin);
+        fbb.addFloat64(8, object.remSleepMin);
+        fbb.addFloat64(9, object.awakeMin);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -3541,6 +3569,26 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final sourceParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGet(buffer, rootOffset, 14, '');
+        final deepSleepMinParam = const fb.Float64Reader().vTableGetNullable(
+          buffer,
+          rootOffset,
+          16,
+        );
+        final lightSleepMinParam = const fb.Float64Reader().vTableGetNullable(
+          buffer,
+          rootOffset,
+          18,
+        );
+        final remSleepMinParam = const fb.Float64Reader().vTableGetNullable(
+          buffer,
+          rootOffset,
+          20,
+        );
+        final awakeMinParam = const fb.Float64Reader().vTableGetNullable(
+          buffer,
+          rootOffset,
+          22,
+        );
         final object = SleepRecordOB(
           id: idParam,
           bedTime: bedTimeParam,
@@ -3548,6 +3596,10 @@ obx_int.ModelDefinition getObjectBoxModel() {
           qualityScore: qualityScoreParam,
           notes: notesParam,
           source: sourceParam,
+          deepSleepMin: deepSleepMinParam,
+          lightSleepMin: lightSleepMinParam,
+          remSleepMin: remSleepMinParam,
+          awakeMin: awakeMinParam,
         );
 
         return object;
@@ -5370,6 +5422,26 @@ class SleepRecordOB_ {
   /// See [SleepRecordOB.source].
   static final source = obx.QueryStringProperty<SleepRecordOB>(
     _entities[17].properties[5],
+  );
+
+  /// See [SleepRecordOB.deepSleepMin].
+  static final deepSleepMin = obx.QueryDoubleProperty<SleepRecordOB>(
+    _entities[17].properties[6],
+  );
+
+  /// See [SleepRecordOB.lightSleepMin].
+  static final lightSleepMin = obx.QueryDoubleProperty<SleepRecordOB>(
+    _entities[17].properties[7],
+  );
+
+  /// See [SleepRecordOB.remSleepMin].
+  static final remSleepMin = obx.QueryDoubleProperty<SleepRecordOB>(
+    _entities[17].properties[8],
+  );
+
+  /// See [SleepRecordOB.awakeMin].
+  static final awakeMin = obx.QueryDoubleProperty<SleepRecordOB>(
+    _entities[17].properties[9],
   );
 }
 

@@ -18,11 +18,19 @@ class HealthKitService {
     HealthDataType.HEART_RATE,
     HealthDataType.HEART_RATE_VARIABILITY_SDNN,
     HealthDataType.SLEEP_ASLEEP,
+    HealthDataType.SLEEP_DEEP,
+    HealthDataType.SLEEP_LIGHT,
+    HealthDataType.SLEEP_REM,
+    HealthDataType.SLEEP_AWAKE,
     HealthDataType.ACTIVE_ENERGY_BURNED,
     HealthDataType.WORKOUT,
   ];
 
   static const _permissions = [
+    HealthDataAccess.READ,
+    HealthDataAccess.READ,
+    HealthDataAccess.READ,
+    HealthDataAccess.READ,
     HealthDataAccess.READ,
     HealthDataAccess.READ,
     HealthDataAccess.READ,
@@ -78,9 +86,14 @@ class HealthKitService {
           .where((d) => d.type == HealthDataType.WEIGHT)
           .toList());
 
-      // Process sleep
+      // Process sleep (all stage types)
       imported += await _syncSleep(dataPoints
-          .where((d) => d.type == HealthDataType.SLEEP_ASLEEP)
+          .where((d) =>
+              d.type == HealthDataType.SLEEP_ASLEEP ||
+              d.type == HealthDataType.SLEEP_DEEP ||
+              d.type == HealthDataType.SLEEP_LIGHT ||
+              d.type == HealthDataType.SLEEP_REM ||
+              d.type == HealthDataType.SLEEP_AWAKE)
           .toList());
 
       // Process heart rate (store as biomarker)
@@ -120,12 +133,16 @@ class HealthKitService {
         'count',
       );
 
-      // Log workout count
+      // Process workouts: extract peak HR within each workout window
       final workouts = dataPoints
           .where((d) => d.type == HealthDataType.WORKOUT)
           .toList();
       if (workouts.isNotEmpty) {
         _log.info('Found ${workouts.length} workouts from HealthKit');
+        final hrPoints = dataPoints
+            .where((d) => d.type == HealthDataType.HEART_RATE)
+            .toList();
+        imported += await _syncWorkoutHR(workouts, hrPoints);
       }
 
       return SyncResult(success: true, importedCount: imported);
@@ -163,8 +180,8 @@ class HealthKitService {
   static Future<int> _syncSleep(List<HealthDataPoint> points) async {
     if (points.isEmpty) return 0;
     final ds = locator<SleepDataSource>();
-    // Group sleep segments by night (same calendar date for wake time)
-    // For simplicity, take the earliest and latest sleep timestamps per night
+
+    // Group all sleep segments by night (keyed on the wake date of each point)
     final nights = <String, List<HealthDataPoint>>{};
     for (final point in points) {
       final wakeDate = point.dateTo;
@@ -175,6 +192,8 @@ class HealthKitService {
     int count = 0;
     for (final entry in nights.entries) {
       final segments = entry.value;
+
+      // Determine bed/wake window across all segments for this night
       final bedTime = segments
           .map((s) => s.dateFrom)
           .reduce((a, b) => a.isBefore(b) ? a : b);
@@ -182,14 +201,78 @@ class HealthKitService {
           .map((s) => s.dateTo)
           .reduce((a, b) => a.isAfter(b) ? a : b);
 
-      await ds.addRecord(SleepRecordOB(
+      // Sum stage durations in minutes
+      double sumMinutes(HealthDataType type) => segments
+          .where((s) => s.type == type)
+          .fold<double>(
+              0,
+              (acc, s) =>
+                  acc + s.dateTo.difference(s.dateFrom).inMinutes.toDouble());
+
+      final deepMin = sumMinutes(HealthDataType.SLEEP_DEEP);
+      final lightMin = sumMinutes(HealthDataType.SLEEP_LIGHT);
+      final remMin = sumMinutes(HealthDataType.SLEEP_REM);
+      final awakeMin = sumMinutes(HealthDataType.SLEEP_AWAKE);
+
+      final hasStageData = deepMin > 0 || lightMin > 0 || remMin > 0;
+
+      final record = SleepRecordOB(
         bedTime: bedTime,
         wakeTime: wakeTime,
-        qualityScore: 3, // default; user can edit
         source: 'healthkit',
+        deepSleepMin: hasStageData ? deepMin : null,
+        lightSleepMin: hasStageData ? lightMin : null,
+        remSleepMin: hasStageData ? remMin : null,
+        awakeMin: awakeMin > 0 ? awakeMin : null,
+      );
+
+      // Auto-calculate quality score from sleepScore (map 0-100 to 1-5)
+      final score = record.sleepScore;
+      record.qualityScore = (score / 20).ceil().clamp(1, 5);
+
+      await ds.addRecord(record);
+      count++;
+    }
+    return count;
+  }
+
+  /// For each workout, find overlapping HR data points and store the peak
+  /// as a 'workout_hr' biomarker keyed to the workout start date.
+  static Future<int> _syncWorkoutHR(
+    List<HealthDataPoint> workouts,
+    List<HealthDataPoint> hrPoints,
+  ) async {
+    if (hrPoints.isEmpty) return 0;
+    final ds = locator<BiomarkerDataSource>();
+    int count = 0;
+
+    for (final workout in workouts) {
+      final workoutStart = workout.dateFrom;
+      final workoutEnd = workout.dateTo;
+
+      // Collect HR readings that fall within the workout window
+      final overlapping = hrPoints.where((hr) {
+        return !hr.dateFrom.isAfter(workoutEnd) &&
+            !hr.dateTo.isBefore(workoutStart);
+      }).toList();
+
+      if (overlapping.isEmpty) continue;
+
+      final peakHR = overlapping
+          .map((p) => (p.value as NumericHealthValue).numericValue.toDouble())
+          .reduce((a, b) => a > b ? a : b);
+
+      await ds.addRecord(BiomarkerRecordOB(
+        type: 'workout_hr',
+        value: peakHR,
+        unit: 'bpm',
+        dateTime: workoutStart,
+        source: 1, // auto from healthkit
       ));
       count++;
     }
+
+    _log.info('Stored $count workout peak HR biomarkers');
     return count;
   }
 

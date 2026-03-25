@@ -977,7 +977,7 @@
     },
     {
       "id": "18:2992183107648926707",
-      "lastPropertyId": "6:7442038126300950605",
+      "lastPropertyId": "10:4183114661903394658",
       "name": "SleepRecordOB",
       "properties": [
         {
@@ -1010,6 +1010,26 @@
           "id": "6:7442038126300950605",
           "name": "source",
           "type": 9
+        },
+        {
+          "id": "7:984860991098657325",
+          "name": "deepSleepMin",
+          "type": 8
+        },
+        {
+          "id": "8:1013098493073842205",
+          "name": "lightSleepMin",
+          "type": 8
+        },
+        {
+          "id": "9:3967635368200505764",
+          "name": "remSleepMin",
+          "type": 8
+        },
+        {
+          "id": "10:4183114661903394658",
+          "name": "awakeMin",
+          "type": 8
         }
       ],
       "relations": []
