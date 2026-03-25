@@ -34,7 +34,7 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
         }
 
         // Check for allergens
-        final allergenAlerts = AllergenService.checkMeal(result);
+        final allergenAlerts = await AllergenService.checkMeal(result);
 
         emit(ScannerLoadedState(
             product: result,

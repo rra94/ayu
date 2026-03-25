@@ -5,7 +5,7 @@
   "entities": [
     {
       "id": "1:6477492202799954719",
-      "lastPropertyId": "16:7057383559295592709",
+      "lastPropertyId": "17:8970579051260580521",
       "name": "ConfigOB",
       "properties": [
         {
@@ -88,6 +88,11 @@
           "id": "16:7057383559295592709",
           "name": "ayuOnboardingComplete",
           "type": 1
+        },
+        {
+          "id": "17:8970579051260580521",
+          "name": "allergenJson",
+          "type": 9
         }
       ],
       "relations": []

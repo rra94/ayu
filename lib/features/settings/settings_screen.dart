@@ -278,9 +278,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: const Text('Cancel'),
             ),
             FilledButton(
-              onPressed: () {
-                AllergenService.setUserAllergens(selected);
-                Navigator.of(ctx).pop();
+              onPressed: () async {
+                await AllergenService.setUserAllergens(selected);
+                if (ctx.mounted) Navigator.of(ctx).pop();
                 setState(() {});
               },
               child: const Text('Save'),

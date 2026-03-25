@@ -130,6 +130,16 @@ class ConfigDataSourceOB {
     final ob = _getConfig();
     return ob?.hasAcceptedSendAnonymousData ?? false;
   }
+
+  /// Get the raw ConfigOB for direct field access (e.g. allergenJson).
+  ConfigOB getConfigOB() => _getOrCreateConfig();
+
+  /// Persist allergen JSON string to the config record.
+  Future<void> saveAllergenJson(String json) async {
+    final ob = _getOrCreateConfig();
+    ob.allergenJson = json;
+    _configBox.put(ob);
+  }
 }
 
 // ---------------------------------------------------------------------------

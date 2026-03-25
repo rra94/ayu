@@ -1,3 +1,7 @@
+import 'dart:convert';
+
+import 'package:opennutritracker/core/db/data_sources/config_data_source_ob.dart';
+import 'package:opennutritracker/core/utils/locator.dart';
 import 'package:opennutritracker/features/add_meal/domain/entity/meal_entity.dart';
 
 class AllergenAlert {
@@ -70,17 +74,53 @@ class AllergenService {
   /// User's configured allergens (stored as Set of display names)
   static Set<String> _userAllergens = {};
 
-  static void setUserAllergens(Set<String> allergens) {
-    _userAllergens = allergens;
+  /// Whether the allergens have been loaded from ObjectBox yet.
+  static bool _loaded = false;
+
+  /// Ensures allergens are loaded from ObjectBox before use.
+  static Future<void> _ensureLoaded() async {
+    if (_loaded) return;
+    try {
+      final configDs = locator<ConfigDataSourceOB>();
+      final config = configDs.getConfigOB();
+      if (config.allergenJson != null && config.allergenJson!.isNotEmpty) {
+        final list = (jsonDecode(config.allergenJson!) as List).cast<String>();
+        _userAllergens = list.toSet();
+      }
+      _loaded = true;
+    } catch (_) {
+      _loaded = true; // don't retry on error
+    }
   }
 
+  /// Persists the current allergen set to ObjectBox.
+  static Future<void> _persist() async {
+    try {
+      final configDs = locator<ConfigDataSourceOB>();
+      await configDs.saveAllergenJson(jsonEncode(_userAllergens.toList()));
+    } catch (_) {}
+  }
+
+  static Future<void> setUserAllergens(Set<String> allergens) async {
+    await _ensureLoaded();
+    _userAllergens = allergens;
+    await _persist();
+  }
+
+  static Future<Set<String>> getUserAllergens() async {
+    await _ensureLoaded();
+    return _userAllergens;
+  }
+
+  /// Synchronous getter — call [_ensureLoaded] first if freshness is required.
   static Set<String> get userAllergens => _userAllergens;
 
   static List<String> get allAllergenNames =>
       _allergenNames.values.toSet().toList()..sort();
 
   /// Check a meal for allergens. Returns alerts for user's configured allergens.
-  static List<AllergenAlert> checkMeal(MealEntity meal) {
+  static Future<List<AllergenAlert>> checkMeal(MealEntity meal) async {
+    await _ensureLoaded();
     if (_userAllergens.isEmpty) return [];
 
     final alerts = <AllergenAlert>[];

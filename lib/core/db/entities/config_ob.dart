@@ -35,6 +35,9 @@ class ConfigOB {
   /// Whether Ayu feature onboarding has been completed
   bool ayuOnboardingComplete;
 
+  /// JSON-encoded list of allergen strings, e.g. '["Gluten","Dairy","Nuts"]'
+  String? allergenJson;
+
   ConfigOB({
     this.id = 0,
     this.hasAcceptedDisclaimer = false,
@@ -52,5 +55,6 @@ class ConfigOB {
     this.dailyStepGoal,
     this.healthConditions,
     this.ayuOnboardingComplete = false,
+    this.allergenJson,
   });
 }
