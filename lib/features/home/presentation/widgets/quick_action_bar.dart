@@ -5,6 +5,7 @@ import 'package:opennutritracker/core/db/entities/caffeine_log_ob.dart';
 import 'package:opennutritracker/core/db/data_sources/caffeine_data_source.dart';
 import 'package:opennutritracker/core/db/entities/fasting_session_ob.dart';
 import 'package:opennutritracker/core/domain/entity/intake_type_entity.dart';
+import 'package:opennutritracker/core/styles/color_schemes.dart';
 import 'package:opennutritracker/core/utils/locator.dart';
 import 'package:opennutritracker/core/utils/navigation_options.dart';
 import 'package:opennutritracker/features/scanner/scanner_screen.dart';
@@ -16,6 +17,9 @@ class QuickActionBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isLight = Theme.of(context).brightness == Brightness.light;
+    final gold = isLight ? ayuGoldMuted : ayuGoldLight;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: SingleChildScrollView(
@@ -25,7 +29,7 @@ class QuickActionBar extends StatelessWidget {
             _QuickChip(
               icon: Icons.water_drop,
               label: '+250ml',
-              color: Colors.blue,
+              color: gold,
               onTap: () async {
                 final ds = locator<WaterDataSource>();
                 await ds.addWaterRecord(250, DateTime.now());
@@ -36,7 +40,7 @@ class QuickActionBar extends StatelessWidget {
             _QuickChip(
               icon: Icons.qr_code_scanner,
               label: 'Scan',
-              color: Theme.of(context).colorScheme.primary,
+              color: gold,
               onTap: () => Navigator.of(context).pushNamed(
                 NavigationOptions.scannerRoute,
                 arguments: ScannerScreenArguments(
@@ -48,7 +52,7 @@ class QuickActionBar extends StatelessWidget {
             _QuickChip(
               icon: Icons.coffee,
               label: 'Coffee',
-              color: Colors.brown,
+              color: gold,
               onTap: () async {
                 final ds = locator<CaffeineDataSource>();
                 await ds.addLog(CaffeineLogOB(
@@ -61,7 +65,7 @@ class QuickActionBar extends StatelessWidget {
             _QuickChip(
               icon: Icons.timer,
               label: 'Fast 16:8',
-              color: Colors.purple,
+              color: gold,
               onTap: () async {
                 final ds = locator<FastingDataSource>();
                 final active = await ds.getActiveSession();

@@ -3,6 +3,7 @@ import 'package:opennutritracker/core/db/data_sources/sleep_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/supplement_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/water_data_source.dart';
 import 'package:opennutritracker/core/services/streak_service.dart';
+import 'package:opennutritracker/core/styles/color_schemes.dart';
 import 'package:opennutritracker/core/domain/usecase/get_intake_usecase.dart';
 import 'package:opennutritracker/core/utils/locator.dart';
 
@@ -78,6 +79,10 @@ class _TodayViewCardState extends State<TodayViewCard> {
         ? (widget.caloriesConsumed / widget.calorieGoal).clamp(0.0, 1.0)
         : 0.0;
 
+    final isLight = theme.brightness == Brightness.light;
+    final gold = isLight ? ayuGoldMuted : ayuGoldLight;
+    final goldDim = gold.withValues(alpha: 0.6);
+
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: Padding(
@@ -89,31 +94,31 @@ class _TodayViewCardState extends State<TodayViewCard> {
               value: calPct,
               label: '${widget.caloriesConsumed.round()}',
               subtitle: 'kcal',
-              color: calPct > 1 ? Colors.red : theme.colorScheme.secondary,
+              color: calPct > 1 ? Colors.red : gold,
             ),
             _MiniGauge(
               value: _waterPct,
               label: '${(_waterPct * 100).round()}%',
               subtitle: 'water',
-              color: Colors.blue,
+              color: gold,
             ),
             _MiniStat(
               value: '$_suppsTaken/$_suppsTotal',
               subtitle: 'supps',
               color: _suppsTaken == _suppsTotal && _suppsTotal > 0
-                  ? Colors.green
-                  : Colors.orange,
+                  ? gold
+                  : goldDim,
             ),
             if (_sleepHours != null)
               _MiniStat(
                 value: '${_sleepHours!.toStringAsFixed(1)}h',
                 subtitle: 'sleep',
-                color: _sleepHours! >= 7 ? Colors.green : Colors.orange,
+                color: _sleepHours! >= 7 ? gold : goldDim,
               ),
             _MiniStat(
               value: '$_streak',
               subtitle: 'streak',
-              color: _streak >= 7 ? Colors.green : Colors.orange,
+              color: _streak >= 7 ? gold : goldDim,
             ),
           ],
         ),

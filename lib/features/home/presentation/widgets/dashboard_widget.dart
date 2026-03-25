@@ -1,5 +1,6 @@
 import 'package:animated_flip_counter/animated_flip_counter.dart';
 import 'package:flutter/material.dart';
+import 'package:opennutritracker/core/styles/color_schemes.dart';
 import 'package:opennutritracker/features/home/presentation/widgets/macro_nutriments_widget.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:opennutritracker/generated/l10n.dart';
@@ -52,7 +53,6 @@ class _DashboardWidgetState extends State<DashboardWidget> {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Card(
-        elevation: 1,
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -90,9 +90,16 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                     animation: true,
                     percent: gaugeValue,
                     arcType: ArcType.FULL,
-                    progressColor: Theme.of(context).colorScheme.primary,
+                    progressColor: gaugeValue >= 1.0
+                        ? Colors.red
+                        : Theme.of(context).brightness == Brightness.light
+                            ? ayuGoldMuted
+                            : ayuGoldLight,
                     arcBackgroundColor:
-                        Theme.of(context).colorScheme.primary.withAlpha(50),
+                        (Theme.of(context).brightness == Brightness.light
+                                ? ayuGoldMuted
+                                : ayuGoldLight)
+                            .withAlpha(50),
                     center: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
