@@ -1,6 +1,8 @@
 import 'package:logging/logging.dart';
 import 'package:opennutritracker/core/db/data_sources/activity_snapshot_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/biomarker_data_source.dart';
+import 'package:opennutritracker/core/services/agent_context.dart';
+import 'package:opennutritracker/core/services/data_collection_agent.dart';
 import 'package:opennutritracker/core/db/data_sources/config_data_source_ob.dart';
 import 'package:opennutritracker/core/db/data_sources/eco_score_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/fasting_data_source.dart';
@@ -38,31 +40,7 @@ class AgentSuggestion {
   });
 }
 
-/// Shared context built by ObservationAgent, read by individual agents.
-/// Lets observations inform which agents fire and what they prioritize.
-class AgentContext {
-  bool gymToday = false;
-  bool sedentaryDay = false;
-  bool poorSleep = false;
-  bool lowMood = false;
-  bool pressureDrop = false;
-  bool highCaffeine = false;
-  bool lowProtein = false;
-  String? currentPlace; // coffee_shop, grocery, restaurant, gym, pharmacy
-  String? currentPlaceName;
-  final Set<String> observationTypes = {};
-
-  /// Observations already covered these topics — agents should skip them
-  bool isAlreadyCovered(String agentType) {
-    // If observation engine already flagged gym+protein, don't also show nutrient_gap for protein
-    if (agentType == 'nutrient_gap' && observationTypes.contains('gym_protein')) return true;
-    // If sedentary+sleep observation fired, don't also show sedentary agent
-    if (agentType == 'sedentary' && observationTypes.contains('sedentary_sleep')) return true;
-    // If pressure+mood fired, don't also show outdoor_time
-    if (agentType == 'outdoor_time' && observationTypes.contains('pressure_mood')) return true;
-    return false;
-  }
-}
+// AgentContext is defined in agent_context.dart and re-exported via the import above.
 
 class AgentService {
   static final _log = Logger('AgentService');
@@ -107,6 +85,9 @@ class AgentService {
     try { suggestions.addAll(await _peptideReminderAgent()); } catch (_) {}
     try { suggestions.addAll(await _ecoScoreAgent()); } catch (_) {}
     try { suggestions.addAll(await _calendarAgent()); } catch (_) {}
+
+    // Phase 3: Data Collection Agent — sends targeted notification for missing data
+    try { await DataCollectionAgent.sendDataRequest(ctx); } catch (_) {}
 
     // Priority order: observations first, then reminders, then informational
     const typePriority = {

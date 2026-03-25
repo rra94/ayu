@@ -7,6 +7,7 @@ import 'package:opennutritracker/core/db/data_sources/supplement_data_source.dar
 import 'package:opennutritracker/core/db/data_sources/symptom_data_source.dart';
 import 'package:opennutritracker/core/domain/usecase/get_intake_usecase.dart';
 import 'package:opennutritracker/core/domain/usecase/get_user_usecase.dart';
+import 'package:opennutritracker/core/services/agent_context.dart';
 import 'package:opennutritracker/core/services/agent_service.dart';
 import 'package:opennutritracker/core/services/barometer_service.dart';
 import 'package:opennutritracker/core/services/bio_age_trend_service.dart';
