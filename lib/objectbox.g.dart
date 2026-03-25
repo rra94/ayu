@@ -21,6 +21,7 @@ import 'core/db/entities/config_ob.dart';
 import 'core/db/entities/dexa_scan_ob.dart';
 import 'core/db/entities/eco_score_ob.dart';
 import 'core/db/entities/fasting_session_ob.dart';
+import 'core/db/entities/food_cache_ob.dart';
 import 'core/db/entities/grocery_item_ob.dart';
 import 'core/db/entities/gut_health_item_ob.dart';
 import 'core/db/entities/habit_log_ob.dart';
@@ -1926,6 +1927,58 @@ final _entities = <obx_int.ModelEntity>[
     relations: <obx_int.ModelRelation>[],
     backlinks: <obx_int.ModelBacklink>[],
   ),
+  obx_int.ModelEntity(
+    id: const obx_int.IdUid(32, 7040856810817177465),
+    name: 'FoodCacheOB',
+    lastPropertyId: const obx_int.IdUid(7, 6011228600432161655),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(1, 8610739434669038656),
+        name: 'id',
+        type: 6,
+        flags: 1,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(2, 2760681917921042280),
+        name: 'query',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 7624453928216188244),
+        name: 'source',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(4, 7389044845480922436),
+        name: 'resultsJson',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(5, 7291120666453141318),
+        name: 'resultCount',
+        type: 6,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(6, 2592804485699450135),
+        name: 'cachedAt',
+        type: 10,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(7, 6011228600432161655),
+        name: 'hitCount',
+        type: 6,
+        flags: 0,
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[],
+    backlinks: <obx_int.ModelBacklink>[],
+  ),
 ];
 
 /// Shortcut for [obx.Store.new] that passes [getObjectBoxModel] and for Flutter
@@ -1966,7 +2019,7 @@ Future<obx.Store> openStore({
 obx_int.ModelDefinition getObjectBoxModel() {
   final model = obx_int.ModelInfo(
     entities: _entities,
-    lastEntityId: const obx_int.IdUid(31, 809104814203709671),
+    lastEntityId: const obx_int.IdUid(32, 7040856810817177465),
     lastIndexId: const obx_int.IdUid(2, 7319863865959781371),
     lastRelationId: const obx_int.IdUid(0, 0),
     lastSequenceId: const obx_int.IdUid(0, 0),
@@ -4522,6 +4575,75 @@ obx_int.ModelDefinition getObjectBoxModel() {
         return object;
       },
     ),
+    FoodCacheOB: obx_int.EntityDefinition<FoodCacheOB>(
+      model: _entities[31],
+      toOneRelations: (FoodCacheOB object) => [],
+      toManyRelations: (FoodCacheOB object) => {},
+      getId: (FoodCacheOB object) => object.id,
+      setId: (FoodCacheOB object, int id) {
+        object.id = id;
+      },
+      objectToFB: (FoodCacheOB object, fb.Builder fbb) {
+        final queryOffset = fbb.writeString(object.query);
+        final sourceOffset = fbb.writeString(object.source);
+        final resultsJsonOffset = fbb.writeString(object.resultsJson);
+        fbb.startTable(8);
+        fbb.addInt64(0, object.id);
+        fbb.addOffset(1, queryOffset);
+        fbb.addOffset(2, sourceOffset);
+        fbb.addOffset(3, resultsJsonOffset);
+        fbb.addInt64(4, object.resultCount);
+        fbb.addInt64(5, object.cachedAt.millisecondsSinceEpoch);
+        fbb.addInt64(6, object.hitCount);
+        fbb.finish(fbb.endTable());
+        return object.id;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
+        final idParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          4,
+          0,
+        );
+        final queryParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 6, '');
+        final sourceParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 8, '');
+        final resultsJsonParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 10, '');
+        final resultCountParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          12,
+          0,
+        );
+        final cachedAtParam = DateTime.fromMillisecondsSinceEpoch(
+          const fb.Int64Reader().vTableGet(buffer, rootOffset, 14, 0),
+        );
+        final hitCountParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          16,
+          0,
+        );
+        final object = FoodCacheOB(
+          id: idParam,
+          query: queryParam,
+          source: sourceParam,
+          resultsJson: resultsJsonParam,
+          resultCount: resultCountParam,
+          cachedAt: cachedAtParam,
+          hitCount: hitCountParam,
+        );
+
+        return object;
+      },
+    ),
   };
 
   return obx_int.ModelDefinition(model, bindings);
@@ -5921,5 +6043,43 @@ class SearchHistoryOB_ {
   /// See [SearchHistoryOB.lastUsed].
   static final lastUsed = obx.QueryDateProperty<SearchHistoryOB>(
     _entities[30].properties[5],
+  );
+}
+
+/// [FoodCacheOB] entity fields to define ObjectBox queries.
+class FoodCacheOB_ {
+  /// See [FoodCacheOB.id].
+  static final id = obx.QueryIntegerProperty<FoodCacheOB>(
+    _entities[31].properties[0],
+  );
+
+  /// See [FoodCacheOB.query].
+  static final query = obx.QueryStringProperty<FoodCacheOB>(
+    _entities[31].properties[1],
+  );
+
+  /// See [FoodCacheOB.source].
+  static final source = obx.QueryStringProperty<FoodCacheOB>(
+    _entities[31].properties[2],
+  );
+
+  /// See [FoodCacheOB.resultsJson].
+  static final resultsJson = obx.QueryStringProperty<FoodCacheOB>(
+    _entities[31].properties[3],
+  );
+
+  /// See [FoodCacheOB.resultCount].
+  static final resultCount = obx.QueryIntegerProperty<FoodCacheOB>(
+    _entities[31].properties[4],
+  );
+
+  /// See [FoodCacheOB.cachedAt].
+  static final cachedAt = obx.QueryDateProperty<FoodCacheOB>(
+    _entities[31].properties[5],
+  );
+
+  /// See [FoodCacheOB.hitCount].
+  static final hitCount = obx.QueryIntegerProperty<FoodCacheOB>(
+    _entities[31].properties[6],
   );
 }

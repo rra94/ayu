@@ -30,6 +30,7 @@ import 'package:opennutritracker/core/db/entities/pressure_reading_ob.dart';
 import 'package:opennutritracker/core/db/entities/saved_location_ob.dart';
 import 'package:opennutritracker/core/db/entities/eco_score_ob.dart';
 import 'package:opennutritracker/core/db/entities/search_history_ob.dart';
+import 'package:opennutritracker/core/db/entities/food_cache_ob.dart';
 import 'package:opennutritracker/objectbox.g.dart';
 
 class ObjectBoxDBProvider extends ChangeNotifier {
@@ -66,6 +67,7 @@ class ObjectBoxDBProvider extends ChangeNotifier {
   late Box<PeptideLogOB> peptideLogBox;
   late Box<EcoScoreOB> ecoScoreBox;
   late Box<SearchHistoryOB> searchHistoryBox;
+  late Box<FoodCacheOB> foodCacheBox;
 
   Future<void> init() async {
     final dir = await getApplicationDocumentsDirectory();
@@ -102,6 +104,7 @@ class ObjectBoxDBProvider extends ChangeNotifier {
     peptideLogBox = store.box<PeptideLogOB>();
     ecoScoreBox = store.box<EcoScoreOB>();
     searchHistoryBox = store.box<SearchHistoryOB>();
+    foodCacheBox = store.box<FoodCacheOB>();
   }
 
   void close() {

@@ -69,6 +69,7 @@ import 'package:opennutritracker/core/db/data_sources/supplement_data_source.dar
 import 'package:opennutritracker/core/db/data_sources/peptide_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/eco_score_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/search_history_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/food_cache_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/stool_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/symptom_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/weight_data_source.dart';
@@ -255,6 +256,8 @@ Future<void> initLocator() async {
       () => EcoScoreDataSource(objectBoxProvider.ecoScoreBox));
   locator.registerLazySingleton<SearchHistoryDataSource>(
       () => SearchHistoryDataSource(objectBoxProvider.searchHistoryBox));
+  locator.registerLazySingleton<FoodCacheDataSource>(
+      () => FoodCacheDataSource(objectBoxProvider.foodCacheBox));
 
   // Store (for direct box access where needed)
   locator.registerLazySingleton<Store>(() => objectBoxProvider.store);

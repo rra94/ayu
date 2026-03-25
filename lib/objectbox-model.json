@@ -1590,9 +1590,53 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "32:7040856810817177465",
+      "lastPropertyId": "7:6011228600432161655",
+      "name": "FoodCacheOB",
+      "properties": [
+        {
+          "id": "1:8610739434669038656",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:2760681917921042280",
+          "name": "query",
+          "type": 9
+        },
+        {
+          "id": "3:7624453928216188244",
+          "name": "source",
+          "type": 9
+        },
+        {
+          "id": "4:7389044845480922436",
+          "name": "resultsJson",
+          "type": 9
+        },
+        {
+          "id": "5:7291120666453141318",
+          "name": "resultCount",
+          "type": 6
+        },
+        {
+          "id": "6:2592804485699450135",
+          "name": "cachedAt",
+          "type": 10
+        },
+        {
+          "id": "7:6011228600432161655",
+          "name": "hitCount",
+          "type": 6
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "31:809104814203709671",
+  "lastEntityId": "32:7040856810817177465",
   "lastIndexId": "2:7319863865959781371",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",
