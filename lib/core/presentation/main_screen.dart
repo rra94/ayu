@@ -219,18 +219,37 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
                 );
               },
             ),
-            if (_photoAnalysisEnabled)
-              ListTile(
-                leading: const Icon(Icons.restaurant),
-                title: const Text('Photo Meal'),
-                subtitle: const Text('Take a photo — AI identifies food & calories'),
-                onTap: () {
-                  Navigator.pop(ctx);
+            ListTile(
+              leading: const Icon(Icons.restaurant),
+              title: const Text('Photo Meal'),
+              subtitle: Text(_photoAnalysisEnabled
+                  ? 'Take a photo — AI identifies food & calories'
+                  : 'Enable in Settings to use AI photo analysis'),
+              onTap: () {
+                Navigator.pop(ctx);
+                if (_photoAnalysisEnabled) {
                   Navigator.of(context).pushNamed(
                     NavigationOptions.photoMealRoute,
                   );
-                },
-              ),
+                } else {
+                  Navigator.of(context).pushNamed(
+                    NavigationOptions.settingsRoute,
+                  );
+                }
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.edit_note),
+              title: const Text('Describe Meal'),
+              subtitle: const Text('Type what you ate — we look up nutrition'),
+              onTap: () {
+                Navigator.pop(ctx);
+                Navigator.of(context).pushNamed(
+                  NavigationOptions.photoMealRoute,
+                  arguments: 'manual',
+                );
+              },
+            ),
             const SizedBox(height: 8),
           ],
         ),

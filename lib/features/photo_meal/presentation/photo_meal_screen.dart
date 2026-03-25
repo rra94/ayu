@@ -40,7 +40,15 @@ class _PhotoMealScreenState extends State<PhotoMealScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _takePhoto());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Check if launched in manual mode (from "Describe Meal")
+      final args = ModalRoute.of(context)?.settings.arguments;
+      if (args == 'manual') {
+        setState(() => _showManualInput = true);
+      } else {
+        _takePhoto();
+      }
+    });
   }
 
   @override
