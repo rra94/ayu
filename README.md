@@ -10,138 +10,111 @@
   <a href="https://github.com/rra94/ayu/issues"><img src="https://img.shields.io/github/issues/rra94/ayu.svg" /></a>
 </p>
 
-## What is Ayu?
+---
 
-Ayu is a comprehensive **nutrition and longevity tracker** for iOS. It goes beyond calorie counting — tracking micronutrients, biomarkers, sleep, fasting, gut health, supplements, and more — all designed around evidence-based longevity protocols.
+**Ayu** is a privacy-first **nutrition and longevity tracker** for iOS. It goes beyond calorie counting — tracking micronutrients, biomarkers, sleep, fasting, gut health, supplements, peptides, and more — all powered by on-device intelligence with zero cloud dependency.
 
-Built on top of [OpenNutriTracker](https://github.com/simonoppowa/OpenNutriTracker) (GPLv3).
+Originally forked from [OpenNutriTracker](https://github.com/simonoppowa/OpenNutriTracker) (GPLv3).
+
+---
 
 ## Features
 
-### Nutrition
-- Barcode scanning with OFF + USDA FDC fallback
+### Food & Nutrition
+- Barcode scanning via Open Food Facts + USDA FDC fallback
 - 23 vitamins & minerals with RDA% progress bars
-- Added sugar tracking
-- Glycemic load estimation (~200 food GI database)
-- Net carbs (total carbs - fiber)
-- Per-serving nutrient display
-- Nutrient synergy checker — 17 rules showing enhancers/inhibitors per meal (iron+C, calcium+iron, etc.)
+- Glycemic load estimation, net carbs, added sugar tracking
+- Nutrient synergy checker (17 evidence-based rules per meal)
+- Bioavailability engine — estimates real absorption based on meal context
+- Smart food recommendations to fill micronutrient gaps
 - Food allergen alerts (user-configured, persisted)
 - Custom food entry for items not in database
+- 30 Plants a Week tracker for gut microbiome diversity
 
-### Home Dashboard
-- Water tracking with daily goal
-- Daily habits checklist with smart time-based reminders
-- Gut health panel — auto-detects 64 harmful additives from OFF E-numbers
-- Today View card (calories, water, supplements, sleep, streak at a glance)
-- Activity Dashboard — 2-row card: steps, activity type, calories, outdoor time (today) + gym visits, workouts, avg HR (this week)
-- Quick action bar (water +250ml, scan, coffee, fast)
-- Supplement checklist with take/skip logging
-- Peptide tracker — dosing cycles, reconstitution calculator, injection site rotation
-- 30 Plants a Week tracker — counts unique plant foods for gut microbiome diversity
-- Fasting timer (16:8, 18:6, 20:4, OMAD presets)
-- NSDR / meditation countdown timer
+### Daily Dashboard
+- Today View — calories, water, supplements, sleep, streak at a glance
+- Activity Dashboard — steps, activity type, calories, outdoor time + gym visits, workouts, avg HR
+- Quick actions — water +250ml, scan barcode, log coffee, start fast
+- Gut health panel — auto-detects 64 harmful additives from E-numbers
+- Daily habits checklist with time-based reminders
 - Caffeine tracking
 
-### Stats Tab
-- TDEE/BMR with thermic effect of food (auto from macros)
-- Weight tracker with fl_chart, target line, and ETA
-- 25 biomarkers with normal + longevity-optimal ranges (red/yellow/green)
-- 8 wellness biomarkers (hair, skin, teeth, nails, energy, sleep quality, stress, Norwood scale)
+### Supplements & Peptides
+- Supplement stack with daily take/skip logging
+- Peptide tracker — dosing cycles, reconstitution calculator, injection site rotation with body map
+- Blueprint Mode — Bryan Johnson's longevity protocol targets
+
+### Body & Biomarkers
+- 25 biomarkers with normal + longevity-optimal ranges
+- 8 wellness biomarkers (hair, skin, teeth, nails, energy, sleep, stress, Norwood scale)
 - Biological age (Levine 2018 Phenotypic Age from 9 blood markers)
 - Longevity Score (0-100 composite)
-- Food-to-Feeling correlation engine (symptom -> trigger food analysis)
-- Bristol Stool Scale logger with 30-day distribution
-- DEXA body composition manual entry
-- Meal timing 24h clock with eating window visualization
-- Cheat meal streak tracker
-- Weekly review digest (wins, improvements, week-over-week trends)
-- Grocery/pantry tracking with receipt scanning
+- DEXA body composition, weight trends with ETA
+- Bristol Stool Scale with 30-day distribution
+- Food-to-Feeling correlation (symptom to trigger food analysis)
+- 16 health conditions with nutrient rules (including cosmetic: acne, hair loss, eczema)
 
-### Longevity Suite
-- Supplement stack with daily adherence tracking
-- Intermittent fasting timer with circular countdown + auto-start/stop
-- Sleep logging (bedtime, wake, quality 1-5) with 7-day trends
-- Meal timing analysis
+### Timers & Streaks
+- Intermittent fasting (16:8, 18:6, 20:4, OMAD) with auto-start/stop
+- NSDR / meditation countdown timer
+- Sleep logging (bedtime, wake, quality 1-5) with trends
 - Clean eating streak calculator
+- Meal timing analysis with eating window visualization
 
 ### Phone Sensors
-- CoreMotion activity detection (stationary, walking, running, cycling, automotive)
-- Sedentary alerts (3+ hours sitting)
-- CoreLocation gym detection (significant location changes, auto-labels after 3+ visits)
-- Outdoor time estimation for vitamin D correlation
-- Barometric pressure tracking for weather-mood correlation
+- CoreMotion — activity detection, sedentary alerts after 3+ hours
+- CoreLocation — gym detection via significant location changes, outdoor time estimation
+- Barometer — pressure tracking for weather-mood correlation
+- Data auto-pruned (90 days snapshots, 30 days locations)
+
+### On-Device Intelligence
+- **11 agents** running locally: meal pattern, nutrient gap, fasting adapt, supplement reminder, hydration, biomarker staleness, sedentary, gym frequency, outdoor time, peptide reminder
+- **Cross-agent observations**: stress+HR contradiction, sleep+caffeine, mood+nutrition, sleep+eating window, pressure+mood, sedentary+sleep, gym+protein
+- Smart notifications for missing entries
+- Weekly review with automated wins/improvements
 
 ### Integrations
-- Apple HealthKit sync (weight, sleep, HR, HRV, steps, workouts)
-- HRV vs. late-meal correlation analysis
-- Longevity insights engine (biomarker-based recommendations)
-- iOS Lock Screen widget (calorie ring + streak) and Home Screen widget (calories, water, supplements, streak)
-
-### Intelligence
-- 11 on-device agents: meal pattern, nutrient gap, fasting adapt, supplement, hydration, biomarker, sedentary, gym frequency, outdoor time, peptide reminder, cross-domain observation
-- Cross-agent observation engine: stress+HR, sleep+caffeine, mood+nutrition, sleep+eating window, pressure+mood, sedentary+sleep, gym+protein
-- Smart notifications for missing entries (meals, water, supplements, sleep)
-- Auto-start fasting after meal logging gap
-- Data retention service — auto-prunes sensor data (90d snapshots, 30d locations)
-- DailySummaryEntity — aggregates all daily data
-- Weekly review service with automated wins/improvements detection
-- Blueprint Mode — Bryan Johnson's longevity protocol targets and supplement stack
-
-### Smart Nutrition
-- **Bioavailability engine** — estimates real absorption for 10+ nutrients based on meal context
-  - Iron: 2-35% depending on heme vs non-heme, vitamin C, calcium, phytates
-  - Calcium: 5-40% (kale 49% bioavailable vs spinach 5% due to oxalates)
-  - Fat-soluble vitamins (A, D, E, K): 10-90% based on dietary fat in meal
-  - Shows enhancers/inhibitors detected in your meals
-- **Food recommendations** — suggests specific foods to fill micronutrient gaps
-  - Shows both raw content AND bioavailable amount
-  - Gender/age-aware RDA targets, ranked by lowest %RDA
-  - Absorption tips (e.g., "Pair with vitamin C to boost iron 2-6x")
-- Research-backed: WHO/FAO 2001, Hurrell & Egli 2010, Weaver 1999, Schuchardt 2017
-
-### On-Device Vision
-- Apple Vision OCR for receipt scanning (no cloud, no API key)
-- Auto-classifies grocery items from receipts (produce, protein, dairy, etc.)
+- Apple HealthKit (weight, sleep, HR, HRV, steps, workouts)
+- iOS Lock Screen + Home Screen widgets (calories, water, supplements, streak)
+- Apple Vision OCR for receipt scanning (grocery classification)
 - Supplement auto-detection from barcode scans
 
-### Health Awareness
-- 16 health conditions with nutrient rules (including cosmetic: acne, dental, eczema, hair loss)
-- Configurable during onboarding and updateable in settings
-- Condition-specific nutrient increase/avoid recommendations
+---
 
 ## Tech Stack
 
-```
-Flutter (iOS only — Android deprecated)
-ObjectBox (local DB, 29 entities)
-BLoC (state management)
-fl_chart (charts)
-health (HealthKit)
-flutter_local_notifications
-home_widget (WidgetKit bridge)
-Apple Vision framework (on-device OCR)
-CoreMotion / CoreLocation / CMAltimeter (phone sensors)
-```
-
-> **Note:** Android support is deprecated. Ayu is developed and tested exclusively for iOS.
+| Layer | Technology |
+|-------|-----------|
+| Framework | Flutter (iOS only) |
+| Database | ObjectBox (29 entities, all local) |
+| State | BLoC |
+| Charts | fl_chart |
+| Health | Apple HealthKit via `health` package |
+| Notifications | flutter_local_notifications |
+| Widgets | WidgetKit via `home_widget` |
+| Vision | Apple Vision framework (on-device OCR) |
+| Sensors | CoreMotion, CoreLocation, CMAltimeter |
 
 ## Data Sources
 
-- [Open Food Facts](https://world.openfoodfacts.org/) — barcode + product search
-- [USDA FDC](https://fdc.nal.usda.gov/) — branded food fallback for barcodes
-- [University of Sydney GI Database](https://glycemicindex.com/) — glycemic index values
-- WHO/FAO mineral bioavailability data (2001) — absorption rate calculations
-- Peer-reviewed nutrient interaction research — enhancer/inhibitor rules
+| Source | Used For |
+|--------|----------|
+| [Open Food Facts](https://world.openfoodfacts.org/) | Barcode + product search |
+| [USDA FDC](https://fdc.nal.usda.gov/) | Branded food fallback |
+| [University of Sydney GI Database](https://glycemicindex.com/) | Glycemic index values |
+| WHO/FAO 2001 | Mineral bioavailability rates |
+| Peer-reviewed research | Nutrient interaction rules |
 
 ## Privacy
 
-- All data stored locally on device (ObjectBox)
-- HealthKit data never leaves the device
-- Location data never exported or synced (auto-pruned after 30 days)
-- On-device OCR (Apple Vision, no cloud)
-- No cloud dependency, no accounts, no tracking
-- Open source
+All computation happens on your device. Nothing leaves your phone.
+
+- ObjectBox local database — no cloud sync
+- HealthKit data stays on device
+- Location data never exported (auto-pruned after 30 days)
+- OCR processed locally via Apple Vision
+- No accounts, no analytics, no tracking
+- Open source (GPLv3)
 
 ## Getting Started
 
@@ -156,16 +129,16 @@ See [GettingStarted.md](GettingStarted.md) for detailed setup.
 
 ## Disclaimer
 
-Ayu is not a medical application. All data provided is not validated and should be used with caution. Consult a healthcare professional before making health decisions. Use during illness, pregnancy, or lactation is not recommended.
+Ayu is not a medical application. All data provided is not validated and should be used with caution. Consult a healthcare professional before making health decisions.
 
 ## Acknowledgments
 
-- Originally forked from [OpenNutriTracker](https://github.com/simonoppowa/OpenNutriTracker) by Simon Oppowa
-- Longevity protocols informed by research from Peter Attia, Bryan Johnson (Blueprint), Andrew Huberman
-- Biomarker optimal ranges from [Longevity Coach](https://github.com/longevitycoach) methodology
-- Biological age calculation based on [Levine 2018](https://pubmed.ncbi.nlm.nih.gov/29676998/)
-- Bioavailability data from [Hurrell & Egli 2010](https://pubmed.ncbi.nlm.nih.gov/20200264/), [Weaver 1999](https://pubmed.ncbi.nlm.nih.gov/10193899/), [Schuchardt & Hahn 2017](https://pubmed.ncbi.nlm.nih.gov/28587022/)
+- [OpenNutriTracker](https://github.com/simonoppowa/OpenNutriTracker) by Simon Oppowa — original foundation
+- Longevity protocols: Peter Attia, Bryan Johnson (Blueprint), Andrew Huberman
+- Biomarker ranges: [Longevity Coach](https://github.com/longevitycoach)
+- Biological age: [Levine 2018](https://pubmed.ncbi.nlm.nih.gov/29676998/)
+- Bioavailability: [Hurrell & Egli 2010](https://pubmed.ncbi.nlm.nih.gov/20200264/), [Weaver 1999](https://pubmed.ncbi.nlm.nih.gov/10193899/), [Schuchardt & Hahn 2017](https://pubmed.ncbi.nlm.nih.gov/28587022/)
 
 ## License
 
-This project is licensed under the GNU General Public License v3.0. See the [LICENSE](LICENSE) file for details.
+GNU General Public License v3.0 — see [LICENSE](LICENSE).
