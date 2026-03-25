@@ -66,6 +66,13 @@ class HealthKitService {
     }
   }
 
+  /// First-ever sync: pull 90 days of history to kickstart circadian profile,
+  /// HRV baselines, and sleep score trends. Call once after permissions granted.
+  static Future<SyncResult> syncInitial() async {
+    _log.info('Running initial 90-day HealthKit backfill');
+    return sync(days: 90);
+  }
+
   /// Sync data from HealthKit for the last [days] days.
   static Future<SyncResult> sync({int days = 7}) async {
     final now = DateTime.now();

@@ -27,6 +27,8 @@ class _HealthKitSyncCardState extends State<HealthKitSyncCard> {
   Future<void> _sync() async {
     setState(() => _syncing = true);
 
+    final isFirstSync = !_hasPermission;
+
     if (!_hasPermission) {
       final granted = await HealthKitService.requestPermissions();
       if (!granted) {
@@ -36,7 +38,10 @@ class _HealthKitSyncCardState extends State<HealthKitSyncCard> {
       setState(() => _hasPermission = true);
     }
 
-    final result = await HealthKitService.sync();
+    // First-ever sync: pull 90 days to kickstart circadian, HRV, sleep baselines
+    final result = isFirstSync
+        ? await HealthKitService.syncInitial()
+        : await HealthKitService.sync();
     setState(() {
       _lastResult = result;
       _syncing = false;
