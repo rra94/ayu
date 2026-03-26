@@ -1,46 +1,41 @@
 # Getting Started
-For setup first you need the following things:
-- Flutter Version 3.27.1
-- IDE like Android Studio or VS Code with Flutter Plugin installed.
+
+## Prerequisites
+- Flutter 3.27.1+
+- Xcode 15+ with iOS 17 SDK
+- CocoaPods (`gem install cocoapods`)
 
 ## Steps to run App
-1.⁠ ⁠Clone the repository with Git
 
-```git clone https://github.com/simonoppowa/OpenNutriTracker.git```
+1. Clone the repository
 
-2.⁠ ⁠Get Dependencies
-
-```flutter pub get```
-
-3.⁠ ⁠Run Build Runner to generate Files
-
-```flutter pub run build_runner build```
-
-4.⁠ ⁠Run App
-
-```flutter run lib/main.dart```
-
-## Running the Application
-
-The application can be run on multiple platforms. Here are the commands for each:
-
-### Web (Chrome)
 ```bash
-flutter run -d chrome
+git clone https://github.com/rra94/ayu.git
+cd ayu
 ```
 
-### iOS
+2. Get dependencies
+
 ```bash
-open -a Simulator
+flutter pub get
+```
+
+3. Install iOS pods
+
+```bash
+cd ios && pod install && cd ..
+```
+
+4. Run build runner to generate ObjectBox + JSON files
+
+```bash
+dart run build_runner build --delete-conflicting-outputs
+```
+
+5. Run on iPhone / Simulator
+
+```bash
 flutter run
 ```
 
-### macOS
-```bash
-flutter run -d macos
-```
-
-### Android
-```bash
-flutter run -d android
-```
+> **Note:** Ayu is iOS-only. Android, Web, and macOS are not supported.

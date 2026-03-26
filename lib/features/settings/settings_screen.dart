@@ -8,6 +8,21 @@ import 'package:opennutritracker/core/utils/locator.dart';
 import 'package:opennutritracker/core/utils/theme_mode_provider.dart';
 import 'package:opennutritracker/core/utils/url_const.dart';
 import 'package:opennutritracker/features/diary/presentation/bloc/calendar_day_bloc.dart';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:opennutritracker/core/db/data_sources/biomarker_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/fasting_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/intake_data_source_ob.dart';
+import 'package:opennutritracker/core/db/data_sources/sleep_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/supplement_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/water_data_source.dart';
+import 'package:opennutritracker/core/services/allergen_service.dart';
+import 'package:opennutritracker/core/services/backup_service.dart';
+import 'package:opennutritracker/core/services/health_condition_service.dart';
+import 'package:opennutritracker/core/utils/csv_exporter.dart';
+import 'package:opennutritracker/features/profile/profile_page.dart';
+import 'package:opennutritracker/features/settings/presentation/widgets/goal_settings_dialog.dart';
 import 'package:opennutritracker/features/diary/presentation/bloc/diary_bloc.dart';
 import 'package:opennutritracker/features/home/presentation/bloc/home_bloc.dart';
 import 'package:opennutritracker/features/profile/presentation/bloc/profile_bloc.dart';
@@ -18,6 +33,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:opennutritracker/core/db/data_sources/config_data_source_ob.dart';
 import 'package:opennutritracker/features/settings/presentation/widgets/calculations_dialog.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -34,6 +50,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
   late DiaryBloc _diaryBloc;
   late CalendarDayBloc _calendarDayBloc;
 
+  bool _showSustainability = false;
+  bool _photoAnalysis = false;
+  int _stepGoal = 10000;
+
   @override
   void initState() {
     _settingsBloc = locator<SettingsBloc>();
@@ -42,6 +62,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _diaryBloc = locator<DiaryBloc>();
     _calendarDayBloc = locator<CalendarDayBloc>();
     super.initState();
+    _loadSustainabilitySetting();
+    _loadPhotoAnalysisSetting();
+    _loadStepGoal();
+  }
+
+  void _loadSustainabilitySetting() {
+    try {
+      final configDs = locator<ConfigDataSourceOB>();
+      final enabled = configDs.getShowSustainability();
+      if (mounted) setState(() => _showSustainability = enabled);
+    } catch (_) {}
+  }
+
+  void _loadPhotoAnalysisSetting() {
+    try {
+      final configDs = locator<ConfigDataSourceOB>();
+      final enabled = configDs.getShowPhotoAnalysis();
+      if (mounted) setState(() => _photoAnalysis = enabled);
+    } catch (_) {}
+  }
+
+  void _loadStepGoal() {
+    try {
+      final configDs = locator<ConfigDataSourceOB>();
+      final goal = configDs.getDailyStepGoal();
+      if (mounted) setState(() => _stepGoal = goal);
+    } catch (_) {}
   }
 
   @override
@@ -58,9 +105,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
           } else if (state is SettingsLoadingState) {
             return const Center(child: CircularProgressIndicator());
           } else if (state is SettingsLoadedState) {
+            final theme = Theme.of(context);
             return ListView(
               children: [
-                const SizedBox(height: 16.0),
+                // ── General ────────────────────────────────────────────────
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+                  child: Text(S.of(context).generalSectionLabel,
+                      style: theme.textTheme.labelLarge?.copyWith(
+                          color: theme.colorScheme.primary,
+                          fontWeight: FontWeight.w600)),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.account_circle_outlined),
+                  title: Text(S.of(context).profileLabel),
+                  subtitle: Text(S.of(context).profileSubtitle),
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const ProfilePage()),
+                  ),
+                ),
                 ListTile(
                   leading: const Icon(Icons.ac_unit_outlined),
                   title: Text(S.of(context).settingsUnitsLabel),
@@ -73,15 +136,106 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   onTap: () => _showCalculationsDialog(context),
                 ),
                 ListTile(
+                  leading: const Icon(Icons.flag_outlined),
+                  title: Text(S.of(context).weightMacroGoalsTitle),
+                  subtitle: Text(S.of(context).weightMacroGoalsSubtitle),
+                  onTap: () => _showGoalSettingsDialog(context),
+                ),
+                ListTile(
                   leading: const Icon(Icons.brightness_medium_outlined),
                   title: Text(S.of(context).settingsThemeLabel),
                   onTap: () => _showThemeDialog(context, state.appTheme),
+                ),
+                // ── Health ─────────────────────────────────────────────────
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+                  child: Text(S.of(context).healthSectionLabel,
+                      style: theme.textTheme.labelLarge?.copyWith(
+                          color: theme.colorScheme.primary,
+                          fontWeight: FontWeight.w600)),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.warning_amber),
+                  title: Text(S.of(context).foodAllergensTitle),
+                  subtitle: Text(AllergenService.userAllergens.isEmpty
+                      ? S.of(context).notConfiguredLabel
+                      : AllergenService.userAllergens.join(', ')),
+                  onTap: () => _showAllergenDialog(context),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.medical_information_outlined),
+                  title: Text(S.of(context).healthConditionsTitle),
+                  subtitle: Text(HealthConditionService.getUserConditions().isEmpty
+                      ? S.of(context).notConfiguredLabel
+                      : HealthConditionService.getUserConditions().join(', ')),
+                  onTap: () => _showHealthConditionsDialog(context),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.directions_walk),
+                  title: Text(S.of(context).dailyStepGoalTitle),
+                  subtitle: Text('$_stepGoal steps'),
+                  onTap: () => _showStepGoalDialog(),
+                ),
+                // ── Features ───────────────────────────────────────────────
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+                  child: Text(S.of(context).featuresSectionLabel,
+                      style: theme.textTheme.labelLarge?.copyWith(
+                          color: theme.colorScheme.primary,
+                          fontWeight: FontWeight.w600)),
+                ),
+                SwitchListTile(
+                  secondary: const Icon(Icons.eco_outlined),
+                  title: Text(S.of(context).sustainabilityScoreTitle),
+                  subtitle: Text(S.of(context).sustainabilityScoreSubtitle),
+                  value: _showSustainability,
+                  onChanged: (v) async {
+                    final configDs = locator<ConfigDataSourceOB>();
+                    await configDs.setShowSustainability(v);
+                    setState(() => _showSustainability = v);
+                    _homeBloc.add(LoadItemsEvent());
+                  },
+                ),
+                SwitchListTile(
+                  secondary: const Icon(Icons.photo_camera_outlined),
+                  title: Text(S.of(context).photoMealAnalysisTitle),
+                  subtitle: Text(S.of(context).photoMealAnalysisSubtitle),
+                  value: _photoAnalysis,
+                  onChanged: (v) async {
+                    final configDs = locator<ConfigDataSourceOB>();
+                    await configDs.setShowPhotoAnalysis(v);
+                    setState(() => _photoAnalysis = v);
+                    _homeBloc.add(LoadItemsEvent());
+                  },
+                ),
+                // ── Data ───────────────────────────────────────────────────
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+                  child: Text(S.of(context).dataSectionLabel,
+                      style: theme.textTheme.labelLarge?.copyWith(
+                          color: theme.colorScheme.primary,
+                          fontWeight: FontWeight.w600)),
                 ),
                 ListTile(
                   leading: const Icon(Icons.import_export),
                   title: Text(S.of(context).exportImportLabel),
                   onTap: () => _showExportImportDialog(context),
                 ),
+                ListTile(
+                  leading: const Icon(Icons.file_download_outlined),
+                  title: Text(S.of(context).exportCsvTitle),
+                  subtitle: Text(S.of(context).exportCsvSubtitle),
+                  onTap: () => _exportCsv(context),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.backup_outlined),
+                  title: Text(S.of(context).backupDataTitle),
+                  subtitle: Text(S.of(context).backupDataSubtitle),
+                  onTap: () async {
+                    await BackupService.shareBackup();
+                  },
+                ),
+                // ── Support ────────────────────────────────────────────────
                 ListTile(
                   leading: const Icon(Icons.description_outlined),
                   title: Text(S.of(context).settingsDisclaimerLabel),
@@ -168,6 +322,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
+  void _showGoalSettingsDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => const GoalSettingsDialog(),
+    );
+  }
+
   void _showCalculationsDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -179,6 +340,187 @@ class _SettingsScreenState extends State<SettingsScreen> {
         calendarDayBloc: _calendarDayBloc,
       ),
     );
+  }
+
+  void _showAllergenDialog(BuildContext context) {
+    final selected = Set<String>.from(AllergenService.userAllergens);
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          title: Text(S.of(context).myAllergensTitle),
+          content: SizedBox(
+            width: double.maxFinite,
+            height: 400,
+            child: ListView(
+              children: AllergenService.allAllergenNames.map((allergen) {
+                return CheckboxListTile(
+                  dense: true,
+                  title: Text(allergen),
+                  value: selected.contains(allergen),
+                  onChanged: (val) {
+                    setDialogState(() {
+                      if (val == true) {
+                        selected.add(allergen);
+                      } else {
+                        selected.remove(allergen);
+                      }
+                    });
+                  },
+                );
+              }).toList(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: Text(S.of(context).cancelLabel),
+            ),
+            FilledButton(
+              onPressed: () async {
+                await AllergenService.setUserAllergens(selected);
+                if (ctx.mounted) Navigator.of(ctx).pop();
+                setState(() {});
+                _homeBloc.add(LoadItemsEvent());
+              },
+              child: Text(S.of(context).saveLabel),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showHealthConditionsDialog(BuildContext context) {
+    final selected = Set<String>.from(HealthConditionService.getUserConditions());
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          title: Text(S.of(context).healthConditionsDialogTitle),
+          content: SizedBox(
+            width: double.maxFinite,
+            height: 400,
+            child: Column(
+              children: [
+                Text(S.of(context).healthConditionsInstructions,
+                    style: Theme.of(ctx).textTheme.bodySmall),
+                const SizedBox(height: 8),
+                Expanded(
+                  child: ListView(
+                    children: HealthConditionService.allConditions.map((c) {
+                      return CheckboxListTile(
+                        dense: true,
+                        title: Text(c, style: const TextStyle(fontSize: 14)),
+                        value: selected.contains(c),
+                        onChanged: (val) {
+                          setDialogState(() {
+                            if (val == true) selected.add(c);
+                            else selected.remove(c);
+                          });
+                        },
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: Text(S.of(context).cancelLabel),
+            ),
+            FilledButton(
+              onPressed: () {
+                HealthConditionService.setUserConditions(selected);
+                Navigator.of(ctx).pop();
+                setState(() {});
+                _homeBloc.add(LoadItemsEvent());
+              },
+              child: Text(S.of(context).saveLabel),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showStepGoalDialog() {
+    final controller = TextEditingController(text: _stepGoal.toString());
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(S.of(context).dailyStepGoalDialogTitle),
+        content: TextField(
+          controller: controller,
+          keyboardType: TextInputType.number,
+          decoration: InputDecoration(
+            labelText: S.of(context).stepsLabel,
+            hintText: S.of(context).stepGoalHint,
+          ),
+          autofocus: true,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(S.of(context).cancelLabel),
+          ),
+          FilledButton(
+            onPressed: () async {
+              final value = int.tryParse(controller.text);
+              if (value == null || value <= 0 || value > 100000) {
+                ScaffoldMessenger.of(ctx).showSnackBar(
+                  SnackBar(content: Text(S.of(context).stepGoalValidationError)),
+                );
+                return;
+              }
+              final configDs = locator<ConfigDataSourceOB>();
+              await configDs.setDailyStepGoal(value);
+              setState(() => _stepGoal = value);
+              _homeBloc.add(LoadItemsEvent());
+              if (ctx.mounted) Navigator.of(ctx).pop();
+            },
+            child: Text(S.of(context).saveLabel),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _exportCsv(BuildContext context) async {
+    try {
+      final intakeDs = locator<IntakeDataSourceOB>();
+      final bioDs = locator<BiomarkerDataSource>();
+      final sleepDs = locator<SleepDataSource>();
+      final waterDs = locator<WaterDataSource>();
+      final suppDs = locator<SupplementDataSource>();
+      final fastingDs = locator<FastingDataSource>();
+
+      final csv = CsvExporter.exportAll(
+        intakes: await intakeDs.getAllIntakesOB(),
+        biomarkers: await bioDs.getAllRecords(),
+        sleepRecords: await sleepDs.getRecords(limit: 365),
+        waterRecords: [],  // TODO: add getAll() to WaterDataSource
+        supplements: await suppDs.getAllActive(),
+        supplementLogs: [],  // TODO: add getAllLogs()
+        fastingSessions: await fastingDs.getCompletedSessions(limit: 365),
+      );
+
+      final dir = await getTemporaryDirectory();
+      final file = File('${dir.path}/ayu_health_export.csv');
+      await file.writeAsString(csv);
+
+      await SharePlus.instance.share(
+        ShareParams(files: [XFile(file.path)]),
+      );
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Export failed: $e')),
+        );
+      }
+    }
   }
 
   void _showExportImportDialog(BuildContext context) {

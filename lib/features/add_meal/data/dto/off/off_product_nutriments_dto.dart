@@ -60,6 +60,49 @@ class OFFProductNutrimentsDTO {
   // final double? fiber_value;
   // final String? fiber_unit;
 
+  // Micronutrients - Minerals
+  final dynamic sodium_100g;
+  @JsonKey(name: 'potassium_100g')
+  final dynamic potassium_100g;
+  final dynamic calcium_100g;
+  final dynamic iron_100g;
+  final dynamic magnesium_100g;
+  final dynamic phosphorus_100g;
+  final dynamic zinc_100g;
+  @JsonKey(name: 'copper_100g')
+  final dynamic copper_100g;
+  @JsonKey(name: 'manganese_100g')
+  final dynamic manganese_100g;
+  @JsonKey(name: 'selenium_100g')
+  final dynamic selenium_100g;
+
+  // Micronutrients - Vitamins
+  @JsonKey(name: 'vitamin-a_100g')
+  final dynamic vitamin_a_100g;
+  @JsonKey(name: 'vitamin-c_100g')
+  final dynamic vitamin_c_100g;
+  @JsonKey(name: 'vitamin-d_100g')
+  final dynamic vitamin_d_100g;
+  @JsonKey(name: 'vitamin-e_100g')
+  final dynamic vitamin_e_100g;
+  @JsonKey(name: 'vitamin-pp_100g')
+  final dynamic vitamin_pp_100g; // niacin/B3 in OFF
+  @JsonKey(name: 'vitamin-b1_100g')
+  final dynamic vitamin_b1_100g;
+  @JsonKey(name: 'vitamin-b2_100g')
+  final dynamic vitamin_b2_100g;
+  @JsonKey(name: 'pantothenic-acid_100g')
+  final dynamic pantothenic_acid_100g;
+  @JsonKey(name: 'vitamin-b6_100g')
+  final dynamic vitamin_b6_100g;
+  @JsonKey(name: 'vitamin-b9_100g')
+  final dynamic vitamin_b9_100g;
+  @JsonKey(name: 'vitamin-b12_100g')
+  final dynamic vitamin_b12_100g;
+
+  // Other
+  final dynamic cholesterol_100g;
+
   OFFProductNutrimentsDTO({
     //required this.energy_kcal,
     required this.energy_kcal_100g,
@@ -96,6 +139,28 @@ class OFFProductNutrimentsDTO {
     // required this.fiber_serving,
     // required this.fiber_value,
     // required this.fiber_unit,
+    this.sodium_100g,
+    this.potassium_100g,
+    this.calcium_100g,
+    this.iron_100g,
+    this.magnesium_100g,
+    this.phosphorus_100g,
+    this.zinc_100g,
+    this.copper_100g,
+    this.manganese_100g,
+    this.selenium_100g,
+    this.vitamin_a_100g,
+    this.vitamin_c_100g,
+    this.vitamin_d_100g,
+    this.vitamin_e_100g,
+    this.vitamin_pp_100g,
+    this.vitamin_b1_100g,
+    this.vitamin_b2_100g,
+    this.pantothenic_acid_100g,
+    this.vitamin_b6_100g,
+    this.vitamin_b9_100g,
+    this.vitamin_b12_100g,
+    this.cholesterol_100g,
   });
 
   factory OFFProductNutrimentsDTO.fromJson(Map<String, dynamic> json) =>

@@ -1,0 +1,1677 @@
+{
+  "_note1": "KEEP THIS FILE! Check it into a version control system (VCS) like git.",
+  "_note2": "ObjectBox manages crucial IDs for your object model. See docs for details.",
+  "_note3": "If you have VCS merge conflicts, you must resolve them according to ObjectBox docs.",
+  "entities": [
+    {
+      "id": "1:6477492202799954719",
+      "lastPropertyId": "20:116370160000831466",
+      "name": "ConfigOB",
+      "properties": [
+        {
+          "id": "1:7096599062265612196",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:1605258323807072596",
+          "name": "hasAcceptedDisclaimer",
+          "type": 1
+        },
+        {
+          "id": "3:8103748892177643272",
+          "name": "hasAcceptedPolicy",
+          "type": 1
+        },
+        {
+          "id": "4:535698736857720524",
+          "name": "hasAcceptedSendAnonymousData",
+          "type": 1
+        },
+        {
+          "id": "5:5673420628141000510",
+          "name": "selectedAppTheme",
+          "type": 6
+        },
+        {
+          "id": "6:4099500244323632474",
+          "name": "usesImperialUnits",
+          "type": 1
+        },
+        {
+          "id": "7:4948167303530435595",
+          "name": "userKcalAdjustment",
+          "type": 8
+        },
+        {
+          "id": "8:7546070661011258207",
+          "name": "userCarbGoalPct",
+          "type": 8
+        },
+        {
+          "id": "9:515557426401210509",
+          "name": "userProteinGoalPct",
+          "type": 8
+        },
+        {
+          "id": "10:703665110577707782",
+          "name": "userFatGoalPct",
+          "type": 8
+        },
+        {
+          "id": "11:1547450199447428793",
+          "name": "hiveMigrationComplete",
+          "type": 1
+        },
+        {
+          "id": "12:1159123641096979405",
+          "name": "targetWeightKG",
+          "type": 8
+        },
+        {
+          "id": "13:4833683237323829330",
+          "name": "customDeficitKcal",
+          "type": 8
+        },
+        {
+          "id": "14:4565518338337104291",
+          "name": "dailyStepGoal",
+          "type": 6
+        },
+        {
+          "id": "15:6046776342296133253",
+          "name": "healthConditions",
+          "type": 9
+        },
+        {
+          "id": "16:7057383559295592709",
+          "name": "ayuOnboardingComplete",
+          "type": 1
+        },
+        {
+          "id": "17:8970579051260580521",
+          "name": "allergenJson",
+          "type": 9
+        },
+        {
+          "id": "19:7249192552959657294",
+          "name": "showSustainability",
+          "type": 1
+        },
+        {
+          "id": "20:116370160000831466",
+          "name": "showPhotoAnalysis",
+          "type": 1
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "2:222820024314402058",
+      "lastPropertyId": "54:1476381368972264513",
+      "name": "IntakeOB",
+      "properties": [
+        {
+          "id": "1:520811337062894370",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:5059740210341806401",
+          "name": "intakeId",
+          "type": 9,
+          "flags": 2080,
+          "indexId": "1:6349337231928206960"
+        },
+        {
+          "id": "3:8953215190018559102",
+          "name": "unit",
+          "type": 9
+        },
+        {
+          "id": "4:1259916367482994431",
+          "name": "amount",
+          "type": 8
+        },
+        {
+          "id": "5:1423991108552084467",
+          "name": "intakeType",
+          "type": 6
+        },
+        {
+          "id": "6:1145201112684106461",
+          "name": "dateTime",
+          "type": 10
+        },
+        {
+          "id": "7:936581049233374452",
+          "name": "code",
+          "type": 9
+        },
+        {
+          "id": "8:1003025297402387938",
+          "name": "name",
+          "type": 9
+        },
+        {
+          "id": "9:5573768768984622890",
+          "name": "brands",
+          "type": 9
+        },
+        {
+          "id": "10:1543503185922050525",
+          "name": "thumbnailImageUrl",
+          "type": 9
+        },
+        {
+          "id": "11:1040625899674691151",
+          "name": "mainImageUrl",
+          "type": 9
+        },
+        {
+          "id": "12:5732902005959526953",
+          "name": "url",
+          "type": 9
+        },
+        {
+          "id": "13:6112917965149515132",
+          "name": "mealQuantity",
+          "type": 9
+        },
+        {
+          "id": "14:6483345057335549356",
+          "name": "mealUnit",
+          "type": 9
+        },
+        {
+          "id": "15:5424539592310399042",
+          "name": "servingQuantity",
+          "type": 8
+        },
+        {
+          "id": "16:9019034584142787756",
+          "name": "servingUnit",
+          "type": 9
+        },
+        {
+          "id": "17:3857457929341562138",
+          "name": "servingSize",
+          "type": 9
+        },
+        {
+          "id": "18:4990414656831801035",
+          "name": "mealSource",
+          "type": 6
+        },
+        {
+          "id": "19:7675916854437309933",
+          "name": "energyKcal100",
+          "type": 8
+        },
+        {
+          "id": "20:2035247653380367410",
+          "name": "carbohydrates100",
+          "type": 8
+        },
+        {
+          "id": "21:607795541679044784",
+          "name": "fat100",
+          "type": 8
+        },
+        {
+          "id": "22:658156367839574930",
+          "name": "proteins100",
+          "type": 8
+        },
+        {
+          "id": "23:3607472227833157161",
+          "name": "sugars100",
+          "type": 8
+        },
+        {
+          "id": "24:7388097191242464657",
+          "name": "saturatedFat100",
+          "type": 8
+        },
+        {
+          "id": "25:3331335119793687726",
+          "name": "fiber100",
+          "type": 8
+        },
+        {
+          "id": "26:2751917060317918041",
+          "name": "sodium100",
+          "type": 8
+        },
+        {
+          "id": "27:6106563860771147160",
+          "name": "potassium100",
+          "type": 8
+        },
+        {
+          "id": "28:3983056364114996429",
+          "name": "calcium100",
+          "type": 8
+        },
+        {
+          "id": "29:6375128194613779203",
+          "name": "iron100",
+          "type": 8
+        },
+        {
+          "id": "30:6358235870478816759",
+          "name": "magnesium100",
+          "type": 8
+        },
+        {
+          "id": "31:5080574838137777033",
+          "name": "phosphorus100",
+          "type": 8
+        },
+        {
+          "id": "32:3253887370971635581",
+          "name": "zinc100",
+          "type": 8
+        },
+        {
+          "id": "33:2477986222544339043",
+          "name": "copper100",
+          "type": 8
+        },
+        {
+          "id": "34:4597288143175488768",
+          "name": "manganese100",
+          "type": 8
+        },
+        {
+          "id": "35:2684091126884698254",
+          "name": "selenium100",
+          "type": 8
+        },
+        {
+          "id": "36:4435583683495340630",
+          "name": "vitaminA100",
+          "type": 8
+        },
+        {
+          "id": "37:2002082733397751101",
+          "name": "vitaminC100",
+          "type": 8
+        },
+        {
+          "id": "38:7886685951497628931",
+          "name": "vitaminD100",
+          "type": 8
+        },
+        {
+          "id": "39:6147560639452323478",
+          "name": "vitaminE100",
+          "type": 8
+        },
+        {
+          "id": "40:6749101435642143216",
+          "name": "vitaminK100",
+          "type": 8
+        },
+        {
+          "id": "41:8276312380632166752",
+          "name": "thiamine100",
+          "type": 8
+        },
+        {
+          "id": "42:8641832840537544956",
+          "name": "riboflavin100",
+          "type": 8
+        },
+        {
+          "id": "43:6898223419118814140",
+          "name": "niacin100",
+          "type": 8
+        },
+        {
+          "id": "44:3268045021358642101",
+          "name": "pantothenicAcid100",
+          "type": 8
+        },
+        {
+          "id": "45:8995285452069790636",
+          "name": "vitaminB6100",
+          "type": 8
+        },
+        {
+          "id": "46:3447893195242372239",
+          "name": "folate100",
+          "type": 8
+        },
+        {
+          "id": "47:2201541038774179969",
+          "name": "vitaminB12100",
+          "type": 8
+        },
+        {
+          "id": "48:3176894868595651877",
+          "name": "cholesterol100",
+          "type": 8
+        },
+        {
+          "id": "49:8262917921999380575",
+          "name": "addedSugars100",
+          "type": 8
+        },
+        {
+          "id": "50:7470205969616379032",
+          "name": "additivesTags",
+          "type": 30
+        },
+        {
+          "id": "51:2380785250413604025",
+          "name": "ingredientsText",
+          "type": 9
+        },
+        {
+          "id": "52:1968518929984074793",
+          "name": "isFavorite",
+          "type": 1
+        },
+        {
+          "id": "53:5771823587479035770",
+          "name": "ecoscoreGrade",
+          "type": 9
+        },
+        {
+          "id": "54:1476381368972264513",
+          "name": "ecoscoreScore",
+          "type": 8
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "3:2952592799405788095",
+      "lastPropertyId": "7:8034931056275971149",
+      "name": "PhysicalActivityOB",
+      "properties": [
+        {
+          "id": "1:4945908154863518828",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:7480938192033899768",
+          "name": "code",
+          "type": 9
+        },
+        {
+          "id": "3:1828750019567401219",
+          "name": "specificActivity",
+          "type": 9
+        },
+        {
+          "id": "4:2333513107317218138",
+          "name": "description",
+          "type": 9
+        },
+        {
+          "id": "5:6225554774266298739",
+          "name": "mets",
+          "type": 8
+        },
+        {
+          "id": "6:2383359518533308175",
+          "name": "tags",
+          "type": 30
+        },
+        {
+          "id": "7:8034931056275971149",
+          "name": "activityType",
+          "type": 6
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "4:3950974448860086310",
+      "lastPropertyId": "10:2683328908506704349",
+      "name": "TrackedDayOB",
+      "properties": [
+        {
+          "id": "1:2545928256364671177",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:1661301873262312958",
+          "name": "day",
+          "type": 10
+        },
+        {
+          "id": "3:6407337014019156484",
+          "name": "calorieGoal",
+          "type": 8
+        },
+        {
+          "id": "4:6084963763959822724",
+          "name": "caloriesTracked",
+          "type": 8
+        },
+        {
+          "id": "5:5447489510314645824",
+          "name": "carbsGoal",
+          "type": 8
+        },
+        {
+          "id": "6:1138120974796152942",
+          "name": "carbsTracked",
+          "type": 8
+        },
+        {
+          "id": "7:3791164846714037286",
+          "name": "fatGoal",
+          "type": 8
+        },
+        {
+          "id": "8:2170125685297133417",
+          "name": "fatTracked",
+          "type": 8
+        },
+        {
+          "id": "9:3040539820399501461",
+          "name": "proteinGoal",
+          "type": 8
+        },
+        {
+          "id": "10:2683328908506704349",
+          "name": "proteinTracked",
+          "type": 8
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "5:9089101762990167869",
+      "lastPropertyId": "11:7202365980286144645",
+      "name": "UserActivityOB",
+      "properties": [
+        {
+          "id": "1:505450033182266586",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:5549108869722236220",
+          "name": "activityId",
+          "type": 9,
+          "flags": 2080,
+          "indexId": "2:7319863865959781371"
+        },
+        {
+          "id": "3:8054229638233298773",
+          "name": "duration",
+          "type": 8
+        },
+        {
+          "id": "4:1731960800043902334",
+          "name": "burnedKcal",
+          "type": 8
+        },
+        {
+          "id": "5:6475511088355020178",
+          "name": "date",
+          "type": 10
+        },
+        {
+          "id": "6:157102528658202797",
+          "name": "activityCode",
+          "type": 9
+        },
+        {
+          "id": "7:4148409488685750977",
+          "name": "specificActivity",
+          "type": 9
+        },
+        {
+          "id": "8:7788434800093330013",
+          "name": "description",
+          "type": 9
+        },
+        {
+          "id": "9:9220718011580399226",
+          "name": "mets",
+          "type": 8
+        },
+        {
+          "id": "10:5341352563548111910",
+          "name": "tags",
+          "type": 30
+        },
+        {
+          "id": "11:7202365980286144645",
+          "name": "activityType",
+          "type": 6
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "6:7636978955874029769",
+      "lastPropertyId": "7:7685946749923979441",
+      "name": "UserOB",
+      "properties": [
+        {
+          "id": "1:5435496905879134844",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:3812970747142964100",
+          "name": "birthday",
+          "type": 10
+        },
+        {
+          "id": "3:7923550915521047736",
+          "name": "heightCM",
+          "type": 8
+        },
+        {
+          "id": "4:4174754889585241468",
+          "name": "weightKG",
+          "type": 8
+        },
+        {
+          "id": "5:1759332707758468134",
+          "name": "gender",
+          "type": 6
+        },
+        {
+          "id": "6:4457269851161958463",
+          "name": "goal",
+          "type": 6
+        },
+        {
+          "id": "7:7685946749923979441",
+          "name": "pal",
+          "type": 6
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "7:2494492286301300394",
+      "lastPropertyId": "6:3486255085334882947",
+      "name": "GutHealthItemOB",
+      "properties": [
+        {
+          "id": "1:7811082825313000450",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:7887262344800656475",
+          "name": "name",
+          "type": 9
+        },
+        {
+          "id": "3:2899736536307687814",
+          "name": "category",
+          "type": 9
+        },
+        {
+          "id": "4:8816371267439659764",
+          "name": "dateTime",
+          "type": 10
+        },
+        {
+          "id": "5:6793353370448096568",
+          "name": "isAutoFlagged",
+          "type": 1
+        },
+        {
+          "id": "6:3486255085334882947",
+          "name": "sourceIntakeId",
+          "type": 9
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "8:1370534373946555578",
+      "lastPropertyId": "4:5571970018044348505",
+      "name": "HabitLogOB",
+      "properties": [
+        {
+          "id": "1:7979968088678243758",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:7061718633088095527",
+          "name": "habitId",
+          "type": 6
+        },
+        {
+          "id": "3:5080065482921261631",
+          "name": "dateTime",
+          "type": 10
+        },
+        {
+          "id": "4:5571970018044348505",
+          "name": "completed",
+          "type": 1
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "9:3446880705750154736",
+      "lastPropertyId": "11:3990488014887907717",
+      "name": "HabitOB",
+      "properties": [
+        {
+          "id": "1:6923817044308253331",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:6152132543417919542",
+          "name": "name",
+          "type": 9
+        },
+        {
+          "id": "3:5156324938121614033",
+          "name": "category",
+          "type": 9
+        },
+        {
+          "id": "4:1395827786658467559",
+          "name": "sortOrder",
+          "type": 6
+        },
+        {
+          "id": "5:3267316403142564014",
+          "name": "isActive",
+          "type": 1
+        },
+        {
+          "id": "6:4320839372809236579",
+          "name": "reminderMinutes",
+          "type": 6
+        },
+        {
+          "id": "7:3074007044692856263",
+          "name": "frequency",
+          "type": 6
+        },
+        {
+          "id": "8:6065818025679882694",
+          "name": "frequencyDay",
+          "type": 6
+        },
+        {
+          "id": "9:3388427240463440883",
+          "name": "scheduleDays",
+          "type": 9
+        },
+        {
+          "id": "10:5422166084123251698",
+          "name": "monthlyDay",
+          "type": 6
+        },
+        {
+          "id": "11:3990488014887907717",
+          "name": "calendarEventId",
+          "type": 9
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "10:789815896546770560",
+      "lastPropertyId": "3:6686232328674370670",
+      "name": "WaterRecordOB",
+      "properties": [
+        {
+          "id": "1:218454635503609085",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:347473416817126082",
+          "name": "amountML",
+          "type": 8
+        },
+        {
+          "id": "3:6686232328674370670",
+          "name": "dateTime",
+          "type": 10
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "11:5538860049560825163",
+      "lastPropertyId": "3:896787463902377656",
+      "name": "WeightRecordOB",
+      "properties": [
+        {
+          "id": "1:4429405453386792156",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:6705470113916040982",
+          "name": "weightKG",
+          "type": 8
+        },
+        {
+          "id": "3:896787463902377656",
+          "name": "dateTime",
+          "type": 10
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "12:4420710930980106944",
+      "lastPropertyId": "4:1183281187575080314",
+      "name": "StoolLogOB",
+      "properties": [
+        {
+          "id": "1:8278386601570190806",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:1440122297551028151",
+          "name": "type",
+          "type": 6
+        },
+        {
+          "id": "3:6471414013196193241",
+          "name": "dateTime",
+          "type": 10
+        },
+        {
+          "id": "4:1183281187575080314",
+          "name": "notes",
+          "type": 9
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "13:982607073446383719",
+      "lastPropertyId": "5:9008183605618040204",
+      "name": "SymptomLogOB",
+      "properties": [
+        {
+          "id": "1:3152687350290846821",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:7228128909076205063",
+          "name": "symptom",
+          "type": 6
+        },
+        {
+          "id": "3:4378226166795625323",
+          "name": "severity",
+          "type": 6
+        },
+        {
+          "id": "4:821579706350880651",
+          "name": "dateTime",
+          "type": 10
+        },
+        {
+          "id": "5:9008183605618040204",
+          "name": "notes",
+          "type": 9
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "14:1034035110825751383",
+      "lastPropertyId": "7:4298711670153257802",
+      "name": "BiomarkerRecordOB",
+      "properties": [
+        {
+          "id": "1:6763726702024422674",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:2493638220060392753",
+          "name": "type",
+          "type": 9
+        },
+        {
+          "id": "3:1535579681657601768",
+          "name": "value",
+          "type": 8
+        },
+        {
+          "id": "4:6100382431439389365",
+          "name": "unit",
+          "type": 9
+        },
+        {
+          "id": "5:8837958407090471998",
+          "name": "dateTime",
+          "type": 10
+        },
+        {
+          "id": "6:4387178617261170057",
+          "name": "source",
+          "type": 6
+        },
+        {
+          "id": "7:4298711670153257802",
+          "name": "notes",
+          "type": 9
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "15:1781774396636105369",
+      "lastPropertyId": "8:1182332487767697968",
+      "name": "DexaScanOB",
+      "properties": [
+        {
+          "id": "1:3033203686372988373",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:3980876848470724272",
+          "name": "scanDate",
+          "type": 10
+        },
+        {
+          "id": "3:896041955866674216",
+          "name": "totalBodyFatPercent",
+          "type": 8
+        },
+        {
+          "id": "4:8090251611330965577",
+          "name": "leanMassKG",
+          "type": 8
+        },
+        {
+          "id": "5:1115534957770209102",
+          "name": "fatMassKG",
+          "type": 8
+        },
+        {
+          "id": "6:884374273444776209",
+          "name": "boneMineralDensity",
+          "type": 8
+        },
+        {
+          "id": "7:2121348649363414868",
+          "name": "visceralFatArea",
+          "type": 8
+        },
+        {
+          "id": "8:1182332487767697968",
+          "name": "tScore",
+          "type": 8
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "16:2247926351166455786",
+      "lastPropertyId": "5:8965767915561563849",
+      "name": "FastingSessionOB",
+      "properties": [
+        {
+          "id": "1:574653573437470648",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:6146045116836756185",
+          "name": "startTime",
+          "type": 10
+        },
+        {
+          "id": "3:951491199965569009",
+          "name": "endTime",
+          "type": 10
+        },
+        {
+          "id": "4:5222499985869293876",
+          "name": "targetHours",
+          "type": 8
+        },
+        {
+          "id": "5:8965767915561563849",
+          "name": "type",
+          "type": 6
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "17:2346511816159630796",
+      "lastPropertyId": "4:387004284061673089",
+      "name": "MindfulnessSessionOB",
+      "properties": [
+        {
+          "id": "1:4741708278793477861",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:4771717370335112344",
+          "name": "type",
+          "type": 6
+        },
+        {
+          "id": "3:4095880314721100286",
+          "name": "durationMinutes",
+          "type": 6
+        },
+        {
+          "id": "4:387004284061673089",
+          "name": "dateTime",
+          "type": 10
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "18:2992183107648926707",
+      "lastPropertyId": "10:4183114661903394658",
+      "name": "SleepRecordOB",
+      "properties": [
+        {
+          "id": "1:9020550136476983718",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:1319764132476342147",
+          "name": "bedTime",
+          "type": 10
+        },
+        {
+          "id": "3:3081932780519821677",
+          "name": "wakeTime",
+          "type": 10
+        },
+        {
+          "id": "4:5489412302073833333",
+          "name": "qualityScore",
+          "type": 6
+        },
+        {
+          "id": "5:3029155134740993332",
+          "name": "notes",
+          "type": 9
+        },
+        {
+          "id": "6:7442038126300950605",
+          "name": "source",
+          "type": 9
+        },
+        {
+          "id": "7:984860991098657325",
+          "name": "deepSleepMin",
+          "type": 8
+        },
+        {
+          "id": "8:1013098493073842205",
+          "name": "lightSleepMin",
+          "type": 8
+        },
+        {
+          "id": "9:3967635368200505764",
+          "name": "remSleepMin",
+          "type": 8
+        },
+        {
+          "id": "10:4183114661903394658",
+          "name": "awakeMin",
+          "type": 8
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "19:2910029066146441198",
+      "lastPropertyId": "4:6830997849336333648",
+      "name": "SupplementLogOB",
+      "properties": [
+        {
+          "id": "1:2501803558246718268",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:1651732256930469796",
+          "name": "supplementId",
+          "type": 6
+        },
+        {
+          "id": "3:3732551627409820874",
+          "name": "taken",
+          "type": 1
+        },
+        {
+          "id": "4:6830997849336333648",
+          "name": "dateTime",
+          "type": 10
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "20:2121155969444040118",
+      "lastPropertyId": "8:8150974449903573653",
+      "name": "SupplementOB",
+      "properties": [
+        {
+          "id": "1:2101622098576608774",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:8618130588363429731",
+          "name": "name",
+          "type": 9
+        },
+        {
+          "id": "3:6923898463619480298",
+          "name": "dosage",
+          "type": 9
+        },
+        {
+          "id": "4:2654758240918964634",
+          "name": "unit",
+          "type": 9
+        },
+        {
+          "id": "5:2663143608679809213",
+          "name": "category",
+          "type": 9
+        },
+        {
+          "id": "6:9080309578445766872",
+          "name": "isActive",
+          "type": 1
+        },
+        {
+          "id": "7:4810855290512620969",
+          "name": "sortOrder",
+          "type": 6
+        },
+        {
+          "id": "8:8150974449903573653",
+          "name": "sourceBarcode",
+          "type": 9
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "21:6917020969235109846",
+      "lastPropertyId": "4:6561509438136183880",
+      "name": "CaffeineLogOB",
+      "properties": [
+        {
+          "id": "1:6175988685367396053",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:7815166798274666762",
+          "name": "amountMg",
+          "type": 8
+        },
+        {
+          "id": "3:2074777167307909676",
+          "name": "source",
+          "type": 9
+        },
+        {
+          "id": "4:6561509438136183880",
+          "name": "dateTime",
+          "type": 10
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "22:5438023546580793832",
+      "lastPropertyId": "8:3668339936043842932",
+      "name": "ProductInventoryOB",
+      "properties": [
+        {
+          "id": "1:2160655106728104732",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:2771732442541374550",
+          "name": "name",
+          "type": 9
+        },
+        {
+          "id": "3:9186689074796547522",
+          "name": "brand",
+          "type": 9
+        },
+        {
+          "id": "4:2613546095708033889",
+          "name": "category",
+          "type": 9
+        },
+        {
+          "id": "5:2520399454521137228",
+          "name": "totalUses",
+          "type": 6
+        },
+        {
+          "id": "6:5161674056983032386",
+          "name": "usesRemaining",
+          "type": 6
+        },
+        {
+          "id": "7:4272689497817172119",
+          "name": "startedDate",
+          "type": 10
+        },
+        {
+          "id": "8:3668339936043842932",
+          "name": "barcode",
+          "type": 9
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "23:1576344663355007761",
+      "lastPropertyId": "10:8888737139918673305",
+      "name": "GroceryItemOB",
+      "properties": [
+        {
+          "id": "1:3270379361794308869",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:3425345120471490516",
+          "name": "name",
+          "type": 9
+        },
+        {
+          "id": "3:4257081532703681395",
+          "name": "brand",
+          "type": 9
+        },
+        {
+          "id": "4:6873105361917782117",
+          "name": "category",
+          "type": 9
+        },
+        {
+          "id": "5:9130503041303469492",
+          "name": "price",
+          "type": 8
+        },
+        {
+          "id": "6:4501869625205725",
+          "name": "store",
+          "type": 9
+        },
+        {
+          "id": "7:902427172344219937",
+          "name": "barcode",
+          "type": 9
+        },
+        {
+          "id": "8:6321287425307076558",
+          "name": "purchaseDate",
+          "type": 10
+        },
+        {
+          "id": "9:5864497113797741664",
+          "name": "consumed",
+          "type": 1
+        },
+        {
+          "id": "10:8888737139918673305",
+          "name": "shelfLifeDays",
+          "type": 6
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "24:3726043629588841255",
+      "lastPropertyId": "3:1482055555812843526",
+      "name": "ActivitySnapshotOB",
+      "properties": [
+        {
+          "id": "1:9218855169352328520",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:7468784593462670288",
+          "name": "activityType",
+          "type": 9
+        },
+        {
+          "id": "3:1482055555812843526",
+          "name": "dateTime",
+          "type": 10
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "25:4695001636616115857",
+      "lastPropertyId": "7:6097026218367331481",
+      "name": "LocationVisitOB",
+      "properties": [
+        {
+          "id": "1:1414251956660618072",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:2799115309493876427",
+          "name": "lat",
+          "type": 8
+        },
+        {
+          "id": "3:1418990312437030761",
+          "name": "lon",
+          "type": 8
+        },
+        {
+          "id": "4:132982664898080776",
+          "name": "arrivalTime",
+          "type": 10
+        },
+        {
+          "id": "5:5924646742097608516",
+          "name": "departureTime",
+          "type": 10
+        },
+        {
+          "id": "6:7860414609054337891",
+          "name": "label",
+          "type": 9
+        },
+        {
+          "id": "7:6097026218367331481",
+          "name": "savedLocationId",
+          "type": 6
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "26:2488768555801822320",
+      "lastPropertyId": "3:7630827916082275084",
+      "name": "PressureReadingOB",
+      "properties": [
+        {
+          "id": "1:3257268515491378416",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:328412430098300662",
+          "name": "pressureKPa",
+          "type": 8
+        },
+        {
+          "id": "3:7630827916082275084",
+          "name": "dateTime",
+          "type": 10
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "27:4365770835936123041",
+      "lastPropertyId": "6:4861489276447377096",
+      "name": "SavedLocationOB",
+      "properties": [
+        {
+          "id": "1:5239031025006901922",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:5021741579705577777",
+          "name": "lat",
+          "type": 8
+        },
+        {
+          "id": "3:7047645941933740677",
+          "name": "lon",
+          "type": 8
+        },
+        {
+          "id": "4:6304125201700913197",
+          "name": "radiusMeters",
+          "type": 8
+        },
+        {
+          "id": "5:5643761263374647098",
+          "name": "label",
+          "type": 9
+        },
+        {
+          "id": "6:4861489276447377096",
+          "name": "visitCount",
+          "type": 6
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "28:6430898856620975951",
+      "lastPropertyId": "7:8918684554699584278",
+      "name": "PeptideLogOB",
+      "properties": [
+        {
+          "id": "1:95963888949789402",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:3293544644710642424",
+          "name": "peptideId",
+          "type": 6
+        },
+        {
+          "id": "3:2241132713012695443",
+          "name": "doseUnits",
+          "type": 8
+        },
+        {
+          "id": "4:7586496901264011267",
+          "name": "doseMcg",
+          "type": 8
+        },
+        {
+          "id": "5:2685847313075896532",
+          "name": "injectionSite",
+          "type": 9
+        },
+        {
+          "id": "6:5080729246179159723",
+          "name": "dateTime",
+          "type": 10
+        },
+        {
+          "id": "7:8918684554699584278",
+          "name": "notes",
+          "type": 9
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "29:1298758183074159118",
+      "lastPropertyId": "14:3853781338877639870",
+      "name": "PeptideOB",
+      "properties": [
+        {
+          "id": "1:1360936791951905323",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:7405380373380406931",
+          "name": "name",
+          "type": 9
+        },
+        {
+          "id": "3:3466866359632447601",
+          "name": "brand",
+          "type": 9
+        },
+        {
+          "id": "4:8086272806844654388",
+          "name": "peptideMg",
+          "type": 8
+        },
+        {
+          "id": "5:5495934380347139230",
+          "name": "bacWaterMl",
+          "type": 8
+        },
+        {
+          "id": "6:6759061371088974792",
+          "name": "doseUnits",
+          "type": 8
+        },
+        {
+          "id": "7:1585606582888789234",
+          "name": "frequency",
+          "type": 9
+        },
+        {
+          "id": "8:4834718831439697842",
+          "name": "cycleDays",
+          "type": 6
+        },
+        {
+          "id": "9:110334479529836660",
+          "name": "restDays",
+          "type": 6
+        },
+        {
+          "id": "10:297796137647576506",
+          "name": "startDate",
+          "type": 10
+        },
+        {
+          "id": "11:7667847756718377450",
+          "name": "endDate",
+          "type": 10
+        },
+        {
+          "id": "12:2596827737126597224",
+          "name": "isActive",
+          "type": 1
+        },
+        {
+          "id": "13:6936520817538177385",
+          "name": "route",
+          "type": 9
+        },
+        {
+          "id": "14:3853781338877639870",
+          "name": "notes",
+          "type": 9
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "30:8907965053874012058",
+      "lastPropertyId": "8:2076587408878767985",
+      "name": "EcoScoreOB",
+      "properties": [
+        {
+          "id": "1:311491961591258946",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:3988238428255865393",
+          "name": "productKey",
+          "type": 9
+        },
+        {
+          "id": "3:5265521983525613238",
+          "name": "productName",
+          "type": 9
+        },
+        {
+          "id": "4:4356387075476942956",
+          "name": "grade",
+          "type": 9
+        },
+        {
+          "id": "5:8028884020788467432",
+          "name": "score",
+          "type": 8
+        },
+        {
+          "id": "6:7490249268429945444",
+          "name": "source",
+          "type": 9
+        },
+        {
+          "id": "7:7512199257671119601",
+          "name": "highQuality",
+          "type": 1
+        },
+        {
+          "id": "8:2076587408878767985",
+          "name": "updatedAt",
+          "type": 10
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "31:809104814203709671",
+      "lastPropertyId": "6:8409510654558441581",
+      "name": "SearchHistoryOB",
+      "properties": [
+        {
+          "id": "1:6854966238187351342",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:3080722790271010457",
+          "name": "searchTerm",
+          "type": 9
+        },
+        {
+          "id": "3:6903565599436336011",
+          "name": "chosenMealName",
+          "type": 9
+        },
+        {
+          "id": "4:6128307269360541414",
+          "name": "chosenMealCode",
+          "type": 9
+        },
+        {
+          "id": "5:2208202562192442790",
+          "name": "count",
+          "type": 6
+        },
+        {
+          "id": "6:8409510654558441581",
+          "name": "lastUsed",
+          "type": 10
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "32:7040856810817177465",
+      "lastPropertyId": "7:6011228600432161655",
+      "name": "FoodCacheOB",
+      "properties": [
+        {
+          "id": "1:8610739434669038656",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:2760681917921042280",
+          "name": "query",
+          "type": 9
+        },
+        {
+          "id": "3:7624453928216188244",
+          "name": "source",
+          "type": 9
+        },
+        {
+          "id": "4:7389044845480922436",
+          "name": "resultsJson",
+          "type": 9
+        },
+        {
+          "id": "5:7291120666453141318",
+          "name": "resultCount",
+          "type": 6
+        },
+        {
+          "id": "6:2592804485699450135",
+          "name": "cachedAt",
+          "type": 10
+        },
+        {
+          "id": "7:6011228600432161655",
+          "name": "hitCount",
+          "type": 6
+        }
+      ],
+      "relations": []
+    }
+  ],
+  "lastEntityId": "32:7040856810817177465",
+  "lastIndexId": "2:7319863865959781371",
+  "lastRelationId": "0:0",
+  "lastSequenceId": "0:0",
+  "modelVersion": 5,
+  "modelVersionParserMinimum": 5,
+  "retiredEntityUids": [],
+  "retiredIndexUids": [],
+  "retiredPropertyUids": [
+    772813461993618442
+  ],
+  "retiredRelationUids": [],
+  "version": 1
+}

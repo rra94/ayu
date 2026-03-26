@@ -31,6 +31,15 @@ class OFFProductDTO {
 
   final OFFProductNutrimentsDTO nutriments;
 
+  final List<dynamic>? additives_tags;
+  final String? ingredients_text;
+
+  @JsonKey(name: 'ecoscore_grade')
+  final String? ecoscore_grade; // a, b, c, d, e
+
+  @JsonKey(name: 'ecoscore_score')
+  final double? ecoscore_score; // 0-100
+
   String? getLocaleName(SupportedLanguage supportedLanguage) {
     String? localeName;
     switch (supportedLanguage) {
@@ -67,7 +76,11 @@ class OFFProductDTO {
       required this.product_quantity,
       required this.serving_quantity,
       required this.serving_size,
-      required this.nutriments});
+      required this.nutriments,
+      this.additives_tags,
+      this.ingredients_text,
+      this.ecoscore_grade,
+      this.ecoscore_score});
 
   factory OFFProductDTO.fromJson(Map<String, dynamic> json) =>
       _$OFFProductDTOFromJson(json);

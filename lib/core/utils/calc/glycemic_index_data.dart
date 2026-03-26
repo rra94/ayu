@@ -1,0 +1,197 @@
+/// Glycemic index lookup table for ~200 common foods.
+/// Sources: University of Sydney GI Database, Harvard Health, ADA.
+/// Values are approximate GI (glucose scale, 0-100).
+class GlycemicIndexData {
+  /// Returns GI for a food name (case-insensitive fuzzy match), or null.
+  static int? lookup(String foodName) {
+    final lower = foodName.toLowerCase();
+    for (final entry in _data.entries) {
+      if (lower.contains(entry.key)) return entry.value;
+    }
+    return null;
+  }
+
+  // Keys are lowercase substrings to match against food names
+  static const Map<String, int> _data = {
+    // ── Grains & Bread ──
+    'white rice': 73,
+    'brown rice': 68,
+    'basmati rice': 58,
+    'jasmine rice': 89,
+    'wild rice': 57,
+    'white bread': 75,
+    'whole wheat bread': 74,
+    'sourdough': 54,
+    'rye bread': 56,
+    'pumpernickel': 50,
+    'pita bread': 68,
+    'naan': 71,
+    'tortilla': 52,
+    'oatmeal': 55,
+    'oat': 55,
+    'instant oat': 79,
+    'muesli': 57,
+    'granola': 55,
+    'cornflakes': 81,
+    'bran flakes': 74,
+    'cheerios': 74,
+    'rice krispies': 82,
+    'quinoa': 53,
+    'couscous': 65,
+    'bulgur': 48,
+    'barley': 28,
+    'millet': 71,
+    'pasta': 49,
+    'spaghetti': 49,
+    'macaroni': 47,
+    'noodle': 47,
+    'ramen': 73,
+
+    // ── Fruits ──
+    'apple': 36,
+    'banana': 51,
+    'orange': 43,
+    'grape': 53,
+    'grapefruit': 25,
+    'mango': 51,
+    'papaya': 59,
+    'pineapple': 59,
+    'watermelon': 76,
+    'cantaloupe': 65,
+    'strawberr': 41,
+    'blueberr': 53,
+    'raspberr': 32,
+    'cherry': 22,
+    'peach': 42,
+    'pear': 38,
+    'plum': 39,
+    'kiwi': 50,
+    'date': 42,
+    'raisin': 64,
+    'dried fruit': 60,
+    'fig': 61,
+    'prune': 29,
+    'avocado': 15,
+    'lemon': 20,
+    'lime': 20,
+    'coconut': 45,
+
+    // ── Vegetables ──
+    'potato': 78,
+    'sweet potato': 63,
+    'yam': 37,
+    'carrot': 39,
+    'corn': 52,
+    'pea': 48,
+    'beet': 64,
+    'pumpkin': 75,
+    'squash': 51,
+    'parsnip': 97,
+    'turnip': 72,
+    'taro': 53,
+    'plantain': 55,
+
+    // Low GI vegetables (most <15, grouped)
+    'broccoli': 10,
+    'cauliflower': 10,
+    'spinach': 10,
+    'kale': 10,
+    'lettuce': 10,
+    'cucumber': 10,
+    'tomato': 15,
+    'pepper': 10,
+    'zucchini': 10,
+    'eggplant': 10,
+    'mushroom': 10,
+    'onion': 10,
+    'garlic': 10,
+    'celery': 10,
+    'asparagus': 10,
+    'green bean': 15,
+    'cabbage': 10,
+
+    // ── Legumes ──
+    'lentil': 32,
+    'chickpea': 28,
+    'kidney bean': 24,
+    'black bean': 30,
+    'navy bean': 38,
+    'soybean': 16,
+    'hummus': 6,
+    'peanut': 14,
+
+    // ── Dairy ──
+    'milk': 39,
+    'skim milk': 37,
+    'yogurt': 41,
+    'greek yogurt': 11,
+    'ice cream': 51,
+    'cheese': 10,
+
+    // ── Sweeteners & Sugars ──
+    'sugar': 65,
+    'honey': 61,
+    'maple syrup': 54,
+    'agave': 15,
+    'fructose': 15,
+    'glucose': 103,
+    'sucrose': 65,
+
+    // ── Snacks & Processed ──
+    'potato chip': 56,
+    'popcorn': 65,
+    'pretzel': 83,
+    'cracker': 74,
+    'rice cake': 87,
+    'chocolate': 40,
+    'dark chocolate': 23,
+    'candy': 70,
+    'jelly bean': 78,
+    'donut': 76,
+    'cake': 67,
+    'cookie': 62,
+    'muffin': 69,
+    'croissant': 67,
+    'pancake': 67,
+    'waffle': 76,
+    'bagel': 72,
+    'pizza': 60,
+    'french fries': 63,
+    'hamburger bun': 61,
+
+    // ── Beverages ──
+    'orange juice': 50,
+    'apple juice': 41,
+    'grape juice': 56,
+    'cola': 63,
+    'soda': 63,
+    'sports drink': 78,
+    'beer': 66,
+
+    // ── Protein (most are ~0 GI) ──
+    'chicken': 0,
+    'turkey': 0,
+    'beef': 0,
+    'pork': 0,
+    'lamb': 0,
+    'fish': 0,
+    'salmon': 0,
+    'tuna': 0,
+    'shrimp': 0,
+    'egg': 0,
+    'tofu': 15,
+    'tempeh': 15,
+
+    // ── Nuts & Seeds ──
+    'almond': 10,
+    'walnut': 15,
+    'cashew': 22,
+    'pecan': 10,
+    'pistachio': 15,
+    'macadamia': 10,
+    'sunflower seed': 10,
+    'chia seed': 1,
+    'flax seed': 1,
+    'pumpkin seed': 10,
+  };
+}

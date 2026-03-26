@@ -161,45 +161,53 @@ class _IntakeVerticalListState extends State<IntakeVerticalList> {
                         firstListElement: firstListElement);
                   } else {
                     final intakeEntity = widget.intakeList[index];
-                    return LongPressDraggable<IntakeEntity>(
-                      onDragStarted: () {
-                        widget.onItemDragCallback?.call(true);
-                      },
-                      onDragEnd: (details) {
-                        widget.onItemDragCallback?.call(false);
-                      },
-                      data: intakeEntity,
-                      feedback: Material(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16.0),
-                        ),
-                        child: Opacity(
-                          opacity: 0.7,
-                          child: IntakeCard(
-                            key: ValueKey(intakeEntity.meal.code),
-                            intake: intakeEntity,
-                            firstListElement: false,
-                            usesImperialUnits: widget.usesImperialUnits,
-                          ),
-                        ),
-                      ),
-                      childWhenDragging: Row(
-                        children: [
-                          SizedBox(width: firstListElement ? 16 : 0),
-                          SizedBox(
-                            width: 120,
-                            height: 120,
-                            child: Card(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16.0),
+                    return Dismissible(
+                      key: ValueKey(intakeEntity.id),
+                      direction: DismissDirection.down,
+                      confirmDismiss: (direction) async {
+                        return await showDialog<bool>(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: Text(S.of(context).deleteTimeDialogTitle),
+                            content: Text(intakeEntity.meal.name ?? ''),
+                            actions: [
+                              TextButton(
+                                onPressed: () =>
+                                    Navigator.of(context).pop(false),
+                                child: Text(S.of(context).dialogCancelLabel),
                               ),
-                              color: Theme.of(context).cardColor,
-                            ),
+                              TextButton(
+                                onPressed: () =>
+                                    Navigator.of(context).pop(true),
+                                child: Text(
+                                  S.of(context).dialogDeleteLabel,
+                                  style: TextStyle(
+                                      color:
+                                          Theme.of(context).colorScheme.error),
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
+                        );
+                      },
+                      onDismissed: (direction) {
+                        widget.onDeleteIntakeCallback(
+                            intakeEntity, widget.trackedDayEntity);
+                      },
+                      background: Container(
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .error
+                              .withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Icon(Icons.delete_outline,
+                            color: Theme.of(context).colorScheme.error),
                       ),
                       child: IntakeCard(
-                        key: ValueKey(intakeEntity.meal.code),
+                        key: ValueKey(intakeEntity.id),
                         intake: intakeEntity,
                         onItemLongPressed: widget.onItemLongPressedCallback,
                         onItemTapped: widget.onItemTappedCallback,

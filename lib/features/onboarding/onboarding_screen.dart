@@ -14,6 +14,8 @@ import 'package:opennutritracker/features/onboarding/presentation/widgets/onboar
 import 'package:opennutritracker/features/onboarding/presentation/widgets/highlight_button.dart';
 import 'package:opennutritracker/features/onboarding/presentation/widgets/onboarding_first_page_body.dart';
 import 'package:opennutritracker/features/onboarding/presentation/widgets/onboarding_second_page_body.dart';
+import 'package:opennutritracker/core/services/allergen_service.dart';
+import 'package:opennutritracker/core/services/health_condition_service.dart';
 import 'package:opennutritracker/generated/l10n.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -37,6 +39,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   bool _secondPageButtonActive = false;
   bool _thirdPageButtonActive = false;
   bool _fourthPageButtonActive = false;
+  final Set<String> _selectedConditions = {};
+  final Set<String> _selectedAllergens = {};
   bool _overviewPageButtonActive = false;
 
   @override
@@ -158,6 +162,54 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               onButtonPressed: () => _scrollToPage(5),
               buttonActive: _fourthPageButtonActive,
             )),
+        // Health Conditions page
+        PageViewModel(
+            title: 'Any health conditions?',
+            decoration: _pageDecoration,
+            image: _defaultImageWidget,
+            bodyWidget: _buildHealthConditionsPage(),
+            footer: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TextButton(
+                  onPressed: () => _scrollToPage(6),
+                  child: const Text('Skip'),
+                ),
+                const SizedBox(width: 16),
+                HighlightButton(
+                  buttonLabel: S.of(context).buttonNextLabel,
+                  onButtonPressed: () {
+                    HealthConditionService.setUserConditions(_selectedConditions);
+                    _scrollToPage(6);
+                  },
+                  buttonActive: true,
+                ),
+              ],
+            )),
+        // Food Allergens page
+        PageViewModel(
+            title: 'Any food allergies?',
+            decoration: _pageDecoration,
+            image: _defaultImageWidget,
+            bodyWidget: _buildAllergensPage(),
+            footer: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TextButton(
+                  onPressed: () => _scrollToPage(7),
+                  child: const Text('Skip'),
+                ),
+                const SizedBox(width: 16),
+                HighlightButton(
+                  buttonLabel: S.of(context).buttonNextLabel,
+                  onButtonPressed: () async {
+                    await AllergenService.setUserAllergens(_selectedAllergens);
+                    _scrollToPage(7);
+                  },
+                  buttonActive: true,
+                ),
+              ],
+            )),
         PageViewModel(
             titleWidget: const SizedBox(),
             // empty
@@ -190,6 +242,80 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               buttonActive: _overviewPageButtonActive,
             )),
       ];
+
+  Widget _buildHealthConditionsPage() {
+    return StatefulBuilder(
+      builder: (context, setLocalState) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "We'll adjust nutrient recommendations accordingly",
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+          ),
+          const SizedBox(height: 16),
+          Wrap(
+            spacing: 8,
+            runSpacing: 4,
+            children: HealthConditionService.allConditions.map((c) {
+              final selected = _selectedConditions.contains(c);
+              return FilterChip(
+                label: Text(c),
+                selected: selected,
+                onSelected: (val) {
+                  setLocalState(() {
+                    if (val) {
+                      _selectedConditions.add(c);
+                    } else {
+                      _selectedConditions.remove(c);
+                    }
+                  });
+                },
+              );
+            }).toList(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAllergensPage() {
+    return StatefulBuilder(
+      builder: (context, setLocalState) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "We'll warn you when scanned foods contain these",
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+          ),
+          const SizedBox(height: 16),
+          Wrap(
+            spacing: 8,
+            runSpacing: 4,
+            children: AllergenService.allAllergenNames.map((a) {
+              final selected = _selectedAllergens.contains(a);
+              return FilterChip(
+                label: Text(a),
+                selected: selected,
+                onSelected: (val) {
+                  setLocalState(() {
+                    if (val) {
+                      _selectedAllergens.add(a);
+                    } else {
+                      _selectedAllergens.remove(a);
+                    }
+                  });
+                },
+              );
+            }).toList(),
+          ),
+        ],
+      ),
+    );
+  }
 
   void _scrollToPage(int page) {
     FocusScope.of(context).requestFocus(FocusNode()); // Dismiss Keyboard
@@ -260,16 +386,33 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     });
   }
 
-  void _onOverviewStartButtonPressed(BuildContext context) {
+  bool _saving = false;
+
+  Future<void> _onOverviewStartButtonPressed(BuildContext context) async {
+    if (_saving) return; // prevent double-tap
+    _saving = true;
+
+    final height = _onboardingBloc.userSelection.height;
+    final weight = _onboardingBloc.userSelection.weight;
+    if (height == null || height <= 0 || weight == null || weight <= 0) {
+      _saving = false;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Height and weight must be greater than zero')),
+      );
+      return;
+    }
     final userEntity = _onboardingBloc.userSelection.toUserEntity();
     final hasAcceptedDataCollection =
         _onboardingBloc.userSelection.acceptDataCollection;
     final usesImperialUnits = _onboardingBloc.userSelection.usesImperialUnits;
     if (userEntity != null) {
-      _onboardingBloc.saveOnboardingData(
+      await _onboardingBloc.saveOnboardingData(
           context, userEntity, hasAcceptedDataCollection, usesImperialUnits);
-      Navigator.pushReplacementNamed(context, NavigationOptions.mainRoute);
+      if (context.mounted) {
+        Navigator.pushReplacementNamed(context, NavigationOptions.mainRoute);
+      }
     } else {
+      _saving = false;
       // Error with user input
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(S.of(context).onboardingSaveUserError)));

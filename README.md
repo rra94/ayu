@@ -1,81 +1,144 @@
 <p align="center">
-  <img alt="Logo" src="assets/icon/ont_logo_square.png" width="128" />
-  <h1 align="center">OpenNutriTracker</h1>
+  <img alt="Ayu Logo" src="assets/icon/ayu_logo.png" width="128" />
+  <h1 align="center">Ayu</h1>
+  <p align="center"><em>आयु — Sanskrit for "life / longevity"</em></p>
 </p>
 
 <p align="center">
-  <a href="https://opensource.org/licenses/MIT" alt="License">
-        <img src="https://img.shields.io/badge/license-GPLv3-blue" /></a>
-  <a href="https://github.com/simonoppowa/OpenNutriTracker/stargazers" alt="GitHub Stars">
-        <img src="https://img.shields.io/github/stars/simonoppowa/OpenNutriTracker.svg" /></a>
-  <a href="https://github.com/simonoppowa/OpenNutriTracker/issues" alt="GitHub Issues">
-        <img src="https://img.shields.io/github/issues/simonoppowa/OpenNutriTracker.svg" /></a>
-  <a href="https://github.com/simonoppowa/OpenNutriTracker/pulls" alt="GitHub Pull Requests">
-        <img src="https://img.shields.io/github/issues-pr/simonoppowa/OpenNutriTracker.svg" /></a>
+  <a href="https://opensource.org/licenses/GPL-3.0"><img src="https://img.shields.io/badge/license-GPLv3-blue" /></a>
+  <a href="https://github.com/rra94/ayu/stargazers"><img src="https://img.shields.io/github/stars/rra94/ayu.svg" /></a>
+  <a href="https://github.com/rra94/ayu/issues"><img src="https://img.shields.io/github/issues/rra94/ayu.svg" /></a>
 </p>
 
-## Description
-OpenNutriTracker is an open-source mobile application designed to simplify nutritional tracking and management. Whether you are looking to improve your health, lose weight, or simply maintain a balanced diet, OpenNutriTracker provides a minimalistic interface to easily track and analyze your daily nutrition.
+---
 
-[Website](https://simonoppowa.github.io/OpenNutriTracker-Website/)
+**Ayu** is a privacy-first **nutrition and longevity tracker** for iOS. It goes beyond calorie counting — tracking micronutrients, biomarkers, sleep, fasting, gut health, supplements, peptides, and more — all powered by on-device intelligence with zero cloud dependency.
 
-## Screenshots
-<p align="center">
-  <img alt="Logo" src="fastlane/metadata/android/en-US/images/phoneScreenshots/1_en-US.png" width="20%" />
-  &nbsp;&nbsp;
-  <img alt="Logo" src="fastlane/metadata/android/en-US/images/phoneScreenshots/2_en-US.png" width="20%" />
-  &nbsp;&nbsp;
-  <img alt="Logo" src="fastlane/metadata/android/en-US/images/phoneScreenshots/3_en-US.png" width="20%" />
-  &nbsp;&nbsp;
-  <img alt="Logo" src="fastlane/metadata/android/en-US/images/phoneScreenshots/4_en-US.png" width="20%" />
-</p>
+Originally forked from [OpenNutriTracker](https://github.com/simonoppowa/OpenNutriTracker) (GPLv3).
 
-## Install
-[<img src="fastlane/metadata/android/en-US/images/appstore_banner.png" width="30%">](https://apps.apple.com/us/app/opennutritracker/id6451490901)
-[<img src="fastlane/metadata/android/en-US/images/playstore_banner.png" width="30%">](https://play.google.com/store/apps/details?id=com.opennutritracker.ont.opennutritracker)
+---
 
-## Key Features
-- **🍎 Nutritional Tracking:** Easily log your meals and snacks, and access a vast database of food items and ingredients to get detailed nutritional information.
-- **📓 Food Diary:** Maintain a comprehensive food diary to keep track of your daily food consumption, habits, and progress.
-- **🍽️ Custom Meals:** Plan your meals in advance, create personalized meal plans, and optimize them according to your dietary goals.
-- **📷 Barcode Scanner:** Scan barcodes on packaged food items to instantly retrieve their nutritional information.
-- **🔒 Privacy Focused:** OpenNutriTracker prioritizes the privacy its users. It does not collect or share any personal data without your consent.
-- **🚫💰 No Subscription, In-App Purchases, or Ads:** OpenNutriTracker is completely free to use, without any subscription fees, in-app purchases, or intrusive advertisements.
+## Features
+
+### Food & Nutrition
+- Barcode scanning via Open Food Facts + USDA FDC fallback
+- 23 vitamins & minerals with RDA% progress bars
+- Glycemic load estimation, net carbs, added sugar tracking
+- Nutrient synergy checker (17 evidence-based rules per meal)
+- Bioavailability engine — estimates real absorption based on meal context
+- Smart food recommendations to fill micronutrient gaps
+- Food allergen alerts (user-configured, persisted)
+- Custom food entry for items not in database
+- 30 Plants a Week tracker for gut microbiome diversity
+- Sustainability eco-score per meal and daily average (optional, from OFF)
+
+### Daily Dashboard
+- Today View — calories, water, supplements, sleep, streak at a glance
+- Activity Dashboard — steps, activity type, calories, outdoor time + gym visits, workouts, avg HR
+- Quick actions — water +250ml, scan barcode, log coffee, start fast
+- Gut health panel — auto-detects 64 harmful additives from E-numbers
+- Daily habits checklist with time-based reminders
+- Caffeine tracking
+
+### Supplements & Peptides
+- Supplement stack with daily take/skip logging
+- Peptide tracker — dosing cycles, reconstitution calculator, injection site rotation with body map
+
+### Body & Biomarkers
+- 25 biomarkers with normal + longevity-optimal ranges
+- 8 wellness biomarkers (hair, skin, teeth, nails, energy, sleep, stress, Norwood scale)
+- Biological age (Levine 2018 Phenotypic Age from 9 blood markers)
+- Longevity Score (0-100 composite)
+- DEXA body composition, weight trends with ETA
+- Bristol Stool Scale with 30-day distribution
+- Food-to-Feeling correlation (symptom to trigger food analysis)
+- 16 health conditions with nutrient rules (including cosmetic: acne, hair loss, eczema)
+
+### Timers & Streaks
+- Intermittent fasting (16:8, 18:6, 20:4, OMAD) with auto-start/stop
+- NSDR / meditation countdown timer
+- Sleep logging (bedtime, wake, quality 1-5) with trends
+- Clean eating streak calculator
+- Meal timing analysis with eating window visualization
+
+### Phone Sensors
+- CoreMotion — activity detection, sedentary alerts after 3+ hours
+- CoreLocation — gym detection via significant location changes, outdoor time estimation
+- Barometer — pressure tracking for weather-mood correlation
+- Data auto-pruned (90 days snapshots, 30 days locations)
+
+### On-Device Intelligence
+- **11 agents** running locally: meal pattern, nutrient gap, fasting adapt, supplement reminder, hydration, biomarker staleness, sedentary, gym frequency, outdoor time, peptide reminder
+- **Cross-agent observations**: stress+HR contradiction, sleep+caffeine, mood+nutrition, sleep+eating window, pressure+mood, sedentary+sleep, gym+protein
+- Smart notifications for missing entries
+- Weekly review with automated wins/improvements
+
+### Integrations
+- Apple HealthKit (weight, sleep, HR, HRV, steps, workouts)
+- iOS Lock Screen + Home Screen widgets (calories, water, supplements, streak)
+- Apple Vision OCR for receipt scanning (grocery classification)
+- Supplement auto-detection from barcode scans
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Framework | Flutter (iOS only) |
+| Database | ObjectBox (29 entities, all local) |
+| State | BLoC |
+| Charts | fl_chart |
+| Health | Apple HealthKit via `health` package |
+| Notifications | flutter_local_notifications |
+| Widgets | WidgetKit via `home_widget` |
+| Vision | Apple Vision framework (on-device OCR) |
+| Sensors | CoreMotion, CoreLocation, CMAltimeter |
+
+## Data Sources
+
+| Source | Used For |
+|--------|----------|
+| [Open Food Facts](https://world.openfoodfacts.org/) | Barcode + product search |
+| [USDA FDC](https://fdc.nal.usda.gov/) | Branded food fallback |
+| [University of Sydney GI Database](https://glycemicindex.com/) | Glycemic index values |
+| WHO/FAO 2001 | Mineral bioavailability rates |
+| Peer-reviewed research | Nutrient interaction rules |
 
 ## Privacy
-See [Data Protection](https://www.iubenda.com/privacy-policy/53501884)
-- **Data Encryption**: All collected user data is encrypted and stored locally on your device
-- **Minimal Data Collection**: OpenNutriTracker only collects the necessary information required for tracking nutrition and providing personalized insights. Your data will not be shared with third parties without your consent.
-- **Open-Source**: OpenNutriTracker is an open-source application
 
-## TODOs
-- ~~Add serving sizes to meals~~
-- ~~Add Imperial unit support~~
-- Add support for Material You themes
+All computation happens on your device. Nothing leaves your phone.
 
-## Contribution
-Contributions to OpenNutriTracker are welcome! If you find any issues or have suggestions for new features, please open an issue or submit a pull request. Make sure to follow the project's code style and guidelines.
+- ObjectBox local database — no cloud sync
+- HealthKit data stays on device
+- Location data never exported (auto-pruned after 30 days)
+- OCR processed locally via Apple Vision
+- No accounts, no analytics, no tracking
+- Open source (GPLv3)
 
 ## Getting Started
-See the [Getting Started](GettingStarted.md) file for more information.
 
+```bash
+flutter pub get
+cd ios && pod install && cd ..
+dart run build_runner build --delete-conflicting-outputs
+flutter run
+```
+
+See [GettingStarted.md](GettingStarted.md) for detailed setup.
 
 ## Disclaimer
-OpenNutriTracker is not a medical application. All data provided is not validated and should be used with caution. Please maintain a healthy lifestyle and consult a professional if you have any problems. Use during illness, pregnancy or lactation is not recommended.
 
-The application is still under construction. Errors, bugs and crashes might occur.
+Ayu is not a medical application. All data provided is not validated and should be used with caution. Consult a healthcare professional before making health decisions.
 
 ## Acknowledgments
-The OpenNutriTracker project was inspired by the need for a simple and effective nutrition tracking tool.
-The food database used in OpenNutriTracker is powered by [Open Food Facts](https://world.openfoodfacts.org/) and [Food Data Central](https://fdc.nal.usda.gov/).
+
+- [OpenNutriTracker](https://github.com/simonoppowa/OpenNutriTracker) by Simon Oppowa — original foundation
+- Longevity protocols: Peter Attia, Bryan Johnson (Blueprint), Andrew Huberman
+- Biomarker ranges: [Longevity Coach](https://github.com/longevitycoach)
+- Biological age: [Levine 2018](https://pubmed.ncbi.nlm.nih.gov/29676998/)
+- Bioavailability: [Hurrell & Egli 2010](https://pubmed.ncbi.nlm.nih.gov/20200264/), [Weaver 1999](https://pubmed.ncbi.nlm.nih.gov/10193899/), [Schuchardt & Hahn 2017](https://pubmed.ncbi.nlm.nih.gov/28587022/)
 
 ## License
-This project is licensed under the GNU General Public License v3.0 License. See the [LICENSE](LICENSE) file for more information.
 
-## Contact
-For questions, suggestions, or collaborations, feel free to contact the project maintainer:
-
-Simon Oppowa
-
-- GitHub: [@simonoppowa](https://github.com/simonoppowa)
-- Email: [opennutritracker-dev@pm.me](mailto:opennutritracker-dev@pm.me)
+GNU General Public License v3.0 — see [LICENSE](LICENSE).

@@ -1,9 +1,9 @@
-import 'package:opennutritracker/core/data/data_source/tracked_day_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/tracked_day_data_source_ob.dart';
 import 'package:opennutritracker/core/data/dbo/tracked_day_dbo.dart';
 import 'package:opennutritracker/core/domain/entity/tracked_day_entity.dart';
 
 class TrackedDayRepository {
-  final TrackedDayDataSource _trackedDayDataSource;
+  final TrackedDayDataSourceOB _trackedDayDataSource;
 
   TrackedDayRepository(this._trackedDayDataSource);
 

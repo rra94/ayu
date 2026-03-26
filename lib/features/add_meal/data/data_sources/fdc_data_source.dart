@@ -13,21 +13,34 @@ class FDCDataSource {
   final log = Logger('FDCDataSource');
 
   Future<FDCWordResponseDTO> fetchSearchWordResults(String searchString) async {
-    try {
-      final searchUrlString =
-          FDCConst.getFDCWordSearchUrl(searchString, Env.fdcApiKey);
+    final searchUrlString =
+        FDCConst.getFDCWordSearchUrl(searchString, Env.fdcApiKey);
+    return _fetchWithRetry(searchUrlString, 'FDC word search');
+  }
 
-      final response =
-          await http.get(searchUrlString).timeout(_timeoutDuration);
-      log.fine('Fetching FDC results from: $searchUrlString');
+  /// Search FDC Branded database by UPC/GTIN barcode
+  Future<FDCWordResponseDTO> fetchBarcodeResults(String barcode) async {
+    final searchUrl =
+        FDCConst.getFDCBarcodeSearchUrl(barcode, Env.fdcApiKey);
+    return _fetchWithRetry(searchUrl, 'FDC barcode search');
+  }
 
-      final wordResponse = FDCWordResponseDTO.fromJson(jsonDecode(response.body));
-      log.fine('Successful response from FDC');
-      return wordResponse;
-    } catch (exception, stacktrace) {
-      log.severe('Exception while getting FDC word search $exception');
-      Sentry.captureException(exception, stackTrace: stacktrace);
-      return Future.error(exception);
+  Future<FDCWordResponseDTO> _fetchWithRetry(Uri url, String label, {int maxRetries = 2}) async {
+    for (var attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        final response = await http.get(url).timeout(_timeoutDuration);
+        log.fine('$label response: ${response.statusCode}');
+        return FDCWordResponseDTO.fromJson(jsonDecode(response.body));
+      } catch (exception, stacktrace) {
+        if (attempt == maxRetries) {
+          log.severe('$label failed after ${attempt + 1} attempts: $exception');
+          Sentry.captureException(exception, stackTrace: stacktrace);
+          return Future.error(exception);
+        }
+        log.info('$label attempt ${attempt + 1} failed, retrying...');
+        await Future.delayed(Duration(milliseconds: 500 * (attempt + 1)));
+      }
     }
+    return Future.error(Exception('$label: max retries exceeded'));
   }
 }

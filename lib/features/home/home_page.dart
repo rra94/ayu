@@ -1,3 +1,4 @@
+import 'package:opennutritracker/core/db/entities/habit_log_ob.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logging/logging.dart';
@@ -5,17 +6,55 @@ import 'package:opennutritracker/core/domain/entity/intake_entity.dart';
 import 'package:opennutritracker/core/domain/entity/intake_type_entity.dart';
 import 'package:opennutritracker/core/domain/entity/tracked_day_entity.dart';
 import 'package:opennutritracker/core/domain/entity/user_activity_entity.dart';
-import 'package:opennutritracker/core/presentation/widgets/activity_vertial_list.dart';
 import 'package:opennutritracker/core/presentation/widgets/edit_dialog.dart';
 import 'package:opennutritracker/core/presentation/widgets/delete_dialog.dart';
 import 'package:opennutritracker/core/presentation/widgets/disclaimer_dialog.dart';
+import 'package:opennutritracker/core/domain/usecase/add_intake_usecase.dart';
+import 'package:opennutritracker/core/domain/usecase/get_user_usecase.dart';
+import 'package:opennutritracker/core/db/data_sources/water_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/habit_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/gut_health_data_source.dart';
+import 'package:opennutritracker/core/db/entities/gut_health_item_ob.dart';
+import 'package:opennutritracker/core/db/data_sources/intake_data_source_ob.dart';
+import 'package:opennutritracker/core/services/gut_health_service.dart';
+// IntakeDataSourceOB kept for toggleFavorite used in onIntakeItemLongPressed
+import 'package:opennutritracker/core/services/habit_notification_service.dart';
+import 'package:opennutritracker/core/services/smart_notification_service.dart';
+import 'package:opennutritracker/core/services/streak_service.dart';
+import 'package:opennutritracker/core/services/widget_service.dart';
+import 'package:opennutritracker/core/db/data_sources/supplement_data_source.dart';
+import 'package:opennutritracker/core/domain/usecase/get_intake_usecase.dart';
 import 'package:opennutritracker/core/utils/locator.dart';
+import 'package:opennutritracker/features/water/presentation/water_tracker_widget.dart';
+import 'package:opennutritracker/features/habits/presentation/habits_checklist_widget.dart';
+import 'package:opennutritracker/features/gut_health/presentation/gut_health_panel.dart';
+import 'package:opennutritracker/features/supplements/presentation/widgets/supplement_checklist_widget.dart';
+import 'package:opennutritracker/features/peptides/presentation/widgets/peptide_stack_widget.dart';
+import 'package:opennutritracker/features/fasting/presentation/widgets/fasting_timer_widget.dart';
+import 'package:opennutritracker/features/stats/presentation/widgets/caffeine_card.dart';
+import 'package:opennutritracker/features/stats/presentation/widgets/inventory_card.dart';
+import 'package:opennutritracker/features/stats/presentation/widgets/grocery_card.dart';
+import 'package:opennutritracker/features/home/presentation/widgets/agent_suggestions_widget.dart';
+import 'package:opennutritracker/features/stats/presentation/widgets/mood_energy_card.dart';
+import 'package:opennutritracker/features/home/presentation/widgets/collapsible_section.dart';
+import 'package:opennutritracker/features/home/presentation/widgets/quick_action_bar.dart';
+import 'package:opennutritracker/features/home/presentation/widgets/activity_dashboard_widget.dart';
+import 'package:opennutritracker/features/home/presentation/widgets/plant_tracker_widget.dart';
+import 'package:opennutritracker/features/home/presentation/widgets/sustainability_score_widget.dart';
+import 'package:opennutritracker/features/home/presentation/widgets/today_view_card.dart';
+import 'package:opennutritracker/features/mindfulness/presentation/widgets/mindfulness_timer_widget.dart';
 import 'package:opennutritracker/features/add_meal/presentation/add_meal_type.dart';
 import 'package:opennutritracker/features/home/presentation/bloc/home_bloc.dart';
 import 'package:opennutritracker/features/home/presentation/widgets/dashboard_widget.dart';
 import 'package:opennutritracker/features/home/presentation/widgets/intake_vertical_list.dart';
+import 'package:opennutritracker/core/presentation/widgets/daily_summary_card.dart';
+import 'package:opennutritracker/features/nutrition/presentation/micronutrient_summary_screen.dart';
+import 'package:opennutritracker/core/styles/color_schemes.dart';
 import 'package:opennutritracker/generated/l10n.dart';
 
+/// Home page uses HomeBloc for core nutrition data (kcal, macros, intakes)
+/// and direct data source access for self-contained widgets (water, habits,
+/// supplements, peptides) that manage their own state.
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -27,12 +66,24 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   final log = Logger('HomePage');
 
   late HomeBloc _homeBloc;
-  bool _isDragging = false;
+
+  // Cached futures to prevent jitter on scroll rebuild
+  late Future<double> _waterFuture;
+  late Future<List<dynamic>> _habitsFuture;
+
+  void _refreshCachedFutures() {
+    _waterFuture = locator<WaterDataSource>().getTodayTotal();
+    _habitsFuture = Future.wait([
+      locator<HabitDataSource>().getAllActiveHabits(),
+      locator<HabitDataSource>().getLogsForDate(DateTime.now()),
+    ]);
+  }
 
   @override
   void initState() {
     WidgetsBinding.instance.addObserver(this);
     _homeBloc = locator<HomeBloc>();
+    _refreshCachedFutures();
     super.initState();
   }
 
@@ -84,6 +135,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     if (state == AppLifecycleState.resumed) {
       log.info('App resumed');
       _refreshPageOnDayChange();
+      SmartNotificationService.checkAndNotify();
     }
     super.didChangeAppLifecycleState(state);
   }
@@ -116,6 +168,15 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     if (showDisclaimerDialog) {
       _showDisclaimerDialog(context);
     }
+
+    // Push fresh snapshot to iOS WidgetKit (fire-and-forget)
+    _pushWidgetUpdate(
+      caloriesConsumed: totalKcalSupplied,
+      calorieGoal: totalKcalDaily,
+    );
+
+    final hour = DateTime.now().hour;
+
     return Stack(children: [
       ListView(children: [
         DashboardWidget(
@@ -130,86 +191,143 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           totalFatsGoal: totalFatsGoal,
           totalProteinsGoal: totalProteinsGoal,
         ),
-        ActivityVerticalList(
-          day: DateTime.now(),
-          title: S.of(context).activityLabel,
-          userActivityList: userActivities,
-          onItemLongPressedCallback: onActivityItemLongPressed,
+        TodayViewCard(
+          caloriesConsumed: totalKcalSupplied,
+          calorieGoal: totalKcalDaily,
         ),
-        IntakeVerticalList(
-          day: DateTime.now(),
-          title: S.of(context).breakfastLabel,
-          listIcon: IntakeTypeEntity.breakfast.getIconData(),
-          addMealType: AddMealType.breakfastType,
-          intakeList: breakfastIntakeList,
-          onDeleteIntakeCallback: onDeleteIntake,
-          onItemDragCallback: onIntakeItemDrag,
-          onItemTappedCallback: onIntakeItemTapped,
-          usesImperialUnits: usesImperialUnits,
+        QuickActionBar(onActionComplete: () => setState(() { _refreshCachedFutures(); })),
+
+        // ── Agent suggestions (dismissible, non-invasive) ──
+        const AgentSuggestionsWidget(),
+
+        // ── Tracking ──
+        CollapsibleSection(
+          title: 'Tracking',
+          icon: Icons.track_changes,
+          storageKey: 'home_tracking',
+          children: [
+            _buildWaterTracker(),
+            const CaffeineCard(),
+            const ActivityDashboardWidget(),
+          ],
         ),
-        IntakeVerticalList(
-          day: DateTime.now(),
-          title: S.of(context).lunchLabel,
-          listIcon: IntakeTypeEntity.lunch.getIconData(),
-          addMealType: AddMealType.lunchType,
-          intakeList: lunchIntakeList,
-          onDeleteIntakeCallback: onDeleteIntake,
-          onItemDragCallback: onIntakeItemDrag,
-          onItemTappedCallback: onIntakeItemTapped,
-          usesImperialUnits: usesImperialUnits,
+
+        // ── Habits & Supplements ──
+        CollapsibleSection(
+          title: 'Habits & Supplements',
+          icon: Icons.checklist,
+          storageKey: 'home_habits',
+          children: [
+            _buildHabitsChecklist(),
+            const SupplementChecklistWidget(),
+            const PeptideStackWidget(),
+            const InventoryCard(),
+            const GroceryCard(),
+          ],
         ),
-        IntakeVerticalList(
-          day: DateTime.now(),
-          title: S.of(context).dinnerLabel,
-          addMealType: AddMealType.dinnerType,
-          listIcon: IntakeTypeEntity.dinner.getIconData(),
-          intakeList: dinnerIntakeList,
-          onDeleteIntakeCallback: onDeleteIntake,
-          onItemDragCallback: onIntakeItemDrag,
-          onItemTappedCallback: onIntakeItemTapped,
-          usesImperialUnits: usesImperialUnits,
+
+        // ── Timers ──
+        CollapsibleSection(
+          title: 'Timers',
+          icon: Icons.timer_outlined,
+          storageKey: 'home_timers',
+          initiallyExpanded: false,
+          children: [
+            const FastingTimerWidget(),
+            const MindfulnessTimerWidget(),
+          ],
         ),
-        IntakeVerticalList(
-          day: DateTime.now(),
-          title: S.of(context).snackLabel,
-          listIcon: IntakeTypeEntity.snack.getIconData(),
-          addMealType: AddMealType.snackType,
-          intakeList: snackIntakeList,
-          onDeleteIntakeCallback: onDeleteIntake,
-          onItemDragCallback: onIntakeItemDrag,
-          onItemTappedCallback: onIntakeItemTapped,
-          usesImperialUnits: usesImperialUnits,
+
+        // ── Health ──
+        CollapsibleSection(
+          title: 'Health',
+          icon: Icons.favorite_outline,
+          storageKey: 'home_health',
+          children: [
+            const MoodEnergyCard(),
+            const PlantTrackerWidget(),
+            SustainabilityScoreWidget(
+              allIntakes: [
+                ...breakfastIntakeList,
+                ...lunchIntakeList,
+                ...dinnerIntakeList,
+                ...snackIntakeList,
+              ],
+            ),
+            _buildMicronutrientButton(context, breakfastIntakeList,
+                lunchIntakeList, dinnerIntakeList, snackIntakeList),
+            _buildGutHealthAndSummary(
+                breakfastIntakeList, lunchIntakeList,
+                dinnerIntakeList, snackIntakeList,
+                totalKcalDaily, totalKcalSupplied,
+                totalCarbsGoal, totalCarbsIntake,
+                totalFatsGoal, totalFatsIntake,
+                totalProteinsGoal, totalProteinsIntake),
+          ],
         ),
+
+        // ── Food (hide empty, show current time slot) ──
+        CollapsibleSection(
+          title: 'Food',
+          icon: Icons.restaurant,
+          storageKey: 'home_food',
+          children: [
+            if (breakfastIntakeList.isNotEmpty || hour < 11)
+              IntakeVerticalList(
+                day: DateTime.now(),
+                title: S.of(context).breakfastLabel,
+                listIcon: IntakeTypeEntity.breakfast.getIconData(),
+                addMealType: AddMealType.breakfastType,
+                intakeList: breakfastIntakeList,
+                onDeleteIntakeCallback: onDeleteIntake,
+                onItemDragCallback: onIntakeItemDrag,
+                onItemTappedCallback: onIntakeItemTapped,
+                onItemLongPressedCallback: onIntakeItemLongPressed,
+                usesImperialUnits: usesImperialUnits,
+              ),
+            if (lunchIntakeList.isNotEmpty || (hour >= 11 && hour < 15))
+              IntakeVerticalList(
+                day: DateTime.now(),
+                title: S.of(context).lunchLabel,
+                listIcon: IntakeTypeEntity.lunch.getIconData(),
+                addMealType: AddMealType.lunchType,
+                intakeList: lunchIntakeList,
+                onDeleteIntakeCallback: onDeleteIntake,
+                onItemDragCallback: onIntakeItemDrag,
+                onItemTappedCallback: onIntakeItemTapped,
+                usesImperialUnits: usesImperialUnits,
+              ),
+            if (dinnerIntakeList.isNotEmpty || (hour >= 15 && hour < 21))
+              IntakeVerticalList(
+                day: DateTime.now(),
+                title: S.of(context).dinnerLabel,
+                listIcon: IntakeTypeEntity.dinner.getIconData(),
+                addMealType: AddMealType.dinnerType,
+                intakeList: dinnerIntakeList,
+                onDeleteIntakeCallback: onDeleteIntake,
+                onItemDragCallback: onIntakeItemDrag,
+                onItemTappedCallback: onIntakeItemTapped,
+                usesImperialUnits: usesImperialUnits,
+              ),
+            if (snackIntakeList.isNotEmpty)
+              IntakeVerticalList(
+                day: DateTime.now(),
+                title: S.of(context).snackLabel,
+                listIcon: IntakeTypeEntity.snack.getIconData(),
+                addMealType: AddMealType.snackType,
+                intakeList: snackIntakeList,
+                onDeleteIntakeCallback: onDeleteIntake,
+                onItemDragCallback: onIntakeItemDrag,
+                onItemTappedCallback: onIntakeItemTapped,
+                usesImperialUnits: usesImperialUnits,
+              ),
+          ],
+        ),
+
+        // Activity tracked via HealthKit (steps card in Tracking section)
+
         const SizedBox(height: 48.0)
       ]),
-      Align(
-          alignment: Alignment.bottomCenter,
-          child: Visibility(
-              visible: _isDragging,
-              child: Container(
-                height: 70,
-                color: Theme.of(context).colorScheme.error
-                  ..withValues(alpha: 0.3),
-                child: DragTarget<IntakeEntity>(
-                  onAcceptWithDetails: (data) {
-                    _confirmDelete(context, data.data);
-                  },
-                  onLeave: (data) {
-                    setState(() {
-                      _isDragging = false;
-                    });
-                  },
-                  builder: (context, candidateData, rejectedData) {
-                    return const Center(
-                      child: Icon(
-                        Icons.delete_outline,
-                        size: 36,
-                        color: Colors.white,
-                      ),
-                    );
-                  },
-                ),
-              )))
     ]);
   }
 
@@ -228,27 +346,44 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     }
   }
 
-  void onIntakeItemLongPressed(
-      BuildContext context, IntakeEntity intakeEntity) async {
-    final deleteIntake = await showDialog<bool>(
-        context: context, builder: (context) => const DeleteDialog());
-
-    if (deleteIntake != null) {
-      _homeBloc.deleteIntakeItem(intakeEntity);
-      _homeBloc.add(const LoadItemsEvent());
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(S.of(context).itemDeletedSnackbar)));
-      }
-    }
+  void onIntakeItemDrag(bool isDragging) {
+    // no-op: drag state is managed internally by IntakeVerticalList
   }
 
-  void onIntakeItemDrag(bool isDragging) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      setState(() {
-        _isDragging = isDragging;
-      });
-    });
+  void onIntakeItemLongPressed(
+      BuildContext context, IntakeEntity intakeEntity) async {
+    final action = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(intakeEntity.meal.name ?? 'Meal'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: Icon(Icons.star, color: Theme.of(ctx).colorScheme.chartAmber),
+              title: const Text('Add to Favorites'),
+              onTap: () => Navigator.of(ctx).pop('favorite'),
+            ),
+            ListTile(
+              leading: Icon(Icons.delete, color: Theme.of(ctx).colorScheme.error),
+              title: const Text('Delete'),
+              onTap: () => Navigator.of(ctx).pop('delete'),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (action == 'favorite') {
+      final ds = locator<IntakeDataSourceOB>();
+      await ds.toggleFavorite(intakeEntity.id, true);
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Added to favorites!')),
+        );
+      }
+    } else if (action == 'delete') {
+      onDeleteIntake(intakeEntity, null);
+    }
   }
 
   void onIntakeItemTapped(BuildContext context, IntakeEntity intakeEntity,
@@ -271,18 +406,22 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   void onDeleteIntake(IntakeEntity intake, TrackedDayEntity? trackedDayEntity) {
     _homeBloc.deleteIntakeItem(intake);
     _homeBloc.add(const LoadItemsEvent());
-  }
-
-  void _confirmDelete(BuildContext context, IntakeEntity intake) async {
-    bool? delete = await showDialog<bool>(
-        context: context, builder: (context) => const DeleteDialog());
-
-    if (delete == true) {
-      onDeleteIntake(intake, null);
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${intake.meal.name ?? 'Meal'} removed'),
+          duration: const Duration(seconds: 10),
+          action: SnackBarAction(
+            label: 'Undo',
+            onPressed: () async {
+              await locator<AddIntakeUsecase>().addIntake(intake);
+              _homeBloc.add(const LoadItemsEvent());
+            },
+          ),
+        ),
+      );
     }
-    setState(() {
-      _isDragging = false;
-    });
   }
 
   /// Show disclaimer dialog after build method
@@ -300,10 +439,194 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     });
   }
 
+  Widget _buildWaterTracker() {
+    final waterDs = locator<WaterDataSource>();
+    return FutureBuilder<double>(
+      future: _waterFuture,
+      builder: (context, snapshot) {
+        if (snapshot.hasError) return const SizedBox.shrink();
+        final currentML = snapshot.data ?? 0;
+        return WaterTrackerWidget(
+          currentML: currentML,
+          goalML: 2500,
+          onAddWater: (ml) async {
+            await waterDs.addWaterRecord(ml, DateTime.now());
+            setState(() { _refreshCachedFutures(); });
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildHabitsChecklist() {
+    final habitDs = locator<HabitDataSource>();
+    return FutureBuilder(
+      future: _habitsFuture,
+      builder: (context, snapshot) {
+        if (snapshot.hasError) return const SizedBox.shrink();
+        if (!snapshot.hasData || snapshot.data!.length < 2) return const SizedBox();
+        final habits = snapshot.data![0] as List;
+        final logs = snapshot.data![1] as List;
+        final completedIds = <int>{};
+        for (final log in logs) {
+          final habitLog = log as HabitLogOB;
+          if (habitLog.completed) {
+            completedIds.add(habitLog.habitId);
+          }
+        }
+        return HabitsChecklistWidget(
+          habits: habits.cast(),
+          completedHabitIds: completedIds,
+          onToggle: (habitId, completed) async {
+            await habitDs.toggleHabitLog(habitId, DateTime.now(), completed);
+            setState(() { _refreshCachedFutures(); });
+          },
+          onSetReminder: (habit, reminderMinutes) async {
+            habit.reminderMinutes = reminderMinutes;
+            await habitDs.updateHabit(habit);
+            if (reminderMinutes != null) {
+              await HabitNotificationService.requestPermission();
+              await HabitNotificationService.scheduleHabitReminder(habit);
+            } else {
+              await HabitNotificationService.cancelHabitReminder(habit.id);
+            }
+            setState(() { _refreshCachedFutures(); });
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildGutHealthAndSummary(
+      List<IntakeEntity> breakfast,
+      List<IntakeEntity> lunch,
+      List<IntakeEntity> dinner,
+      List<IntakeEntity> snack,
+      double calorieGoal,
+      double caloriesTracked,
+      double carbsGoal,
+      double carbsTracked,
+      double fatGoal,
+      double fatTracked,
+      double proteinGoal,
+      double proteinTracked) {
+    final allIntakes = [...breakfast, ...lunch, ...dinner, ...snack];
+    final gutService = locator<GutHealthService>();
+    final autoFlagged = gutService.flagFromIntakes(allIntakes);
+    final gutDs = locator<GutHealthDataSource>();
+    return FutureBuilder<List<GutHealthItemOB>>(
+      future: gutDs.getManualItemsByDate(DateTime.now()),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) return const SizedBox.shrink();
+        final manualItems = snapshot.data ?? [];
+        final allItems = [...autoFlagged, ...manualItems];
+        return Column(
+          children: [
+            GutHealthPanel(
+              items: allItems,
+              onAddManualItem: (item) async {
+                await gutDs.addItem(item);
+                setState(() {});
+              },
+              onDeleteItem: (id) async {
+                await gutDs.deleteItem(id);
+                setState(() {});
+              },
+            ),
+            DailySummaryCard(
+              calorieGoal: calorieGoal,
+              caloriesTracked: caloriesTracked,
+              carbsGoal: carbsGoal,
+              carbsTracked: carbsTracked,
+              fatGoal: fatGoal,
+              fatTracked: fatTracked,
+              proteinGoal: proteinGoal,
+              proteinTracked: proteinTracked,
+              gutHealthItems: allItems,
+              hasIntakes: allIntakes.isNotEmpty,
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildMicronutrientButton(
+      BuildContext context,
+      List<IntakeEntity> breakfast,
+      List<IntakeEntity> lunch,
+      List<IntakeEntity> dinner,
+      List<IntakeEntity> snack) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      child: Card(
+        child: ListTile(
+          leading: const Icon(Icons.science_outlined),
+          title: const Text('Micronutrient Tracker'),
+          subtitle: const Text('Vitamins & minerals vs RDA'),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () async {
+            final allIntakes = [
+              ...breakfast,
+              ...lunch,
+              ...dinner,
+              ...snack,
+            ];
+            final user =
+                await locator<GetUserUsecase>().getUserData();
+            Navigator.of(context).push(MaterialPageRoute(
+              builder: (_) => MicronutrientSummaryScreen(
+                allIntakes: allIntakes,
+                gender: user.gender.index,
+                age: user.age,
+              ),
+            ));
+          },
+        ),
+      ),
+    );
+  }
+
   /// Refresh page when day changes
   void _refreshPageOnDayChange() {
     if (!DateUtils.isSameDay(_homeBloc.currentDay, DateTime.now())) {
       _homeBloc.add(const LoadItemsEvent());
     }
+  }
+
+  /// Push current health snapshot to the iOS WidgetKit extension.
+  /// Runs in the background — failures are swallowed inside WidgetService.
+  void _pushWidgetUpdate({
+    required double caloriesConsumed,
+    required double calorieGoal,
+  }) {
+    Future(() async {
+      // Water
+      final waterMl = await locator<WaterDataSource>().getTodayTotal();
+      const waterTargetMl = 2500.0;
+
+      // Supplements
+      final suppDs = locator<SupplementDataSource>();
+      final allSupps = await suppDs.getAllActive();
+      final takenIds = await suppDs.getTakenIdsForDate(DateTime.now());
+
+      // Streak — compute via StreakService using all historical intakes
+      int streak = 0;
+      try {
+        final allIntakes = await locator<GetIntakeUsecase>().getAllIntakes();
+        final result = StreakService.computeStreak(allIntakes);
+        streak = result.currentStreak;
+      } catch (_) {}
+
+      await WidgetService.updateWidget(
+        caloriesConsumed: caloriesConsumed,
+        calorieGoal: calorieGoal,
+        waterMl: waterMl,
+        waterTargetMl: waterTargetMl,
+        streak: streak,
+        supplementsTaken: takenIds.length,
+        supplementsTotal: allSupps.length,
+      );
+    });
   }
 }

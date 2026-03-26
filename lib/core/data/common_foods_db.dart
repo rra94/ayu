@@ -1,0 +1,473 @@
+import 'package:opennutritracker/features/add_meal/domain/entity/meal_entity.dart';
+import 'package:opennutritracker/features/add_meal/domain/entity/meal_nutriments_entity.dart';
+
+/// Built-in database of common generic foods that aren't in OFF/FDC.
+/// Returns MealEntity with typical nutrition per 100g/100ml.
+class CommonFoodsDB {
+  /// Glycemic index classification for common foods
+  /// Sources: University of Sydney GI Database
+  static const _highGiFoods = {
+    'white rice': 73,
+    'bread': 75,
+    'toast': 75,
+    'bagel': 72,
+    'french fries': 75,
+    'mashed potatoes': 83,
+    'baked potato': 78,
+    'cornflakes': 81,
+    'watermelon': 76,
+    'pancakes': 67,
+    'waffle': 76,
+    'donut': 76,
+    'coca cola': 63,
+    'ramen': 73,
+    'instant noodle': 73,
+  };
+
+  static int? getGlycemicIndex(String foodName) {
+    final lower = foodName.toLowerCase();
+    for (final entry in _highGiFoods.entries) {
+      if (lower.contains(entry.key)) return entry.value;
+    }
+    return null;
+  }
+
+  static String? getGiLabel(String foodName) {
+    final gi = getGlycemicIndex(foodName);
+    if (gi == null) return null;
+    if (gi >= 70) return 'High GI ($gi)';
+    if (gi >= 56) return 'Medium GI ($gi)';
+    return 'Low GI ($gi)';
+  }
+
+  static List<MealEntity> search(String query) {
+    if (query.isEmpty) return [];
+    final lower = query.toLowerCase().trim();
+    return _foods.where((f) {
+      final name = f.name!.toLowerCase();
+      return name.contains(lower) || lower.contains(name);
+    }).toList();
+  }
+
+  static final _foods = [
+    // ── Coffee & Tea ──
+    _f('Americano', 2, 0, 0.3, 0, coffee: true),
+    _f('Espresso', 2, 0, 0.1, 0, coffee: true),
+    _f('Black Coffee', 2, 0, 0.3, 0, coffee: true),
+    _f('Latte', 67, 3.5, 3.4, 5, coffee: true, ingredients: 'milk, espresso, sugar'),
+    _f('Cappuccino', 45, 2.3, 2.5, 3.5, coffee: true, ingredients: 'milk, espresso'),
+    _f('Flat White', 54, 3, 2.8, 4, coffee: true),
+    _f('Mocha', 80, 3.5, 3, 10, coffee: true),
+    _f('Iced Coffee', 2, 0, 0.3, 0, coffee: true),
+    _f('Cold Brew', 3, 0, 0.3, 0, coffee: true),
+    _f('Chai Latte', 75, 2, 2, 12, coffee: true),
+    _f('Matcha Latte', 60, 2.5, 3, 7, coffee: true),
+    _f('Green Tea', 1, 0, 0.2, 0),
+    _f('Black Tea', 1, 0, 0.1, 0),
+    _f('Herbal Tea', 1, 0, 0, 0),
+
+    // ── Breakfast ──
+    _f('Oatmeal', 68, 1.4, 2.4, 12, iron: 1.6, magnesium: 27, zinc: 0.6, fiber: 1.7),
+    _f('Scrambled Eggs', 149, 11, 10, 1, iron: 1.2, vitaminB12: 1.1, vitaminD: 1.8, calcium: 50, zinc: 1.0),
+    _f('Fried Egg', 196, 15, 14, 0.6),
+    _f('Boiled Egg', 155, 11, 13, 1.1),
+    _f('Poached Egg', 143, 10, 12, 0.7),
+    _f('Toast with Butter', 313, 14, 7, 42),
+    _f('Pancakes', 227, 10, 6, 28, ingredients: 'wheat flour, eggs, milk, butter, sugar'),
+    _f('French Toast', 229, 10, 8, 26, ingredients: 'bread (wheat), eggs, milk, butter, cinnamon'),
+    _f('Granola', 471, 20, 10, 61),
+    _f('Yogurt Bowl', 59, 0.5, 10, 3.6),
+    _f('Avocado Toast', 220, 14, 5, 20),
+    _f('Smoothie Bowl', 80, 1, 2, 16),
+    _f('Bagel with Cream Cheese', 280, 10, 8, 38),
+
+    // ── Basics ──
+    _f('White Rice', 130, 0.3, 2.7, 28, iron: 0.2, magnesium: 12),
+    _f('Brown Rice', 123, 1, 2.6, 26, iron: 0.4, magnesium: 44, zinc: 0.6, fiber: 1.8),
+    _f('Pasta', 131, 1.1, 5, 25, ingredients: 'wheat flour (gluten), water', iron: 1.3, magnesium: 18),
+    _f('Bread', 265, 3.2, 9, 49, ingredients: 'wheat flour (gluten), water, yeast, salt', iron: 3.6, calcium: 151, magnesium: 25),
+    _f('Tortilla', 237, 5, 6, 41),
+    _f('Quinoa', 120, 1.9, 4.4, 21, iron: 1.5, magnesium: 64, zinc: 1.1, potassium: 172, fiber: 2.8),
+    _f('Couscous', 112, 0.2, 3.8, 23),
+
+    // ── Proteins ──
+    _f('Grilled Chicken Breast', 165, 3.6, 31, 0, iron: 1.0, zinc: 0.9, vitaminB12: 0.3, potassium: 256),
+    _f('Chicken Thigh', 209, 11, 26, 0),
+    _f('Salmon Fillet', 208, 13, 20, 0, iron: 0.8, vitaminD: 11, vitaminB12: 3.2, potassium: 363, magnesium: 29),
+    _f('Tuna Steak', 144, 5, 23, 0, iron: 1.0, vitaminB12: 9.4, vitaminD: 7.2, potassium: 252, magnesium: 50),
+    _f('Ground Beef', 250, 17, 26, 0, iron: 2.1, vitaminB12: 2.2, zinc: 4.5, potassium: 270),
+    _f('Steak', 271, 19, 26, 0, iron: 2.6, vitaminB12: 2.6, zinc: 4.8, potassium: 318),
+    _f('Pork Chop', 231, 13, 27, 0),
+    _f('Turkey Breast', 135, 1, 30, 0, iron: 0.7, vitaminB12: 0.4, zinc: 1.2, potassium: 293),
+    _f('Shrimp', 99, 0.3, 24, 0.2),
+    _f('Tofu', 76, 4.8, 8, 1.9, iron: 5.4, calcium: 350, magnesium: 30, zinc: 0.8),
+    _f('Tempeh', 192, 11, 20, 8),
+    _f('Lentils', 116, 0.4, 9, 20, iron: 3.3, calcium: 19, fiber: 7.9, magnesium: 36, potassium: 369, zinc: 1.3),
+    _f('Chickpeas', 164, 2.6, 9, 27, iron: 2.9, calcium: 49, fiber: 7.6, magnesium: 48, potassium: 291, zinc: 1.5),
+    _f('Black Beans', 132, 0.5, 9, 24, iron: 2.1, calcium: 27, fiber: 8.7, magnesium: 70, potassium: 355, zinc: 1.1),
+
+    // ── Vegetables ──
+    _f('Broccoli', 34, 0.4, 2.8, 7, iron: 0.7, calcium: 47, vitaminC: 89, magnesium: 21, potassium: 316, fiber: 2.6),
+    _f('Spinach', 23, 0.4, 2.9, 3.6, iron: 2.7, calcium: 99, vitaminC: 28, magnesium: 79, potassium: 558, fiber: 2.2),
+    _f('Kale', 49, 0.9, 4.3, 9, iron: 1.5, calcium: 150, vitaminC: 120, magnesium: 47, potassium: 491, fiber: 3.6),
+    _f('Sweet Potato', 86, 0.1, 1.6, 20, vitaminC: 2.4, potassium: 337, magnesium: 25, calcium: 30, fiber: 3.0),
+    _f('Baked Potato', 93, 0.1, 2.5, 21),
+    _f('Mixed Salad', 20, 0.2, 1.5, 3.6),
+    _f('Caesar Salad', 127, 8, 6, 8),
+    _f('Steamed Vegetables', 35, 0.3, 2, 7),
+
+    // ── Fruits ──
+    _f('Banana', 89, 0.3, 1.1, 23, potassium: 358, magnesium: 27, vitaminC: 8.7, fiber: 2.6),
+    _f('Apple', 52, 0.2, 0.3, 14, vitaminC: 4.6, potassium: 107, fiber: 2.4),
+    _f('Orange', 47, 0.1, 0.9, 12, vitaminC: 53, potassium: 181, calcium: 40, fiber: 2.4),
+    _f('Berries', 57, 0.3, 0.7, 14),
+    _f('Mango', 60, 0.4, 0.8, 15),
+    _f('Watermelon', 30, 0.2, 0.6, 8),
+
+    // ── Dairy ──
+    _f('Whole Milk', 61, 3.3, 3.2, 4.8, calcium: 113, vitaminB12: 0.45, vitaminD: 1.3, potassium: 132),
+    _f('Skim Milk', 34, 0.1, 3.4, 5, calcium: 122, vitaminB12: 0.5, vitaminD: 1.3, potassium: 156),
+    _f('Almond Milk', 17, 1.1, 0.6, 0.8),
+    _f('Oat Milk', 43, 1.5, 1, 7),
+    _f('Greek Yogurt', 97, 5, 9, 3.6, calcium: 110, vitaminB12: 0.75, potassium: 141, zinc: 0.7, magnesium: 11),
+    _f('Cottage Cheese', 98, 4.3, 11, 3.4),
+    _f('Cheese', 402, 33, 25, 1.3, calcium: 721, vitaminB12: 0.8, zinc: 3.1),
+    _f('Butter', 717, 81, 0.9, 0.1),
+
+    // ── Snacks ──
+    _f('Almonds', 579, 50, 21, 22, iron: 3.7, calcium: 269, magnesium: 270, zinc: 3.1, fiber: 12.5),
+    _f('Peanut Butter', 588, 50, 25, 20, ingredients: 'peanuts, salt, oil'),
+    _f('Trail Mix', 462, 29, 13, 45, ingredients: 'peanuts, tree nuts, raisins, chocolate'),
+    _f('Dark Chocolate', 546, 31, 5, 60, iron: 8.0, magnesium: 146, zinc: 2.0, potassium: 559, fiber: 7.0),
+    _f('Hummus', 166, 10, 8, 14),
+    _f('Protein Bar', 350, 12, 20, 40),
+    _f('Rice Cake', 387, 2.8, 8, 81),
+    _f('Popcorn', 387, 4.5, 13, 78),
+
+    // ── Common Meals ──
+    _f('Burger', 295, 14, 17, 24, ingredients: 'beef, wheat bun, lettuce, tomato'),
+    _f('Cheeseburger', 303, 15, 17, 25, ingredients: 'beef, wheat bun, cheese (dairy), lettuce'),
+    _f('Pizza Slice', 266, 10, 11, 33, ingredients: 'wheat flour, cheese (dairy), tomato sauce'),
+    _f('Burrito', 206, 8, 9, 25),
+    _f('Taco', 210, 10, 9, 21),
+    _f('Sandwich', 250, 10, 12, 28),
+    _f('Wrap', 200, 8, 10, 24),
+    _f('Sushi Roll', 140, 2, 5, 26),
+    _f('Fried Rice', 163, 5, 4, 25),
+    _f('Noodles', 138, 2, 5, 25, ingredients: 'wheat flour, eggs, water'),
+    _f('Egg Noodles', 138, 2, 5, 25),
+    _f('Rice Noodles', 109, 0.2, 1, 25),
+    _f('Udon', 99, 0.4, 3, 21),
+    _f('Soba', 99, 0.1, 5, 21),
+    _f('Pad Thai', 155, 5, 6, 22, ingredients: 'rice noodles, peanuts, shrimp, egg, soy sauce'),
+    _f('Ramen', 106, 5, 4, 13, ingredients: 'wheat noodles, broth, soy sauce'),
+    _f('Pho', 45, 1, 4, 6),
+    _f('Chow Mein', 155, 6, 5, 21),
+    _f('Lo Mein', 150, 5, 5, 22),
+    _f('Stir Fry', 130, 5, 8, 14),
+    _f('Dumplings', 195, 7, 8, 25),
+    _f('Spring Roll', 180, 8, 4, 24),
+    _f('Wonton Soup', 70, 2, 4, 8),
+    _f('Curry with Rice', 142, 5, 5, 20, ingredients: 'rice, coconut milk (dairy alternative), spices, vegetables'),
+    _f('Fish and Chips', 230, 12, 13, 18),
+    _f('Grilled Cheese', 366, 21, 14, 29, ingredients: 'bread (wheat), cheese (dairy), butter'),
+    _f('Chicken Soup', 36, 1, 3, 3),
+    _f('Tomato Soup', 30, 0.4, 1, 6),
+    _f('French Fries', 312, 15, 3.4, 41),
+    _f('Onion Rings', 332, 18, 4, 39),
+    _f('Mac and Cheese', 164, 8, 6, 17, ingredients: 'wheat pasta, cheese (dairy), butter, milk'),
+    _f('Mashed Potatoes', 83, 3, 1.5, 13),
+
+    // ── Drinks ──
+    _f('Orange Juice', 45, 0.2, 0.7, 10),
+    _f('Apple Juice', 46, 0.1, 0.1, 11),
+    _f('Coca Cola', 42, 0, 0, 11),
+    _f('Sparkling Water', 0, 0, 0, 0),
+    _f('Kombucha', 17, 0, 0.5, 3),
+    _f('Protein Shake', 80, 1.5, 15, 3),
+    _f('Milkshake', 112, 3, 3.5, 18),
+    _f('Smoothie', 50, 0.3, 0.8, 12),
+    _f('Coconut Water', 19, 0.2, 0.7, 3.7),
+    _f('Beer', 43, 0, 0.5, 3.6),
+    _f('Red Wine', 85, 0, 0.1, 2.6),
+    _f('White Wine', 82, 0, 0.1, 2.6),
+    _f('Margarita', 274, 0.1, 0, 17),
+    _f('Whiskey', 250, 0, 0, 0),
+    _f('Vodka', 231, 0, 0, 0),
+
+    // ── Indian ──
+    _f('Dal', 104, 1.5, 7, 18, iron: 3.3, calcium: 19, fiber: 7.9, magnesium: 36, potassium: 369, zinc: 1.3),
+    _f('Lentil Dal', 104, 1.5, 7, 18, iron: 3.3, calcium: 19, fiber: 7.9, magnesium: 36, potassium: 369, zinc: 1.3),
+    _f('Chicken Tikka Masala', 150, 8, 12, 8),
+    _f('Butter Chicken', 147, 9, 11, 6, ingredients: 'chicken, butter (dairy), cream (dairy), tomato, spices'),
+    _f('Palak Paneer', 130, 9, 7, 5),
+    _f('Paneer', 265, 21, 18, 1.2, calcium: 208, iron: 0.2, zinc: 0.6),
+    _f('Biryani', 150, 5, 5, 22),
+    _f('Naan', 262, 5, 9, 45, ingredients: 'wheat flour, yogurt (dairy), butter', iron: 2.9, calcium: 48),
+    _f('Roti', 240, 3.5, 8, 45),
+    _f('Chapati', 240, 3.5, 8, 45),
+    _f('Paratha', 290, 10, 7, 42),
+    _f('Samosa', 262, 14, 5, 30),
+    _f('Pakora', 240, 14, 6, 24),
+    _f('Idli', 130, 0.4, 4, 28),
+    _f('Dosa', 120, 1.5, 3, 24),
+    _f('Upma', 110, 3, 3, 18),
+    _f('Chana Masala', 140, 4, 7, 20),
+    _f('Aloo Gobi', 85, 3, 2, 13),
+    _f('Raita', 40, 1.5, 2, 4),
+    _f('Tandoori Chicken', 148, 6, 22, 2),
+    _f('Korma', 155, 10, 9, 8),
+    _f('Vindaloo', 130, 7, 10, 6),
+    _f('Lassi', 72, 2, 3, 10),
+    _f('Mango Lassi', 90, 2, 3, 15),
+    _f('Chai', 45, 1.5, 2, 6, coffee: true),
+    _f('Gulab Jamun', 325, 12, 4, 50),
+    _f('Kheer', 120, 4, 3, 18),
+    _f('Puri', 310, 14, 6, 40),
+    _f('Chole', 140, 4, 7, 20),
+    _f('Rajma', 127, 0.5, 9, 23),
+    _f('Poha', 130, 3, 3, 23),
+
+    // ── Middle Eastern / Mediterranean ──
+    _f('Falafel', 333, 18, 13, 32),
+    _f('Shawarma', 215, 12, 16, 12),
+    _f('Kebab', 230, 14, 20, 5),
+    _f('Pita Bread', 275, 1.2, 9, 55),
+    _f('Tabbouleh', 90, 5, 2, 10),
+    _f('Baba Ganoush', 95, 7, 2, 7),
+    _f('Fattoush', 60, 3, 1, 8),
+    _f('Labneh', 155, 11, 6, 8),
+    _f('Tahini', 595, 54, 17, 21),
+    _f('Halloumi', 321, 25, 22, 2),
+    _f('Tzatziki', 50, 3, 3, 3),
+    _f('Moussaka', 135, 8, 7, 9),
+    _f('Dolma', 150, 8, 3, 16),
+    _f('Couscous Salad', 130, 3, 4, 22),
+    _f('Baklava', 428, 23, 6, 53),
+
+    // ── Mexican / Latin ──
+    _f('Enchilada', 168, 8, 10, 14),
+    _f('Nachos', 346, 19, 9, 36),
+    _f('Guacamole', 160, 15, 2, 9),
+    _f('Salsa', 36, 0.2, 1.5, 7),
+    _f('Tamale', 195, 8, 7, 25),
+    _f('Elote', 150, 7, 4, 20),
+    _f('Churro', 370, 18, 4, 48),
+    _f('Empanada', 280, 14, 8, 30),
+    _f('Pupusa', 240, 10, 8, 30),
+    _f('Ceviche', 90, 2, 14, 4),
+    _f('Chilaquiles', 190, 10, 7, 18),
+    _f('Pozole', 80, 2, 6, 10),
+    _f('Horchata', 68, 1, 0.5, 14),
+    _f('Refried Beans', 132, 2, 8, 20),
+    _f('Mexican Rice', 140, 2, 3, 27),
+    _f('Pico de Gallo', 20, 0.2, 1, 4),
+
+    // ── Japanese ──
+    _f('Miso Soup', 21, 0.6, 1.3, 2.7),
+    _f('Edamame', 121, 5, 12, 9, iron: 2.3, calcium: 63, magnesium: 64, potassium: 436, zinc: 1.4, fiber: 5.2),
+    _f('Gyoza', 185, 7, 8, 22, ingredients: 'wheat wrapper, pork, vegetables, soy sauce'),
+    _f('Tempura', 230, 14, 6, 20, ingredients: 'wheat flour, egg, shrimp/vegetables'),
+    _f('Teriyaki Chicken', 150, 3, 20, 10),
+    _f('Onigiri', 155, 0.5, 3, 35),
+    _f('Sashimi', 127, 4, 21, 0),
+    _f('Katsu', 217, 12, 15, 12),
+    _f('Okonomiyaki', 160, 5, 6, 22),
+    _f('Takoyaki', 180, 7, 7, 22),
+    _f('Mochi', 280, 0.5, 4, 63),
+    _f('Matcha', 3, 0, 0.3, 0.5, coffee: true),
+
+    // ── Korean ──
+    _f('Kimchi', 15, 0.5, 1, 2),
+    _f('Bibimbap', 130, 4, 6, 18),
+    _f('Bulgogi', 175, 8, 20, 6),
+    _f('Korean BBQ', 200, 10, 22, 4),
+    _f('Japchae', 140, 4, 4, 22),
+    _f('Tteokbokki', 160, 3, 3, 31),
+    _f('Kimbap', 140, 3, 5, 24),
+    _f('Sundubu Jjigae', 55, 3, 5, 2),
+    _f('Banchan', 40, 1, 2, 5),
+
+    // ── Thai ──
+    _f('Green Curry', 130, 8, 6, 8),
+    _f('Red Curry', 120, 7, 6, 8),
+    _f('Tom Yum', 45, 1.5, 3, 5),
+    _f('Tom Kha', 90, 6, 4, 5),
+    _f('Papaya Salad', 55, 2, 1.5, 9),
+    _f('Satay', 180, 10, 15, 8),
+    _f('Mango Sticky Rice', 160, 2, 2, 34),
+    _f('Thai Iced Tea', 80, 2, 1, 14, coffee: true),
+
+    // ── Chinese ──
+    _f('Kung Pao Chicken', 160, 9, 14, 7),
+    _f('Mapo Tofu', 100, 6, 7, 4),
+    _f('Hot and Sour Soup', 35, 1, 2, 4),
+    _f('Egg Drop Soup', 30, 1, 2, 3),
+    _f('Peking Duck', 225, 15, 20, 2),
+    _f('Char Siu', 190, 6, 24, 10),
+    _f('Congee', 46, 0.3, 1, 10),
+    _f('Dim Sum', 180, 8, 7, 20),
+    _f('Bao Bun', 200, 4, 6, 34),
+    _f('Egg Fried Rice', 175, 6, 5, 25),
+    _f('Sweet and Sour', 160, 5, 8, 20),
+    _f('General Tso Chicken', 230, 13, 12, 16),
+    _f('Orange Chicken', 220, 11, 12, 18),
+    _f('Chop Suey', 90, 3, 6, 9),
+    _f('Ma La', 120, 8, 5, 7),
+
+    // ── Vietnamese ──
+    _f('Banh Mi', 230, 6, 12, 32),
+    _f('Bun Cha', 150, 6, 12, 12),
+    _f('Goi Cuon', 80, 1.5, 5, 12),
+    _f('Cao Lau', 140, 3, 7, 22),
+    _f('Vietnamese Coffee', 60, 2, 1, 10, coffee: true),
+
+    // ── Italian ──
+    _f('Risotto', 140, 5, 3, 20),
+    _f('Lasagna', 135, 6, 8, 12),
+    _f('Ravioli', 175, 6, 8, 22),
+    _f('Gnocchi', 133, 1, 3, 28),
+    _f('Pesto Pasta', 190, 8, 6, 24),
+    _f('Carbonara', 185, 9, 8, 18),
+    _f('Bolognese', 140, 6, 10, 12),
+    _f('Bruschetta', 200, 7, 4, 28),
+    _f('Minestrone', 45, 1, 2, 7),
+    _f('Caprese Salad', 110, 8, 6, 3),
+    _f('Tiramisu', 240, 11, 5, 30),
+    _f('Gelato', 160, 6, 3, 24),
+    _f('Panna Cotta', 230, 15, 3, 20),
+    _f('Focaccia', 271, 8, 7, 42),
+    _f('Prosciutto', 195, 12, 22, 0),
+    _f('Arancini', 220, 10, 6, 27),
+
+    // ── American / Diner ──
+    _f('Hot Dog', 290, 18, 10, 22),
+    _f('Corn Dog', 330, 18, 8, 34),
+    _f('BLT Sandwich', 280, 14, 12, 26),
+    _f('Club Sandwich', 350, 17, 18, 30),
+    _f('Philly Cheesesteak', 310, 16, 18, 24),
+    _f('Buffalo Wings', 250, 17, 20, 5),
+    _f('Mozzarella Sticks', 300, 16, 12, 28),
+    _f('Coleslaw', 150, 10, 1, 14),
+    _f('Corn on the Cob', 96, 1.5, 3, 21),
+    _f('Biscuits and Gravy', 280, 15, 6, 30),
+    _f('Chicken Fried Steak', 290, 17, 16, 18),
+    _f('Pot Roast', 180, 8, 24, 2),
+    _f('Meatloaf', 170, 9, 14, 8),
+    _f('Clam Chowder', 100, 5, 4, 10),
+    _f('Lobster Roll', 275, 12, 18, 22),
+    _f('Cobb Salad', 180, 12, 14, 5),
+    _f('Pulled Pork', 210, 11, 24, 4),
+    _f('BBQ Ribs', 260, 17, 22, 6),
+    _f('Cornbread', 196, 5, 4, 33),
+    _f('Hush Puppies', 290, 14, 4, 36),
+    _f('Banana Split', 280, 10, 4, 46),
+
+    // ── African ──
+    _f('Jollof Rice', 160, 4, 3, 28),
+    _f('Injera', 125, 0.5, 4, 26),
+    _f('Fufu', 160, 0.5, 2, 38),
+    _f('Egusi Soup', 140, 10, 6, 6),
+    _f('Suya', 200, 12, 20, 3),
+    _f('Bobotie', 160, 8, 12, 10),
+    _f('Tagine', 130, 5, 8, 14),
+    _f('Couscous', 112, 0.2, 3.8, 23),
+    _f('Plantain', 122, 0.4, 1.3, 32),
+    _f('Fried Plantain', 200, 8, 1, 31),
+
+    // ── Caribbean ──
+    _f('Jerk Chicken', 165, 5, 25, 4),
+    _f('Rice and Peas', 145, 2, 4, 27),
+    _f('Ackee and Saltfish', 150, 10, 10, 4),
+    _f('Roti (Caribbean)', 260, 7, 8, 40),
+    _f('Callaloo', 30, 0.5, 3, 4),
+
+    // ── Snacks & Sweets ──
+    _f('Croissant', 406, 21, 8, 46, ingredients: 'wheat flour, butter (dairy), eggs, sugar'),
+    _f('Muffin', 340, 13, 5, 52, ingredients: 'wheat flour, eggs, milk, butter, sugar'),
+    _f('Donut', 403, 22, 5, 47),
+    _f('Cinnamon Roll', 350, 14, 5, 50),
+    _f('Scone', 362, 14, 7, 52),
+    _f('Cheesecake', 321, 23, 6, 26),
+    _f('Eclair', 262, 16, 6, 24),
+    _f('Macaroon', 420, 18, 5, 60),
+    _f('Energy Ball', 360, 18, 8, 42),
+    _f('Granola Bar', 430, 15, 8, 66),
+    _f('Fruit Salad', 40, 0.2, 0.5, 10),
+    _f('Acai Bowl', 210, 6, 3, 38),
+    _f('Chia Pudding', 90, 4, 3, 12),
+    _f('Overnight Oats', 160, 5, 6, 24),
+    _f('Peanut Butter Toast', 340, 17, 11, 36),
+    _f('Nutella Toast', 370, 15, 6, 52),
+
+    // ── Condiments & Sides ──
+    _f('Ketchup', 112, 0.1, 1.7, 26),
+    _f('Mayonnaise', 680, 75, 1, 0.6),
+    _f('Mustard', 60, 3, 4, 5),
+    _f('Soy Sauce', 53, 0, 8, 5),
+    _f('Hot Sauce', 12, 0.3, 0.5, 2),
+    _f('Olive Oil', 884, 100, 0, 0),
+    _f('Coconut Oil', 862, 100, 0, 0),
+    _f('Honey', 304, 0, 0.3, 82),
+    _f('Maple Syrup', 260, 0.1, 0, 67),
+    _f('Jam', 250, 0.1, 0.4, 63),
+
+    // ── Supplements & Health Foods ──
+    _f('Whey Protein', 400, 6, 75, 10, ingredients: 'whey protein (dairy), cocoa, sweetener'),
+    _f('Collagen Powder', 360, 0, 90, 0),
+    _f('Creatine', 0, 0, 0, 0),
+    _f('BCAA', 0, 0, 0, 0),
+    _f('MCT Oil', 830, 93, 0, 0),
+    _f('Bone Broth', 17, 0.2, 3, 0.5),
+    _f('Apple Cider Vinegar', 22, 0, 0, 0.9),
+    _f('Spirulina', 290, 8, 57, 24),
+    _f('Flaxseed', 534, 42, 18, 29),
+    _f('Hemp Seeds', 553, 49, 32, 9),
+    _f('Chia Seeds', 486, 31, 17, 42),
+  ];
+
+  static MealEntity _f(String name, double kcal, double fat, double protein,
+      double carbs,
+      {bool coffee = false,
+      String? ingredients,
+      double? iron,
+      double? calcium,
+      double? vitaminC,
+      double? vitaminB12,
+      double? vitaminD,
+      double? magnesium,
+      double? zinc,
+      double? potassium,
+      double? fiber}) {
+    return MealEntity(
+      code: null,
+      name: name,
+      url: null,
+      mealQuantity: coffee ? '240' : '100',
+      mealUnit: coffee ? 'ml' : 'g',
+      servingQuantity: coffee ? 240 : null,
+      servingUnit: coffee ? 'ml' : null,
+      servingSize: coffee ? '1 cup (240ml)' : null,
+      ingredientsText: ingredients,
+      source: MealSourceEntity.custom,
+      nutriments: MealNutrimentsEntity(
+        energyKcal100: kcal,
+        carbohydrates100: carbs,
+        fat100: fat,
+        proteins100: protein,
+        sugars100: null,
+        saturatedFat100: null,
+        fiber100: fiber,
+        sodium100: null,
+        iron100: iron,
+        calcium100: calcium,
+        vitaminC100: vitaminC,
+        vitaminB12100: vitaminB12,
+        vitaminD100: vitaminD,
+        magnesium100: magnesium,
+        zinc100: zinc,
+        potassium100: potassium,
+      ),
+    );
+  }
+}

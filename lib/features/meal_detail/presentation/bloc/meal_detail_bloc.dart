@@ -8,8 +8,11 @@ import 'package:opennutritracker/core/domain/usecase/add_intake_usecase.dart';
 import 'package:opennutritracker/core/domain/usecase/add_tracked_day_usecase.dart';
 import 'package:opennutritracker/core/domain/usecase/get_kcal_goal_usecase.dart';
 import 'package:opennutritracker/core/domain/usecase/get_macro_goal_usecase.dart';
+import 'package:opennutritracker/core/db/data_sources/search_history_data_source.dart';
+import 'package:opennutritracker/core/services/widget_service.dart';
 import 'package:opennutritracker/core/utils/calc/unit_calc.dart';
 import 'package:opennutritracker/core/utils/id_generator.dart';
+import 'package:opennutritracker/core/utils/locator.dart';
 import 'package:opennutritracker/features/add_meal/domain/entity/meal_entity.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
@@ -19,6 +22,11 @@ part 'meal_detail_state.dart';
 
 class MealDetailBloc extends Bloc<MealDetailEvent, MealDetailState> {
   final log = Logger('MealDetailBloc');
+
+  // Duplicate meal prevention (rapid double-tap guard)
+  static DateTime? _lastAddTime;
+  static String? _lastAddName;
+
   final AddIntakeUsecase _addIntakeUseCase;
   final AddTrackedDayUsecase _addTrackedDayUsecase;
   final GetKcalGoalUsecase _getKcalGoalUsecase;
@@ -74,9 +82,22 @@ class MealDetailBloc extends Bloc<MealDetailEvent, MealDetailState> {
     });
   }
 
-  void addIntake(BuildContext context, String unit, String amountText,
-      IntakeTypeEntity type, MealEntity meal, DateTime day) async {
+  Future<IntakeEntity> addIntake(BuildContext context, String unit,
+      String amountText, IntakeTypeEntity type, MealEntity meal,
+      DateTime day) async {
     final quantity = double.parse(amountText.replaceAll(',', '.'));
+
+    // Prevent duplicate from rapid taps (same meal within 5 seconds)
+    final now = DateTime.now();
+    if (_lastAddTime != null &&
+        _lastAddName == meal.name &&
+        now.difference(_lastAddTime!).inSeconds < 5) {
+      log.warning('Duplicate meal detected, skipping: ${meal.name}');
+      return IntakeEntity(
+          id: '', unit: unit, amount: quantity, type: type, meal: meal, dateTime: day);
+    }
+    _lastAddTime = now;
+    _lastAddName = meal.name;
 
     final intakeEntity = IntakeEntity(
         id: IdGenerator.getUniqueID(),
@@ -87,6 +108,33 @@ class MealDetailBloc extends Bloc<MealDetailEvent, MealDetailState> {
         dateTime: day);
     await _addIntakeUseCase.addIntake(intakeEntity);
     _updateTrackedDay(intakeEntity, day);
+
+    // Update iOS home-screen widget with latest totals
+    WidgetService.refreshFromDB();
+
+    // Record meal choice so future searches surface preferred items first
+    try {
+      final historyDs = locator<SearchHistoryDataSource>();
+      final name = meal.name;
+      if (name != null && name.isNotEmpty) {
+        await historyDs.recordChoice(
+          searchTerm: name.toLowerCase(),
+          mealName: name,
+          mealCode: meal.code,
+        );
+        for (final word in name.split(' ').where((w) => w.length > 2)) {
+          await historyDs.recordChoice(
+            searchTerm: word.toLowerCase(),
+            mealName: name,
+            mealCode: meal.code,
+          );
+        }
+      }
+    } catch (e) {
+      debugPrint('Search history record failed: $e');
+    }
+
+    return intakeEntity;
   }
 
   Future<void> _updateTrackedDay(

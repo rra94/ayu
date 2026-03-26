@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:opennutritracker/core/styles/color_schemes.dart';
 import 'package:opennutritracker/core/presentation/widgets/error_dialog.dart';
 import 'package:opennutritracker/core/utils/locator.dart';
 import 'package:opennutritracker/core/utils/navigation_options.dart';
@@ -7,7 +8,9 @@ import 'package:opennutritracker/features/add_meal/presentation/add_meal_type.da
 import 'package:opennutritracker/features/add_meal/presentation/bloc/add_meal_bloc.dart';
 import 'package:opennutritracker/features/add_meal/presentation/bloc/food_bloc.dart';
 import 'package:opennutritracker/features/add_meal/presentation/bloc/recent_meal_bloc.dart';
+import 'package:opennutritracker/core/db/data_sources/search_history_data_source.dart';
 import 'package:opennutritracker/features/add_meal/presentation/widgets/default_results_widget.dart';
+import 'package:opennutritracker/features/add_meal/presentation/widgets/favorites_tab.dart';
 import 'package:opennutritracker/features/add_meal/presentation/widgets/meal_search_bar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:opennutritracker/features/add_meal/presentation/widgets/no_results_widget.dart';
@@ -42,7 +45,7 @@ class _AddMealScreenState extends State<AddMealScreen>
     _productsBloc = locator<ProductsBloc>();
     _foodBloc = locator<FoodBloc>();
     _recentMealBloc = locator<RecentMealBloc>();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
     _tabController.addListener(() {
       // Update search results when tab changes
       _onSearchSubmit(_searchStringListener.value);
@@ -69,7 +72,7 @@ class _AddMealScreenState extends State<AddMealScreen>
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text(_mealType.getTypeName(context)),
+          title: Text(S.of(context).addFoodLabel),
           actions: [
             BlocBuilder<AddMealBloc, AddMealState>(
               bloc: locator<AddMealBloc>()..add(InitializeAddMealEvent()),
@@ -98,6 +101,7 @@ class _AddMealScreenState extends State<AddMealScreen>
               const SizedBox(height: 16.0),
               TabBar(
                   tabs: [
+                    Tab(text: S.of(context).favoritesLabel),
                     Tab(text: S.of(context).searchProductsPage),
                     Tab(text: S.of(context).searchFoodPage),
                     Tab(text: S.of(context).recentlyAddedLabel)
@@ -107,6 +111,7 @@ class _AddMealScreenState extends State<AddMealScreen>
               const SizedBox(height: 16),
               Expanded(
                 child: TabBarView(controller: _tabController, children: [
+                  FavoritesTab(day: _day),
                   Column(
                     children: [
                       Container(
@@ -119,7 +124,7 @@ class _AddMealScreenState extends State<AddMealScreen>
                         bloc: _productsBloc,
                         builder: (context, state) {
                           if (state is ProductsInitial) {
-                            return const DefaultsResultsWidget();
+                            return _buildPopularMeals();
                           } else if (state is ProductsLoadingState) {
                             return const Padding(
                               padding: EdgeInsets.only(top: 32),
@@ -128,17 +133,36 @@ class _AddMealScreenState extends State<AddMealScreen>
                           } else if (state is ProductsLoadedState) {
                             return state.products.isNotEmpty
                                 ? Flexible(
-                                    child: ListView.builder(
-                                        itemCount: state.products.length,
-                                        itemBuilder: (context, index) {
-                                          return MealItemCard(
-                                            day: _day,
-                                            mealEntity: state.products[index],
-                                            addMealType: _mealType,
-                                            usesImperialUnits:
-                                                state.usesImperialUnits,
-                                          );
-                                        }))
+                                    child: Column(
+                                      children: [
+                                        if (state.isOfflineResults)
+                                          Container(
+                                            padding: const EdgeInsets.all(8),
+                                            color: Theme.of(context).colorScheme.warning.withValues(alpha: 0.1),
+                                            child: Row(
+                                              children: [
+                                                Icon(Icons.wifi_off, size: 16, color: Theme.of(context).colorScheme.warning),
+                                                const SizedBox(width: 8),
+                                                Text(S.of(context).offlineLocalResultsOnly,
+                                                    style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.warning)),
+                                              ],
+                                            ),
+                                          ),
+                                        Expanded(
+                                          child: ListView.builder(
+                                              itemCount: state.products.length,
+                                              itemBuilder: (context, index) {
+                                                return MealItemCard(
+                                                  day: _day,
+                                                  mealEntity: state.products[index],
+                                                  addMealType: _mealType,
+                                                  usesImperialUnits:
+                                                      state.usesImperialUnits,
+                                                );
+                                              }),
+                                        ),
+                                      ],
+                                    ))
                                 : const NoResultsWidget();
                           } else if (state is ProductsFailedState) {
                             return ErrorDialog(
@@ -246,6 +270,35 @@ class _AddMealScreenState extends State<AddMealScreen>
         ));
   }
 
+  Widget _buildPopularMeals() {
+    return FutureBuilder(
+      future: locator<SearchHistoryDataSource>().getTopOverall(limit: 5),
+      builder: (ctx, snap) {
+        if (snap.hasError || !snap.hasData || snap.data!.isEmpty) {
+          return const DefaultsResultsWidget();
+        }
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text(
+                S.of(ctx).recentFavoritesLabel,
+                style: Theme.of(ctx).textTheme.titleSmall,
+              ),
+            ),
+            ...snap.data!.map((h) => ListTile(
+                  dense: true,
+                  title: Text(h.chosenMealName),
+                  leading: const Icon(Icons.history),
+                  onTap: () => _onSearchSubmit(h.chosenMealName),
+                )),
+          ],
+        );
+      },
+    );
+  }
+
   void _onProductsRefreshButtonPressed() {
     _productsBloc.add(const RefreshProductsEvent());
   }
@@ -259,12 +312,23 @@ class _AddMealScreenState extends State<AddMealScreen>
   }
 
   void _onSearchSubmit(String inputText) {
+    if (inputText.isEmpty) return;
+
+    // Auto-switch to search tab if on Favorites
+    if (_tabController.index == 0) {
+      _tabController.animateTo(1);
+    }
+
     switch (_tabController.index) {
       case 0:
+        // Favorites tab — switch handled above
+        _tabController.animateTo(1);
         _productsBloc.add(LoadProductsEvent(searchString: inputText));
       case 1:
-        _foodBloc.add(LoadFoodEvent(searchString: inputText));
+        _productsBloc.add(LoadProductsEvent(searchString: inputText));
       case 2:
+        _foodBloc.add(LoadFoodEvent(searchString: inputText));
+      case 3:
         _recentMealBloc.add(LoadRecentMealEvent(searchString: inputText));
     }
   }

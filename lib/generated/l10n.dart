@@ -18,8 +18,10 @@ class S {
   static S? _current;
 
   static S get current {
-    assert(_current != null,
-        'No instance of S was loaded. Try to initialize the S delegate before accessing S.current.');
+    assert(
+      _current != null,
+      'No instance of S was loaded. Try to initialize the S delegate before accessing S.current.',
+    );
     return _current!;
   }
 
@@ -41,8 +43,10 @@ class S {
 
   static S of(BuildContext context) {
     final instance = S.maybeOf(context);
-    assert(instance != null,
-        'No instance of S present in the widget tree. Did you add S.delegate in localizationsDelegates?');
+    assert(
+      instance != null,
+      'No instance of S present in the widget tree. Did you add S.delegate in localizationsDelegates?',
+    );
     return instance!;
   }
 
@@ -50,14 +54,9 @@ class S {
     return Localizations.of<S>(context, S);
   }
 
-  /// `OpenNutriTracker`
+  /// `Ayu`
   String get appTitle {
-    return Intl.message(
-      'OpenNutriTracker',
-      name: 'appTitle',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Ayu', name: 'appTitle', desc: '', args: []);
   }
 
   /// `Version {versionNumber}`
@@ -70,10 +69,10 @@ class S {
     );
   }
 
-  /// `OpenNutriTracker is a free and open-source calorie and nutrient tracker that respects your privacy.`
+  /// `Ayu is a comprehensive nutrition and longevity tracker that respects your privacy.`
   String get appDescription {
     return Intl.message(
-      'OpenNutriTracker is a free and open-source calorie and nutrient tracker that respects your privacy.',
+      'Ayu is a comprehensive nutrition and longevity tracker that respects your privacy.',
       name: 'appDescription',
       desc: '',
       args: [],
@@ -92,22 +91,12 @@ class S {
 
   /// `[Beta]`
   String get betaVersionName {
-    return Intl.message(
-      '[Beta]',
-      name: 'betaVersionName',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('[Beta]', name: 'betaVersionName', desc: '', args: []);
   }
 
   /// `Add`
   String get addLabel {
-    return Intl.message(
-      'Add',
-      name: 'addLabel',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Add', name: 'addLabel', desc: '', args: []);
   }
 
   /// `Create custom meal item?`
@@ -132,52 +121,27 @@ class S {
 
   /// `Settings`
   String get settingsLabel {
-    return Intl.message(
-      'Settings',
-      name: 'settingsLabel',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Settings', name: 'settingsLabel', desc: '', args: []);
   }
 
   /// `Home`
   String get homeLabel {
-    return Intl.message(
-      'Home',
-      name: 'homeLabel',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Home', name: 'homeLabel', desc: '', args: []);
   }
 
   /// `Diary`
   String get diaryLabel {
-    return Intl.message(
-      'Diary',
-      name: 'diaryLabel',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Diary', name: 'diaryLabel', desc: '', args: []);
   }
 
   /// `Profile`
   String get profileLabel {
-    return Intl.message(
-      'Profile',
-      name: 'profileLabel',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Profile', name: 'profileLabel', desc: '', args: []);
   }
 
   /// `Search`
   String get searchLabel {
-    return Intl.message(
-      'Search',
-      name: 'searchLabel',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Search', name: 'searchLabel', desc: '', args: []);
   }
 
   /// `Products`
@@ -192,12 +156,7 @@ class S {
 
   /// `Food`
   String get searchFoodPage {
-    return Intl.message(
-      'Food',
-      name: 'searchFoodPage',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Food', name: 'searchFoodPage', desc: '', args: []);
   }
 
   /// `Search results`
@@ -222,12 +181,7 @@ class S {
 
   /// `All`
   String get allItemsLabel {
-    return Intl.message(
-      'All',
-      name: 'allItemsLabel',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('All', name: 'allItemsLabel', desc: '', args: []);
   }
 
   /// `Recently`
@@ -262,12 +216,7 @@ class S {
 
   /// `OK`
   String get dialogOKLabel {
-    return Intl.message(
-      'OK',
-      name: 'dialogOKLabel',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('OK', name: 'dialogOKLabel', desc: '', args: []);
   }
 
   /// `CANCEL`
@@ -282,52 +231,27 @@ class S {
 
   /// `START`
   String get buttonStartLabel {
-    return Intl.message(
-      'START',
-      name: 'buttonStartLabel',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('START', name: 'buttonStartLabel', desc: '', args: []);
   }
 
   /// `NEXT`
   String get buttonNextLabel {
-    return Intl.message(
-      'NEXT',
-      name: 'buttonNextLabel',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('NEXT', name: 'buttonNextLabel', desc: '', args: []);
   }
 
   /// `Save`
   String get buttonSaveLabel {
-    return Intl.message(
-      'Save',
-      name: 'buttonSaveLabel',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Save', name: 'buttonSaveLabel', desc: '', args: []);
   }
 
   /// `YES`
   String get buttonYesLabel {
-    return Intl.message(
-      'YES',
-      name: 'buttonYesLabel',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('YES', name: 'buttonYesLabel', desc: '', args: []);
   }
 
   /// `Reset`
   String get buttonResetLabel {
-    return Intl.message(
-      'Reset',
-      name: 'buttonResetLabel',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Reset', name: 'buttonResetLabel', desc: '', args: []);
   }
 
   /// `Welcome to`
@@ -662,22 +586,12 @@ class S {
 
   /// `About`
   String get settingAboutLabel {
-    return Intl.message(
-      'About',
-      name: 'settingAboutLabel',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('About', name: 'settingAboutLabel', desc: '', args: []);
   }
 
   /// `Mass`
   String get settingsMassLabel {
-    return Intl.message(
-      'Mass',
-      name: 'settingsMassLabel',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Mass', name: 'settingsMassLabel', desc: '', args: []);
   }
 
   /// `System`
@@ -730,10 +644,10 @@ class S {
     );
   }
 
-  /// `OpenNutriTracker is not a medical application. All data provided is not validated and should be used with caution. Please maintain a healthy lifestyle and consult a professional if you have any problems. Use during illness, pregnancy or lactation is not recommended.`
+  /// `Ayu is not a medical application. All data provided is not validated and should be used with caution. Please maintain a healthy lifestyle and consult a professional if you have any problems. Use during illness, pregnancy or lactation is not recommended.`
   String get disclaimerText {
     return Intl.message(
-      'OpenNutriTracker is not a medical application. All data provided is not validated and should be used with caution. Please maintain a healthy lifestyle and consult a professional if you have any problems. Use during illness, pregnancy or lactation is not recommended.',
+      'Ayu is not a medical application. All data provided is not validated and should be used with caution. Please maintain a healthy lifestyle and consult a professional if you have any problems. Use during illness, pregnancy or lactation is not recommended.',
       name: 'disclaimerText',
       desc: '',
       args: [],
@@ -812,7 +726,10 @@ class S {
 
   /// `{pctCarbs}% carbs, {pctFats}% fats, {pctProteins}% proteins`
   String calculationsMacrosDistribution(
-      Object pctCarbs, Object pctFats, Object pctProteins) {
+    Object pctCarbs,
+    Object pctFats,
+    Object pctProteins,
+  ) {
     return Intl.message(
       '$pctCarbs% carbs, $pctFats% fats, $pctProteins% proteins',
       name: 'calculationsMacrosDistribution',
@@ -883,22 +800,12 @@ class S {
 
   /// `Export`
   String get exportAction {
-    return Intl.message(
-      'Export',
-      name: 'exportAction',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Export', name: 'exportAction', desc: '', args: []);
   }
 
   /// `Import`
   String get importAction {
-    return Intl.message(
-      'Import',
-      name: 'importAction',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Import', name: 'importAction', desc: '', args: []);
   }
 
   /// `Add new Item:`
@@ -913,12 +820,7 @@ class S {
 
   /// `Activity`
   String get activityLabel {
-    return Intl.message(
-      'Activity',
-      name: 'activityLabel',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Activity', name: 'activityLabel', desc: '', args: []);
   }
 
   /// `e.g. running, biking, yoga ...`
@@ -953,12 +855,7 @@ class S {
 
   /// `Lunch`
   String get lunchLabel {
-    return Intl.message(
-      'Lunch',
-      name: 'lunchLabel',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Lunch', name: 'lunchLabel', desc: '', args: []);
   }
 
   /// `e.g. pizza, salad, rice ...`
@@ -973,12 +870,7 @@ class S {
 
   /// `Dinner`
   String get dinnerLabel {
-    return Intl.message(
-      'Dinner',
-      name: 'dinnerLabel',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Dinner', name: 'dinnerLabel', desc: '', args: []);
   }
 
   /// `e.g. soup, chicken, wine ...`
@@ -993,12 +885,7 @@ class S {
 
   /// `Snack`
   String get snackLabel {
-    return Intl.message(
-      'Snack',
-      name: 'snackLabel',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Snack', name: 'snackLabel', desc: '', args: []);
   }
 
   /// `e.g. apple, ice cream, chocolate ...`
@@ -1143,32 +1030,17 @@ class S {
 
   /// `supplied`
   String get suppliedLabel {
-    return Intl.message(
-      'supplied',
-      name: 'suppliedLabel',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('supplied', name: 'suppliedLabel', desc: '', args: []);
   }
 
   /// `burned`
   String get burnedLabel {
-    return Intl.message(
-      'burned',
-      name: 'burnedLabel',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('burned', name: 'burnedLabel', desc: '', args: []);
   }
 
   /// `kcal left`
   String get kcalLeftLabel {
-    return Intl.message(
-      'kcal left',
-      name: 'kcalLeftLabel',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('kcal left', name: 'kcalLeftLabel', desc: '', args: []);
   }
 
   /// `Nutrition Information`
@@ -1183,52 +1055,27 @@ class S {
 
   /// `kcal`
   String get kcalLabel {
-    return Intl.message(
-      'kcal',
-      name: 'kcalLabel',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('kcal', name: 'kcalLabel', desc: '', args: []);
   }
 
   /// `carbs`
   String get carbsLabel {
-    return Intl.message(
-      'carbs',
-      name: 'carbsLabel',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('carbs', name: 'carbsLabel', desc: '', args: []);
   }
 
   /// `fat`
   String get fatLabel {
-    return Intl.message(
-      'fat',
-      name: 'fatLabel',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('fat', name: 'fatLabel', desc: '', args: []);
   }
 
   /// `protein`
   String get proteinLabel {
-    return Intl.message(
-      'protein',
-      name: 'proteinLabel',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('protein', name: 'proteinLabel', desc: '', args: []);
   }
 
   /// `energy`
   String get energyLabel {
-    return Intl.message(
-      'energy',
-      name: 'energyLabel',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('energy', name: 'energyLabel', desc: '', args: []);
   }
 
   /// `saturated fat`
@@ -1253,22 +1100,12 @@ class S {
 
   /// `sugar`
   String get sugarLabel {
-    return Intl.message(
-      'sugar',
-      name: 'sugarLabel',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('sugar', name: 'sugarLabel', desc: '', args: []);
   }
 
   /// `fiber`
   String get fiberLabel {
-    return Intl.message(
-      'fiber',
-      name: 'fiberLabel',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('fiber', name: 'fiberLabel', desc: '', args: []);
   }
 
   /// `Per 100g/ml`
@@ -1343,12 +1180,7 @@ class S {
 
   /// `Quantity`
   String get quantityLabel {
-    return Intl.message(
-      'Quantity',
-      name: 'quantityLabel',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Quantity', name: 'quantityLabel', desc: '', args: []);
   }
 
   /// `Base quantity (g/ml)`
@@ -1363,12 +1195,7 @@ class S {
 
   /// `Unit`
   String get unitLabel {
-    return Intl.message(
-      'Unit',
-      name: 'unitLabel',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Unit', name: 'unitLabel', desc: '', args: []);
   }
 
   /// `Scan Product`
@@ -1383,62 +1210,32 @@ class S {
 
   /// `g`
   String get gramUnit {
-    return Intl.message(
-      'g',
-      name: 'gramUnit',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('g', name: 'gramUnit', desc: '', args: []);
   }
 
   /// `ml`
   String get milliliterUnit {
-    return Intl.message(
-      'ml',
-      name: 'milliliterUnit',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('ml', name: 'milliliterUnit', desc: '', args: []);
   }
 
   /// `g/ml`
   String get gramMilliliterUnit {
-    return Intl.message(
-      'g/ml',
-      name: 'gramMilliliterUnit',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('g/ml', name: 'gramMilliliterUnit', desc: '', args: []);
   }
 
   /// `oz`
   String get ozUnit {
-    return Intl.message(
-      'oz',
-      name: 'ozUnit',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('oz', name: 'ozUnit', desc: '', args: []);
   }
 
   /// `fl.oz`
   String get flOzUnit {
-    return Intl.message(
-      'fl.oz',
-      name: 'flOzUnit',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('fl.oz', name: 'flOzUnit', desc: '', args: []);
   }
 
   /// `N/A`
   String get notAvailableLabel {
-    return Intl.message(
-      'N/A',
-      name: 'notAvailableLabel',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('N/A', name: 'notAvailableLabel', desc: '', args: []);
   }
 
   /// `Product missing required kcal or macronutrients information`
@@ -1473,32 +1270,17 @@ class S {
 
   /// `Edit meal`
   String get editMealLabel {
-    return Intl.message(
-      'Edit meal',
-      name: 'editMealLabel',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Edit meal', name: 'editMealLabel', desc: '', args: []);
   }
 
   /// `Meal name`
   String get mealNameLabel {
-    return Intl.message(
-      'Meal name',
-      name: 'mealNameLabel',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Meal name', name: 'mealNameLabel', desc: '', args: []);
   }
 
   /// `Brands`
   String get mealBrandsLabel {
-    return Intl.message(
-      'Brands',
-      name: 'mealBrandsLabel',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Brands', name: 'mealBrandsLabel', desc: '', args: []);
   }
 
   /// `Meal size (g/ml)`
@@ -1523,12 +1305,7 @@ class S {
 
   /// `Serving`
   String get servingLabel {
-    return Intl.message(
-      'Serving',
-      name: 'servingLabel',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Serving', name: 'servingLabel', desc: '', args: []);
   }
 
   /// `Per Serving`
@@ -1563,22 +1340,12 @@ class S {
 
   /// `Meal unit`
   String get mealUnitLabel {
-    return Intl.message(
-      'Meal unit',
-      name: 'mealUnitLabel',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Meal unit', name: 'mealUnitLabel', desc: '', args: []);
   }
 
   /// `kcal per`
   String get mealKcalLabel {
-    return Intl.message(
-      'kcal per',
-      name: 'mealKcalLabel',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('kcal per', name: 'mealKcalLabel', desc: '', args: []);
   }
 
   /// `carbs per`
@@ -1593,12 +1360,7 @@ class S {
 
   /// `fat per`
   String get mealFatLabel {
-    return Intl.message(
-      'fat per',
-      name: 'mealFatLabel',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('fat per', name: 'mealFatLabel', desc: '', args: []);
   }
 
   /// `protein per 100 g/ml`
@@ -1623,12 +1385,7 @@ class S {
 
   /// `BMI`
   String get bmiLabel {
-    return Intl.message(
-      'BMI',
-      name: 'bmiLabel',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('BMI', name: 'bmiLabel', desc: '', args: []);
   }
 
   /// `Body Mass Index (BMI) is a index to classify overweight and obesity in adults. It is defined as weight in kilograms divided by the square of height in meters (kg/m²).\n\nBMI does not differentiate between fat and muscle mass and can be misleading for some individuals.`
@@ -1713,12 +1470,7 @@ class S {
 
   /// `Active`
   String get palActiveLabel {
-    return Intl.message(
-      'Active',
-      name: 'palActiveLabel',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Active', name: 'palActiveLabel', desc: '', args: []);
   }
 
   /// `Mostly standing or walking in job and active free time activities`
@@ -1803,12 +1555,7 @@ class S {
 
   /// `Goal`
   String get goalLabel {
-    return Intl.message(
-      'Goal',
-      name: 'goalLabel',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Goal', name: 'goalLabel', desc: '', args: []);
   }
 
   /// `Select Height`
@@ -1823,32 +1570,17 @@ class S {
 
   /// `Height`
   String get heightLabel {
-    return Intl.message(
-      'Height',
-      name: 'heightLabel',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Height', name: 'heightLabel', desc: '', args: []);
   }
 
   /// `cm`
   String get cmLabel {
-    return Intl.message(
-      'cm',
-      name: 'cmLabel',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('cm', name: 'cmLabel', desc: '', args: []);
   }
 
   /// `ft`
   String get ftLabel {
-    return Intl.message(
-      'ft',
-      name: 'ftLabel',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('ft', name: 'ftLabel', desc: '', args: []);
   }
 
   /// `Select Weight`
@@ -1863,42 +1595,22 @@ class S {
 
   /// `Weight`
   String get weightLabel {
-    return Intl.message(
-      'Weight',
-      name: 'weightLabel',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Weight', name: 'weightLabel', desc: '', args: []);
   }
 
   /// `kg`
   String get kgLabel {
-    return Intl.message(
-      'kg',
-      name: 'kgLabel',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('kg', name: 'kgLabel', desc: '', args: []);
   }
 
   /// `lbs`
   String get lbsLabel {
-    return Intl.message(
-      'lbs',
-      name: 'lbsLabel',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('lbs', name: 'lbsLabel', desc: '', args: []);
   }
 
   /// `Age`
   String get ageLabel {
-    return Intl.message(
-      'Age',
-      name: 'ageLabel',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Age', name: 'ageLabel', desc: '', args: []);
   }
 
   /// `{age} years`
@@ -1923,22 +1635,12 @@ class S {
 
   /// `Gender`
   String get genderLabel {
-    return Intl.message(
-      'Gender',
-      name: 'genderLabel',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Gender', name: 'genderLabel', desc: '', args: []);
   }
 
   /// `♂ male`
   String get genderMaleLabel {
-    return Intl.message(
-      '♂ male',
-      name: 'genderMaleLabel',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('♂ male', name: 'genderMaleLabel', desc: '', args: []);
   }
 
   /// `♀ female`
@@ -2153,12 +1855,7 @@ class S {
 
   /// `Retry`
   String get retryLabel {
-    return Intl.message(
-      'Retry',
-      name: 'retryLabel',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Retry', name: 'retryLabel', desc: '', args: []);
   }
 
   /// `bicycling`
@@ -2203,12 +1900,7 @@ class S {
 
   /// `sports`
   String get paHeadingSports {
-    return Intl.message(
-      'sports',
-      name: 'paHeadingSports',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('sports', name: 'paHeadingSports', desc: '', args: []);
   }
 
   /// `walking`
@@ -2243,12 +1935,7 @@ class S {
 
   /// `general`
   String get paGeneralDesc {
-    return Intl.message(
-      'general',
-      name: 'paGeneralDesc',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('general', name: 'paGeneralDesc', desc: '', args: []);
   }
 
   /// `bicycling`
@@ -2593,12 +2280,7 @@ class S {
 
   /// `boxing`
   String get paBoxingBag {
-    return Intl.message(
-      'boxing',
-      name: 'paBoxingBag',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('boxing', name: 'paBoxingBag', desc: '', args: []);
   }
 
   /// `punching bag`
@@ -2613,12 +2295,7 @@ class S {
 
   /// `boxing`
   String get paBoxingGeneral {
-    return Intl.message(
-      'boxing',
-      name: 'paBoxingGeneral',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('boxing', name: 'paBoxingGeneral', desc: '', args: []);
   }
 
   /// `in ring, general`
@@ -2633,22 +2310,12 @@ class S {
 
   /// `broomball`
   String get paBroomball {
-    return Intl.message(
-      'broomball',
-      name: 'paBroomball',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('broomball', name: 'paBroomball', desc: '', args: []);
   }
 
   /// `general`
   String get paBroomballDesc {
-    return Intl.message(
-      'general',
-      name: 'paBroomballDesc',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('general', name: 'paBroomballDesc', desc: '', args: []);
   }
 
   /// `children’s games`
@@ -2693,12 +2360,7 @@ class S {
 
   /// `cricket`
   String get paCricket {
-    return Intl.message(
-      'cricket',
-      name: 'paCricket',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('cricket', name: 'paCricket', desc: '', args: []);
   }
 
   /// `batting, bowling, fielding`
@@ -2713,52 +2375,27 @@ class S {
 
   /// `croquet`
   String get paCroquet {
-    return Intl.message(
-      'croquet',
-      name: 'paCroquet',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('croquet', name: 'paCroquet', desc: '', args: []);
   }
 
   /// `general`
   String get paCroquetDesc {
-    return Intl.message(
-      'general',
-      name: 'paCroquetDesc',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('general', name: 'paCroquetDesc', desc: '', args: []);
   }
 
   /// `curling`
   String get paCurling {
-    return Intl.message(
-      'curling',
-      name: 'paCurling',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('curling', name: 'paCurling', desc: '', args: []);
   }
 
   /// `general`
   String get paCurlingDesc {
-    return Intl.message(
-      'general',
-      name: 'paCurlingDesc',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('general', name: 'paCurlingDesc', desc: '', args: []);
   }
 
   /// `darts`
   String get paDartsWall {
-    return Intl.message(
-      'darts',
-      name: 'paDartsWall',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('darts', name: 'paDartsWall', desc: '', args: []);
   }
 
   /// `wall or lawn`
@@ -2793,22 +2430,12 @@ class S {
 
   /// `fencing`
   String get paFencing {
-    return Intl.message(
-      'fencing',
-      name: 'paFencing',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('fencing', name: 'paFencing', desc: '', args: []);
   }
 
   /// `general`
   String get paFencingDesc {
-    return Intl.message(
-      'general',
-      name: 'paFencingDesc',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('general', name: 'paFencingDesc', desc: '', args: []);
   }
 
   /// `football`
@@ -2863,22 +2490,12 @@ class S {
 
   /// `general`
   String get paFrisbeeDesc {
-    return Intl.message(
-      'general',
-      name: 'paFrisbeeDesc',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('general', name: 'paFrisbeeDesc', desc: '', args: []);
   }
 
   /// `golf`
   String get paGolfGeneral {
-    return Intl.message(
-      'golf',
-      name: 'paGolfGeneral',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('golf', name: 'paGolfGeneral', desc: '', args: []);
   }
 
   /// `general`
@@ -2913,22 +2530,12 @@ class S {
 
   /// `hacky sack`
   String get paHackySack {
-    return Intl.message(
-      'hacky sack',
-      name: 'paHackySack',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('hacky sack', name: 'paHackySack', desc: '', args: []);
   }
 
   /// `general`
   String get paHackySackDesc {
-    return Intl.message(
-      'general',
-      name: 'paHackySackDesc',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('general', name: 'paHackySackDesc', desc: '', args: []);
   }
 
   /// `handball`
@@ -3033,22 +2640,12 @@ class S {
 
   /// `jai alai`
   String get paJaiAlai {
-    return Intl.message(
-      'jai alai',
-      name: 'paJaiAlai',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('jai alai', name: 'paJaiAlai', desc: '', args: []);
   }
 
   /// `general`
   String get paJaiAlaiDesc {
-    return Intl.message(
-      'general',
-      name: 'paJaiAlaiDesc',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('general', name: 'paJaiAlaiDesc', desc: '', args: []);
   }
 
   /// `martial arts`
@@ -3093,62 +2690,32 @@ class S {
 
   /// `juggling`
   String get paJuggling {
-    return Intl.message(
-      'juggling',
-      name: 'paJuggling',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('juggling', name: 'paJuggling', desc: '', args: []);
   }
 
   /// `general`
   String get paJugglingDesc {
-    return Intl.message(
-      'general',
-      name: 'paJugglingDesc',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('general', name: 'paJugglingDesc', desc: '', args: []);
   }
 
   /// `kickball`
   String get paKickball {
-    return Intl.message(
-      'kickball',
-      name: 'paKickball',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('kickball', name: 'paKickball', desc: '', args: []);
   }
 
   /// `general`
   String get paKickballDesc {
-    return Intl.message(
-      'general',
-      name: 'paKickballDesc',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('general', name: 'paKickballDesc', desc: '', args: []);
   }
 
   /// `lacrosse`
   String get paLacrosse {
-    return Intl.message(
-      'lacrosse',
-      name: 'paLacrosse',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('lacrosse', name: 'paLacrosse', desc: '', args: []);
   }
 
   /// `general`
   String get paLacrosseDesc {
-    return Intl.message(
-      'general',
-      name: 'paLacrosseDesc',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('general', name: 'paLacrosseDesc', desc: '', args: []);
   }
 
   /// `lawn bowling`
@@ -3173,12 +2740,7 @@ class S {
 
   /// `moto-cross`
   String get paMotoCross {
-    return Intl.message(
-      'moto-cross',
-      name: 'paMotoCross',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('moto-cross', name: 'paMotoCross', desc: '', args: []);
   }
 
   /// `off-road motor sports, all-terrain vehicle, general`
@@ -3213,12 +2775,7 @@ class S {
 
   /// `paddleball`
   String get paPaddleball {
-    return Intl.message(
-      'paddleball',
-      name: 'paPaddleball',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('paddleball', name: 'paPaddleball', desc: '', args: []);
   }
 
   /// `casual, general`
@@ -3233,12 +2790,7 @@ class S {
 
   /// `polo`
   String get paPoloHorse {
-    return Intl.message(
-      'polo',
-      name: 'paPoloHorse',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('polo', name: 'paPoloHorse', desc: '', args: []);
   }
 
   /// `on horseback`
@@ -3453,12 +3005,7 @@ class S {
 
   /// `skydiving`
   String get paSkydiving {
-    return Intl.message(
-      'skydiving',
-      name: 'paSkydiving',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('skydiving', name: 'paSkydiving', desc: '', args: []);
   }
 
   /// `skydiving, base jumping, bungee jumping`
@@ -3473,12 +3020,7 @@ class S {
 
   /// `soccer`
   String get paSoccerGeneral {
-    return Intl.message(
-      'soccer',
-      name: 'paSoccerGeneral',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('soccer', name: 'paSoccerGeneral', desc: '', args: []);
   }
 
   /// `casual, general`
@@ -3513,12 +3055,7 @@ class S {
 
   /// `squash`
   String get paSquashGeneral {
-    return Intl.message(
-      'squash',
-      name: 'paSquashGeneral',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('squash', name: 'paSquashGeneral', desc: '', args: []);
   }
 
   /// `general`
@@ -3573,12 +3110,7 @@ class S {
 
   /// `tennis`
   String get paTennisGeneral {
-    return Intl.message(
-      'tennis',
-      name: 'paTennisGeneral',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('tennis', name: 'paTennisGeneral', desc: '', args: []);
   }
 
   /// `general`
@@ -3633,42 +3165,22 @@ class S {
 
   /// `wrestling`
   String get paWrestling {
-    return Intl.message(
-      'wrestling',
-      name: 'paWrestling',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('wrestling', name: 'paWrestling', desc: '', args: []);
   }
 
   /// `general`
   String get paWrestlingDesc {
-    return Intl.message(
-      'general',
-      name: 'paWrestlingDesc',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('general', name: 'paWrestlingDesc', desc: '', args: []);
   }
 
   /// `wallyball`
   String get paWallyball {
-    return Intl.message(
-      'wallyball',
-      name: 'paWallyball',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('wallyball', name: 'paWallyball', desc: '', args: []);
   }
 
   /// `general`
   String get paWallyballDesc {
-    return Intl.message(
-      'general',
-      name: 'paWallyballDesc',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('general', name: 'paWallyballDesc', desc: '', args: []);
   }
 
   /// `track and field`
@@ -3933,12 +3445,7 @@ class S {
 
   /// `diving`
   String get paDivingGeneral {
-    return Intl.message(
-      'diving',
-      name: 'paDivingGeneral',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('diving', name: 'paDivingGeneral', desc: '', args: []);
   }
 
   /// `skindiving, scuba diving, general`
@@ -3953,12 +3460,7 @@ class S {
 
   /// `snorkeling`
   String get paSnorkeling {
-    return Intl.message(
-      'snorkeling',
-      name: 'paSnorkeling',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('snorkeling', name: 'paSnorkeling', desc: '', args: []);
   }
 
   /// `general`
@@ -3973,12 +3475,7 @@ class S {
 
   /// `surfing`
   String get paSurfing {
-    return Intl.message(
-      'surfing',
-      name: 'paSurfing',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('surfing', name: 'paSurfing', desc: '', args: []);
   }
 
   /// `body or board, general`
@@ -4053,22 +3550,12 @@ class S {
 
   /// `water polo`
   String get paWaterPolo {
-    return Intl.message(
-      'water polo',
-      name: 'paWaterPolo',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('water polo', name: 'paWaterPolo', desc: '', args: []);
   }
 
   /// `general`
   String get paWaterPoloDesc {
-    return Intl.message(
-      'general',
-      name: 'paWaterPoloDesc',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('general', name: 'paWaterPoloDesc', desc: '', args: []);
   }
 
   /// `water volleyball`
@@ -4113,12 +3600,7 @@ class S {
 
   /// `skiing`
   String get paSkiingGeneral {
-    return Intl.message(
-      'skiing',
-      name: 'paSkiingGeneral',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('skiing', name: 'paSkiingGeneral', desc: '', args: []);
   }
 
   /// `general`
@@ -4149,6 +3631,1341 @@ class S {
       desc: '',
       args: [],
     );
+  }
+
+  /// `Charts`
+  String get chartsLabel {
+    return Intl.message('Charts', name: 'chartsLabel', desc: '', args: []);
+  }
+
+  /// `Stats`
+  String get statsLabel {
+    return Intl.message('Stats', name: 'statsLabel', desc: '', args: []);
+  }
+
+  /// `Add Food`
+  String get addFoodLabel {
+    return Intl.message('Add Food', name: 'addFoodLabel', desc: '', args: []);
+  }
+
+  /// `Favorites`
+  String get favoritesLabel {
+    return Intl.message(
+      'Favorites',
+      name: 'favoritesLabel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Offline — showing local results only`
+  String get offlineLocalResultsOnly {
+    return Intl.message(
+      'Offline — showing local results only',
+      name: 'offlineLocalResultsOnly',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Recent favorites`
+  String get recentFavoritesLabel {
+    return Intl.message(
+      'Recent favorites',
+      name: 'recentFavoritesLabel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Search Food`
+  String get searchFoodTitle {
+    return Intl.message(
+      'Search Food',
+      name: 'searchFoodTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Look up by name`
+  String get searchFoodSubtitle {
+    return Intl.message(
+      'Look up by name',
+      name: 'searchFoodSubtitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Scan Barcode`
+  String get scanBarcodeTitle {
+    return Intl.message(
+      'Scan Barcode',
+      name: 'scanBarcodeTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Scan a product barcode`
+  String get scanBarcodeSubtitle {
+    return Intl.message(
+      'Scan a product barcode',
+      name: 'scanBarcodeSubtitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Scan Receipt`
+  String get scanReceiptTitle {
+    return Intl.message(
+      'Scan Receipt',
+      name: 'scanReceiptTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Photo of grocery or restaurant receipt`
+  String get scanReceiptSubtitle {
+    return Intl.message(
+      'Photo of grocery or restaurant receipt',
+      name: 'scanReceiptSubtitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Photo Meal`
+  String get photoMealTitle {
+    return Intl.message(
+      'Photo Meal',
+      name: 'photoMealTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Take a photo — AI identifies food & calories`
+  String get photoMealSubtitleEnabled {
+    return Intl.message(
+      'Take a photo — AI identifies food & calories',
+      name: 'photoMealSubtitleEnabled',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Enable in Settings to use AI photo analysis`
+  String get photoMealSubtitleDisabled {
+    return Intl.message(
+      'Enable in Settings to use AI photo analysis',
+      name: 'photoMealSubtitleDisabled',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Describe Meal`
+  String get describeMealTitle {
+    return Intl.message(
+      'Describe Meal',
+      name: 'describeMealTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Type what you ate — we look up nutrition`
+  String get describeMealSubtitle {
+    return Intl.message(
+      'Type what you ate — we look up nutrition',
+      name: 'describeMealSubtitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Blood Glucose`
+  String get bloodGlucoseLabel {
+    return Intl.message(
+      'Blood Glucose',
+      name: 'bloodGlucoseLabel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add reading`
+  String get addReadingTooltip {
+    return Intl.message(
+      'Add reading',
+      name: 'addReadingTooltip',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add a blood glucose reading to start tracking`
+  String get addGlucoseReadingEmpty {
+    return Intl.message(
+      'Add a blood glucose reading to start tracking',
+      name: 'addGlucoseReadingEmpty',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `7d`
+  String get glucoseRange7d {
+    return Intl.message('7d', name: 'glucoseRange7d', desc: '', args: []);
+  }
+
+  /// `30d`
+  String get glucoseRange30d {
+    return Intl.message('30d', name: 'glucoseRange30d', desc: '', args: []);
+  }
+
+  /// `90d`
+  String get glucoseRange90d {
+    return Intl.message('90d', name: 'glucoseRange90d', desc: '', args: []);
+  }
+
+  /// `Controlled (70–130)`
+  String get glucoseControlled {
+    return Intl.message(
+      'Controlled (70–130)',
+      name: 'glucoseControlled',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Above target`
+  String get glucoseAboveTarget {
+    return Intl.message(
+      'Above target',
+      name: 'glucoseAboveTarget',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `High (>180)`
+  String get glucoseHigh {
+    return Intl.message('High (>180)', name: 'glucoseHigh', desc: '', args: []);
+  }
+
+  /// `Normal (70–100)`
+  String get glucoseNormal {
+    return Intl.message(
+      'Normal (70–100)',
+      name: 'glucoseNormal',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Pre-diabetic`
+  String get glucosePreDiabetic {
+    return Intl.message(
+      'Pre-diabetic',
+      name: 'glucosePreDiabetic',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `High`
+  String get glucoseHighShort {
+    return Intl.message('High', name: 'glucoseHighShort', desc: '', args: []);
+  }
+
+  /// `Controlled`
+  String get glucoseControlledShort {
+    return Intl.message(
+      'Controlled',
+      name: 'glucoseControlledShort',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `High — consult doctor`
+  String get glucoseHighConsultDoctor {
+    return Intl.message(
+      'High — consult doctor',
+      name: 'glucoseHighConsultDoctor',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add Reading`
+  String get addReadingTitle {
+    return Intl.message(
+      'Add Reading',
+      name: 'addReadingTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Edit Reading`
+  String get editReadingTitle {
+    return Intl.message(
+      'Edit Reading',
+      name: 'editReadingTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Blood glucose (mg/dL)`
+  String get bloodGlucoseMgDl {
+    return Intl.message(
+      'Blood glucose (mg/dL)',
+      name: 'bloodGlucoseMgDl',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `e.g. 95`
+  String get glucoseHintEg95 {
+    return Intl.message('e.g. 95', name: 'glucoseHintEg95', desc: '', args: []);
+  }
+
+  /// `mg/dL`
+  String get mgDlUnit {
+    return Intl.message('mg/dL', name: 'mgDlUnit', desc: '', args: []);
+  }
+
+  /// `Timing`
+  String get timingLabel {
+    return Intl.message('Timing', name: 'timingLabel', desc: '', args: []);
+  }
+
+  /// `Notes (optional)`
+  String get notesOptionalLabel {
+    return Intl.message(
+      'Notes (optional)',
+      name: 'notesOptionalLabel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `e.g. after breakfast`
+  String get notesHintAfterBreakfast {
+    return Intl.message(
+      'e.g. after breakfast',
+      name: 'notesHintAfterBreakfast',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Cancel`
+  String get cancelLabel {
+    return Intl.message('Cancel', name: 'cancelLabel', desc: '', args: []);
+  }
+
+  /// `Save`
+  String get saveLabel {
+    return Intl.message('Save', name: 'saveLabel', desc: '', args: []);
+  }
+
+  /// `Clean Streak`
+  String get cleanStreakLabel {
+    return Intl.message(
+      'Clean Streak',
+      name: 'cleanStreakLabel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Clean`
+  String get cleanLabel {
+    return Intl.message('Clean', name: 'cleanLabel', desc: '', args: []);
+  }
+
+  /// `Longest`
+  String get longestLabel {
+    return Intl.message('Longest', name: 'longestLabel', desc: '', args: []);
+  }
+
+  /// `Fasts/mo`
+  String get fastsPerMonthLabel {
+    return Intl.message(
+      'Fasts/mo',
+      name: 'fastsPerMonthLabel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Cheats`
+  String get cheatsLabel {
+    return Intl.message('Cheats', name: 'cheatsLabel', desc: '', args: []);
+  }
+
+  /// `Great day!`
+  String get greatDayTitle {
+    return Intl.message(
+      'Great day!',
+      name: 'greatDayTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Daily Summary`
+  String get dailySummaryTitle {
+    return Intl.message(
+      'Daily Summary',
+      name: 'dailySummaryTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `You hit your goals and kept your gut clean. Keep it up!`
+  String get greatDayMessage {
+    return Intl.message(
+      'You hit your goals and kept your gut clean. Keep it up!',
+      name: 'greatDayMessage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `How was today?`
+  String get howWasTodayLabel {
+    return Intl.message(
+      'How was today?',
+      name: 'howWasTodayLabel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Calories on track ({pctCal}% of goal)`
+  String caloriesOnTrack(Object pctCal) {
+    return Intl.message(
+      'Calories on track ($pctCal% of goal)',
+      name: 'caloriesOnTrack',
+      desc: '',
+      args: [pctCal],
+    );
+  }
+
+  /// `Over calorie goal by {kcalDiff} kcal`
+  String overCalorieGoal(Object kcalDiff) {
+    return Intl.message(
+      'Over calorie goal by $kcalDiff kcal',
+      name: 'overCalorieGoal',
+      desc: '',
+      args: [kcalDiff],
+    );
+  }
+
+  /// `Under calorie goal ({pctCal}%)`
+  String underCalorieGoal(Object pctCal) {
+    return Intl.message(
+      'Under calorie goal ($pctCal%)',
+      name: 'underCalorieGoal',
+      desc: '',
+      args: [pctCal],
+    );
+  }
+
+  /// `Protein goal met ({pctProtein}%)`
+  String proteinGoalMet(Object pctProtein) {
+    return Intl.message(
+      'Protein goal met ($pctProtein%)',
+      name: 'proteinGoalMet',
+      desc: '',
+      args: [pctProtein],
+    );
+  }
+
+  /// `Protein low ({pctProtein}% of goal)`
+  String proteinLow(Object pctProtein) {
+    return Intl.message(
+      'Protein low ($pctProtein% of goal)',
+      name: 'proteinLow',
+      desc: '',
+      args: [pctProtein],
+    );
+  }
+
+  /// `Add Water`
+  String get addWaterTitle {
+    return Intl.message('Add Water', name: 'addWaterTitle', desc: '', args: []);
+  }
+
+  /// `Amount (ml)`
+  String get amountMlLabel {
+    return Intl.message(
+      'Amount (ml)',
+      name: 'amountMlLabel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `e.g. 350`
+  String get waterHintEg350 {
+    return Intl.message('e.g. 350', name: 'waterHintEg350', desc: '', args: []);
+  }
+
+  /// `Added {ml} ml of water`
+  String addedWaterSnackbar(Object ml) {
+    return Intl.message(
+      'Added $ml ml of water',
+      name: 'addedWaterSnackbar',
+      desc: '',
+      args: [ml],
+    );
+  }
+
+  /// `+250ml`
+  String get waterPlus250 {
+    return Intl.message('+250ml', name: 'waterPlus250', desc: '', args: []);
+  }
+
+  /// `+500ml`
+  String get waterPlus500 {
+    return Intl.message('+500ml', name: 'waterPlus500', desc: '', args: []);
+  }
+
+  /// `+Custom`
+  String get waterCustom {
+    return Intl.message('+Custom', name: 'waterCustom', desc: '', args: []);
+  }
+
+  /// `General`
+  String get generalSectionLabel {
+    return Intl.message(
+      'General',
+      name: 'generalSectionLabel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Weight, height, age, activity level`
+  String get profileSubtitle {
+    return Intl.message(
+      'Weight, height, age, activity level',
+      name: 'profileSubtitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Weight & Macro Goals`
+  String get weightMacroGoalsTitle {
+    return Intl.message(
+      'Weight & Macro Goals',
+      name: 'weightMacroGoalsTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Target weight, deficit, macro ratios`
+  String get weightMacroGoalsSubtitle {
+    return Intl.message(
+      'Target weight, deficit, macro ratios',
+      name: 'weightMacroGoalsSubtitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Health`
+  String get healthSectionLabel {
+    return Intl.message(
+      'Health',
+      name: 'healthSectionLabel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Food Allergens`
+  String get foodAllergensTitle {
+    return Intl.message(
+      'Food Allergens',
+      name: 'foodAllergensTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Not configured`
+  String get notConfiguredLabel {
+    return Intl.message(
+      'Not configured',
+      name: 'notConfiguredLabel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Health Conditions`
+  String get healthConditionsTitle {
+    return Intl.message(
+      'Health Conditions',
+      name: 'healthConditionsTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Daily Step Goal`
+  String get dailyStepGoalTitle {
+    return Intl.message(
+      'Daily Step Goal',
+      name: 'dailyStepGoalTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Features`
+  String get featuresSectionLabel {
+    return Intl.message(
+      'Features',
+      name: 'featuresSectionLabel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Sustainability Score`
+  String get sustainabilityScoreTitle {
+    return Intl.message(
+      'Sustainability Score',
+      name: 'sustainabilityScoreTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Show daily eco-score from Open Food Facts`
+  String get sustainabilityScoreSubtitle {
+    return Intl.message(
+      'Show daily eco-score from Open Food Facts',
+      name: 'sustainabilityScoreSubtitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Photo Meal Analysis`
+  String get photoMealAnalysisTitle {
+    return Intl.message(
+      'Photo Meal Analysis',
+      name: 'photoMealAnalysisTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Uses Google Gemini (photo sent to cloud)`
+  String get photoMealAnalysisSubtitle {
+    return Intl.message(
+      'Uses Google Gemini (photo sent to cloud)',
+      name: 'photoMealAnalysisSubtitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Data`
+  String get dataSectionLabel {
+    return Intl.message('Data', name: 'dataSectionLabel', desc: '', args: []);
+  }
+
+  /// `Export CSV`
+  String get exportCsvTitle {
+    return Intl.message(
+      'Export CSV',
+      name: 'exportCsvTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Share your food log as spreadsheet`
+  String get exportCsvSubtitle {
+    return Intl.message(
+      'Share your food log as spreadsheet',
+      name: 'exportCsvSubtitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Backup Data`
+  String get backupDataTitle {
+    return Intl.message(
+      'Backup Data',
+      name: 'backupDataTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Export all settings as JSON`
+  String get backupDataSubtitle {
+    return Intl.message(
+      'Export all settings as JSON',
+      name: 'backupDataSubtitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `My Allergens`
+  String get myAllergensTitle {
+    return Intl.message(
+      'My Allergens',
+      name: 'myAllergensTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Health Conditions`
+  String get healthConditionsDialogTitle {
+    return Intl.message(
+      'Health Conditions',
+      name: 'healthConditionsDialogTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Select any conditions — Ayu will tailor nutrition advice accordingly.`
+  String get healthConditionsInstructions {
+    return Intl.message(
+      'Select any conditions — Ayu will tailor nutrition advice accordingly.',
+      name: 'healthConditionsInstructions',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Daily Step Goal`
+  String get dailyStepGoalDialogTitle {
+    return Intl.message(
+      'Daily Step Goal',
+      name: 'dailyStepGoalDialogTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Steps`
+  String get stepsLabel {
+    return Intl.message('Steps', name: 'stepsLabel', desc: '', args: []);
+  }
+
+  /// `10000`
+  String get stepGoalHint {
+    return Intl.message('10000', name: 'stepGoalHint', desc: '', args: []);
+  }
+
+  /// `Enter a value between 1 and 100,000`
+  String get stepGoalValidationError {
+    return Intl.message(
+      'Enter a value between 1 and 100,000',
+      name: 'stepGoalValidationError',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Export failed: {error}`
+  String exportFailedError(Object error) {
+    return Intl.message(
+      'Export failed: $error',
+      name: 'exportFailedError',
+      desc: '',
+      args: [error],
+    );
+  }
+
+  /// `Energy Expenditure`
+  String get energyExpenditureLabel {
+    return Intl.message(
+      'Energy Expenditure',
+      name: 'energyExpenditureLabel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `BMR (Mifflin-St Jeor)`
+  String get bmrMifflinLabel {
+    return Intl.message(
+      'BMR (Mifflin-St Jeor)',
+      name: 'bmrMifflinLabel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Activity`
+  String get activityBreakdownLabel {
+    return Intl.message(
+      'Activity',
+      name: 'activityBreakdownLabel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `TEF (thermic effect)`
+  String get tefLabel {
+    return Intl.message(
+      'TEF (thermic effect)',
+      name: 'tefLabel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `TEF will appear after you log meals today`
+  String get tefHintLabel {
+    return Intl.message(
+      'TEF will appear after you log meals today',
+      name: 'tefHintLabel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Log weight`
+  String get logWeightTooltip {
+    return Intl.message(
+      'Log weight',
+      name: 'logWeightTooltip',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Set target`
+  String get setTargetTooltip {
+    return Intl.message(
+      'Set target',
+      name: 'setTargetTooltip',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Log your first weight entry`
+  String get logFirstWeightEntry {
+    return Intl.message(
+      'Log your first weight entry',
+      name: 'logFirstWeightEntry',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Target: {weight} kg`
+  String targetWeightDisplay(Object weight) {
+    return Intl.message(
+      'Target: $weight kg',
+      name: 'targetWeightDisplay',
+      desc: '',
+      args: [weight],
+    );
+  }
+
+  /// `You're at your target weight!`
+  String get atTargetWeight {
+    return Intl.message(
+      'You\'re at your target weight!',
+      name: 'atTargetWeight',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Estimated {weeks}w to target (at ~0.45 kg/week)`
+  String estimatedWeeksToTarget(Object weeks) {
+    return Intl.message(
+      'Estimated ${weeks}w to target (at ~0.45 kg/week)',
+      name: 'estimatedWeeksToTarget',
+      desc: '',
+      args: [weeks],
+    );
+  }
+
+  /// `Log Weight`
+  String get logWeightTitle {
+    return Intl.message(
+      'Log Weight',
+      name: 'logWeightTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Weight (kg)`
+  String get weightKgLabel {
+    return Intl.message(
+      'Weight (kg)',
+      name: 'weightKgLabel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `e.g. 72.5`
+  String get weightHintEg725 {
+    return Intl.message(
+      'e.g. 72.5',
+      name: 'weightHintEg725',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Set Target Weight`
+  String get setTargetWeightTitle {
+    return Intl.message(
+      'Set Target Weight',
+      name: 'setTargetWeightTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Target weight (kg)`
+  String get targetWeightKgLabel {
+    return Intl.message(
+      'Target weight (kg)',
+      name: 'targetWeightKgLabel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `e.g. 70.0`
+  String get targetWeightHint {
+    return Intl.message(
+      'e.g. 70.0',
+      name: 'targetWeightHint',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Biomarkers`
+  String get biomarkersLabel {
+    return Intl.message(
+      'Biomarkers',
+      name: 'biomarkersLabel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add lab result`
+  String get addLabResultTooltip {
+    return Intl.message(
+      'Add lab result',
+      name: 'addLabResultTooltip',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add your blood work results to track\nbiomarkers against longevity-optimal ranges`
+  String get biomarkerEmptyState {
+    return Intl.message(
+      'Add your blood work results to track\nbiomarkers against longevity-optimal ranges',
+      name: 'biomarkerEmptyState',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Stale biomarkers — time to re-check:`
+  String get staleBiomarkersHeader {
+    return Intl.message(
+      'Stale biomarkers — time to re-check:',
+      name: 'staleBiomarkersHeader',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Optimal`
+  String get optimalRating {
+    return Intl.message('Optimal', name: 'optimalRating', desc: '', args: []);
+  }
+
+  /// `Normal`
+  String get normalRating {
+    return Intl.message('Normal', name: 'normalRating', desc: '', args: []);
+  }
+
+  /// `Out of range`
+  String get outOfRangeRating {
+    return Intl.message(
+      'Out of range',
+      name: 'outOfRangeRating',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Edit {name}`
+  String editBiomarkerTitle(Object name) {
+    return Intl.message(
+      'Edit $name',
+      name: 'editBiomarkerTitle',
+      desc: '',
+      args: [name],
+    );
+  }
+
+  /// `Value`
+  String get valueLabel {
+    return Intl.message('Value', name: 'valueLabel', desc: '', args: []);
+  }
+
+  /// `Unusual Value`
+  String get unusualValueTitle {
+    return Intl.message(
+      'Unusual Value',
+      name: 'unusualValueTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Save Anyway`
+  String get saveAnywayLabel {
+    return Intl.message(
+      'Save Anyway',
+      name: 'saveAnywayLabel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Update`
+  String get updateLabel {
+    return Intl.message('Update', name: 'updateLabel', desc: '', args: []);
+  }
+
+  /// `Add Lab Result`
+  String get addLabResultTitle {
+    return Intl.message(
+      'Add Lab Result',
+      name: 'addLabResultTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Caffeine`
+  String get caffeineLabel {
+    return Intl.message('Caffeine', name: 'caffeineLabel', desc: '', args: []);
+  }
+
+  /// `{mg}mg today`
+  String caffeineTodayMg(Object mg) {
+    return Intl.message(
+      '${mg}mg today',
+      name: 'caffeineTodayMg',
+      desc: '',
+      args: [mg],
+    );
+  }
+
+  /// `Over 400mg daily limit`
+  String get overDailyLimitWarning {
+    return Intl.message(
+      'Over 400mg daily limit',
+      name: 'overDailyLimitWarning',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Cut off caffeine 8-10h before bed`
+  String get caffeineCutoffTip {
+    return Intl.message(
+      'Cut off caffeine 8-10h before bed',
+      name: 'caffeineCutoffTip',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `View & delete logs`
+  String get viewDeleteLogsTooltip {
+    return Intl.message(
+      'View & delete logs',
+      name: 'viewDeleteLogsTooltip',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Today's Caffeine`
+  String get todayCaffeineTitle {
+    return Intl.message(
+      'Today\'s Caffeine',
+      name: 'todayCaffeineTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No logs today`
+  String get noLogsTodayLabel {
+    return Intl.message(
+      'No logs today',
+      name: 'noLogsTodayLabel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Close`
+  String get closeLabel {
+    return Intl.message('Close', name: 'closeLabel', desc: '', args: []);
+  }
+
+  /// `Clear All`
+  String get clearAllLabel {
+    return Intl.message('Clear All', name: 'clearAllLabel', desc: '', args: []);
+  }
+
+  /// `Log Caffeine`
+  String get logCaffeineTitle {
+    return Intl.message(
+      'Log Caffeine',
+      name: 'logCaffeineTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Supplements`
+  String get supplementsLabel {
+    return Intl.message(
+      'Supplements',
+      name: 'supplementsLabel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `{name} marked as taken`
+  String markedAsTaken(Object name) {
+    return Intl.message(
+      '$name marked as taken',
+      name: 'markedAsTaken',
+      desc: '',
+      args: [name],
+    );
+  }
+
+  /// `{name} marked as skipped`
+  String markedAsSkipped(Object name) {
+    return Intl.message(
+      '$name marked as skipped',
+      name: 'markedAsSkipped',
+      desc: '',
+      args: [name],
+    );
+  }
+
+  /// `Undo`
+  String get undoLabel {
+    return Intl.message('Undo', name: 'undoLabel', desc: '', args: []);
+  }
+
+  /// `Failed to update: {error}`
+  String failedToUpdate(Object error) {
+    return Intl.message(
+      'Failed to update: $error',
+      name: 'failedToUpdate',
+      desc: '',
+      args: [error],
+    );
+  }
+
+  /// `Add Supplement`
+  String get addSupplementTitle {
+    return Intl.message(
+      'Add Supplement',
+      name: 'addSupplementTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Name`
+  String get nameLabel {
+    return Intl.message('Name', name: 'nameLabel', desc: '', args: []);
+  }
+
+  /// `Dosage`
+  String get dosageLabel {
+    return Intl.message('Dosage', name: 'dosageLabel', desc: '', args: []);
+  }
+
+  /// `Water +250ml`
+  String get waterSnackbar {
+    return Intl.message(
+      'Water +250ml',
+      name: 'waterSnackbar',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Coffee`
+  String get coffeeChipLabel {
+    return Intl.message('Coffee', name: 'coffeeChipLabel', desc: '', args: []);
+  }
+
+  /// `Coffee logged (95mg caffeine)`
+  String get coffeeLoggedSnackbar {
+    return Intl.message(
+      'Coffee logged (95mg caffeine)',
+      name: 'coffeeLoggedSnackbar',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Fast 16:8`
+  String get fastChipLabel {
+    return Intl.message('Fast 16:8', name: 'fastChipLabel', desc: '', args: []);
+  }
+
+  /// `Fast already active`
+  String get fastAlreadyActive {
+    return Intl.message(
+      'Fast already active',
+      name: 'fastAlreadyActive',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Fast 16:8 started`
+  String get fastStartedSnackbar {
+    return Intl.message(
+      'Fast 16:8 started',
+      name: 'fastStartedSnackbar',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Sleep`
+  String get sleepLabel {
+    return Intl.message('Sleep', name: 'sleepLabel', desc: '', args: []);
+  }
+
+  /// `Log sleep`
+  String get logSleepTooltip {
+    return Intl.message(
+      'Log sleep',
+      name: 'logSleepTooltip',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Log your sleep to track duration and quality`
+  String get sleepEmptyState {
+    return Intl.message(
+      'Log your sleep to track duration and quality',
+      name: 'sleepEmptyState',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Edit Sleep Entry`
+  String get editSleepTitle {
+    return Intl.message(
+      'Edit Sleep Entry',
+      name: 'editSleepTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Bedtime`
+  String get bedtimeLabel {
+    return Intl.message('Bedtime', name: 'bedtimeLabel', desc: '', args: []);
+  }
+
+  /// `Wake time`
+  String get wakeTimeLabel {
+    return Intl.message('Wake time', name: 'wakeTimeLabel', desc: '', args: []);
+  }
+
+  /// `Quality: `
+  String get qualityLabel {
+    return Intl.message('Quality: ', name: 'qualityLabel', desc: '', args: []);
+  }
+
+  /// `Log Sleep`
+  String get logSleepTitle {
+    return Intl.message('Log Sleep', name: 'logSleepTitle', desc: '', args: []);
+  }
+
+  /// `expanded`
+  String get sectionExpanded {
+    return Intl.message(
+      'expanded',
+      name: 'sectionExpanded',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `collapsed`
+  String get sectionCollapsed {
+    return Intl.message(
+      'collapsed',
+      name: 'sectionCollapsed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `expand`
+  String get tapToExpand {
+    return Intl.message('expand', name: 'tapToExpand', desc: '', args: []);
+  }
+
+  /// `collapse`
+  String get tapToCollapse {
+    return Intl.message('collapse', name: 'tapToCollapse', desc: '', args: []);
   }
 }
 

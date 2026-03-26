@@ -165,6 +165,8 @@ class FDCConst {
 
   static String _getDataTypeParams() => _dataTypeParams.join(",");
 
+  // Note: USDA FDC API requires api_key in URL per their documentation.
+  // This is a free public API key, not a secret. Risk is acceptable.
   static Uri getFDCWordSearchUrl(String searchString, String apiKey) {
     final queryParameters = {
       _fdcQueryTag: searchString,
@@ -172,6 +174,19 @@ class FDCConst {
       _fdcDataTypeTag: _getDataTypeParams(),
       _fdcSortOrderTag: _fdcSortOrderAscValue,
       _fdcApiKeyTag: apiKey
+    };
+
+    return Uri.https(_fdcBaseUrl, _fdcFoodSearchPath, queryParameters);
+  }
+
+  /// UPC/GTIN barcode search via FDC Branded foods
+  static Uri getFDCBarcodeSearchUrl(String barcode, String apiKey) {
+    final queryParameters = {
+      _fdcQueryTag: barcode,
+      _fdcPageSizeTag: '5',
+      _fdcDataTypeTag: 'Branded',
+      _fdcSortOrderTag: _fdcSortOrderAscValue,
+      _fdcApiKeyTag: apiKey,
     };
 
     return Uri.https(_fdcBaseUrl, _fdcFoodSearchPath, queryParameters);
@@ -187,6 +202,53 @@ class FDCConst {
   static const fdcTotalSugarId = 1063;
   static const fdcTotalSaturatedFatId = 1258;
   static const fdcTotalDietaryFiberId = 1079;
+
+  // Micronutrient IDs
+  static const fdcSodiumId = 1093;
+  static const fdcPotassiumId = 1092;
+  static const fdcCalciumId = 1087;
+  static const fdcIronId = 1089;
+  static const fdcMagnesiumId = 1090;
+  static const fdcPhosphorusId = 1091;
+  static const fdcZincId = 1095;
+  static const fdcCopperId = 1098;
+  static const fdcManganeseId = 1101;
+  static const fdcSeleniumId = 1103;
+  static const fdcVitaminAId = 1106;      // Vitamin A, RAE
+  static const fdcVitaminCId = 1162;
+  static const fdcVitaminDId = 1114;      // Vitamin D (D2 + D3)
+  static const fdcVitaminEId = 1109;      // Vitamin E (alpha-tocopherol)
+  static const fdcVitaminKId = 1185;      // Vitamin K (phylloquinone)
+  static const fdcThiamineId = 1165;      // B1
+  static const fdcRiboflavinId = 1166;    // B2
+  static const fdcNiacinId = 1167;        // B3
+  static const fdcPantothenicAcidId = 1170; // B5
+  static const fdcVitaminB6Id = 1175;
+  static const fdcFolateId = 1187;        // Folate, total
+  static const fdcVitaminB12Id = 1178;
+  static const fdcCholesterolId = 1253;
+  static const fdcAddedSugarsId = 1235;
+
+  // Extended lipid profile
+  static const fdcMonoFatId = 1292;
+  static const fdcPolyFatId = 1293;
+  static const fdcTransFatId = 1257;
+  static const fdcOmega3ALAId = 1404;
+  static const fdcOmega3EPAId = 1278;
+  static const fdcOmega3DHAId = 1272;
+  static const fdcOmega6Id = 1316;
+  static const fdcSugarAlcoholsId = 1086;
+
+  // Amino acids
+  static const fdcLeucineId = 1212;
+  static const fdcIsoleucineId = 1214;
+  static const fdcValineId = 1219;
+  static const fdcLysineId = 1213;
+  static const fdcMethionineId = 1215;
+  static const fdcPhenylalanineId = 1217;
+  static const fdcThreonineId = 1211;
+  static const fdcTryptophanId = 1210;
+  static const fdcHistidineId = 1221;
 
   // Measure unit codes
   static const fdcPortionServingId = 1049;

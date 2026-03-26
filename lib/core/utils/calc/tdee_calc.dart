@@ -10,6 +10,7 @@ class TDEECalc {
   /// TDEE = BMR x PAL
   /// https://www.fao.org/3/y5686e/y5686e00.htm
   static double getTDEEKcalWHO2001(UserEntity userEntity) {
+    if (userEntity.heightCM <= 0 || userEntity.weightKG <= 0) return 1500.0;
     final userBMR = BMRCalc.getBMRSchofield11985(userEntity);
     final userPAL = PalCalc.getPALValueFromActivityCategory(userEntity);
     return userBMR * userPAL;
@@ -25,6 +26,7 @@ class TDEECalc {
   /// https://doi.org/10.17226/10490.
   /// https://nap.nationalacademies.org/catalog/10490/dietary-reference-intakes-for-energy-carbohydrate-fiber-fat-fatty-acids-cholesterol-protein-and-amino-acids
   static double getTDEEKcalIOM2005(UserEntity userEntity) {
+    if (userEntity.heightCM <= 0 || userEntity.weightKG <= 0) return 1500.0;
     double tdeeKcal;
     if (userEntity.gender == UserGenderEntity.male) {
       tdeeKcal = 864 -

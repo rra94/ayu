@@ -1,0 +1,58 @@
+import 'package:flutter_test/flutter_test.dart';
+import 'package:opennutritracker/core/utils/calc/rda_calc.dart';
+
+void main() {
+  group('RDACalc', () {
+    test('returns targets for male (default weight)', () {
+      final targets = RDACalc.getDailyTargets(gender: 0, age: 30);
+      expect(targets['potassium'], 3400);
+      expect(targets['iron'], 8);
+      // Default male weight 70 kg * 0.8 = 56 g protein
+      expect(targets['protein'], 56);
+      expect(targets['calcium'], 1000);
+    });
+
+    test('returns targets for female (default weight)', () {
+      final targets = RDACalc.getDailyTargets(gender: 1, age: 30);
+      expect(targets['potassium'], 2600);
+      expect(targets['iron'], 18);
+      // Default female weight 57.5 kg * 0.8 = 46 g protein
+      expect(targets['protein'], 46);
+    });
+
+    test('protein scales with body weight', () {
+      final targets90 =
+          RDACalc.getDailyTargets(gender: 0, age: 30, weightKg: 90);
+      // 90 * 0.8 = 72
+      expect(targets90['protein'], 72);
+
+      final targets50 =
+          RDACalc.getDailyTargets(gender: 1, age: 30, weightKg: 50);
+      // 50 * 0.8 = 46 (clamped to min 46)
+      expect(targets50['protein'], 46);
+    });
+
+    test('all expected nutrients are present', () {
+      final targets = RDACalc.getDailyTargets(gender: 0, age: 30);
+      expect(targets.keys, containsAll([
+        'sodium', 'potassium', 'calcium', 'iron', 'magnesium',
+        'zinc', 'vitaminC', 'vitaminD', 'vitaminB12', 'folate',
+        'fiber', 'fat', 'carbs', 'protein',
+      ]));
+    });
+
+    test('all values are positive', () {
+      final targets = RDACalc.getDailyTargets(gender: 0, age: 30);
+      for (final entry in targets.entries) {
+        expect(entry.value, greaterThan(0),
+            reason: '${entry.key} should be > 0');
+      }
+    });
+
+    test('age affects vitamin B6 target', () {
+      final young = RDACalc.getDailyTargets(gender: 0, age: 30);
+      final old = RDACalc.getDailyTargets(gender: 0, age: 55);
+      expect(old['vitaminB6'], greaterThan(young['vitaminB6']!));
+    });
+  });
+}

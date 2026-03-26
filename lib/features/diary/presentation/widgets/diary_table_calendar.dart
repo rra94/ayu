@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:opennutritracker/core/domain/entity/tracked_day_entity.dart';
+import 'package:opennutritracker/core/styles/color_schemes.dart';
 import 'package:opennutritracker/core/utils/extensions.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -41,11 +42,11 @@ class _DiaryTableCalendarState extends State<DiaryTableCalendar> {
       calendarStyle: CalendarStyle(
           markersMaxCount: 1,
           todayTextStyle:
-              Theme.of(context).textTheme.bodyMedium ?? const TextStyle(),
+              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.bold) ??
+                  const TextStyle(fontWeight: FontWeight.bold),
           todayDecoration: BoxDecoration(
-              border: Border.all(
-                  color: Theme.of(context).colorScheme.onSurface,
-                  width: 2.0),
+              color: ayuGold.withValues(alpha: 0.3),
               shape: BoxShape.circle),
           selectedTextStyle: Theme.of(context)
                   .textTheme

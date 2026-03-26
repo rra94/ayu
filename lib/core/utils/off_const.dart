@@ -48,7 +48,9 @@ class OFFConst {
     _offQuantityTag,
     _offServingQuantityTag,
     _offServingSizeTag,
-    _offNutrimentsTag
+    _offNutrimentsTag,
+    'additives_tags',
+    'ingredients_text'
   ];
 
   static String _getReturnFields() => _returnFields.join(",");

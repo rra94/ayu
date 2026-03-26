@@ -13,7 +13,7 @@ extension Cast on Object? {
       value = this as double;
     } else if (this is String) {
       final stringValue = this as String;
-      value = double.parse(stringValue);
+      value = double.tryParse(stringValue);
     } else {
       value = null;
     }
@@ -35,14 +35,15 @@ extension CastString on String {
     if (isEmpty) {
       return null;
     } else {
-      return double.parse(this);
+      return double.tryParse(this);
     }
   }
 }
 
 extension Round on double {
   double roundToPrecision(int n) {
-    int fac = pow(10, n).toInt();
+    final clamped = n.clamp(0, 15);
+    int fac = pow(10, clamped).toInt();
     return (this * fac).round() / fac;
   }
 }

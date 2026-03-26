@@ -1,46 +1,39 @@
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:opennutritracker/core/data/dbo/meal_nutriments_dbo.dart';
 import 'package:opennutritracker/features/add_meal/domain/entity/meal_entity.dart';
 
 part 'meal_dbo.g.dart';
 
-@HiveType(typeId: 1)
+
 @JsonSerializable()
-class MealDBO extends HiveObject {
-  @HiveField(0)
+class MealDBO {
   final String? code;
-  @HiveField(1)
   final String? name;
 
-  @HiveField(2)
   final String? brands;
 
-  @HiveField(3)
   final String? thumbnailImageUrl;
-  @HiveField(4)
   final String? mainImageUrl;
 
-  @HiveField(5)
   final String? url;
 
-  @HiveField(6)
   final String? mealQuantity;
-  @HiveField(7)
   final String? mealUnit;
-  @HiveField(8)
   final double? servingQuantity;
-  @HiveField(9)
   final String? servingUnit;
 
-  @HiveField(12)
   final String? servingSize;
 
-  @HiveField(10)
   final MealSourceDBO source;
 
-  @HiveField(11)
   final MealNutrimentsDBO nutriments;
+
+  final List<String>? additivesTags;
+
+  final String? ingredientsText;
+
+  final String? ecoscoreGrade;
+  final double? ecoscoreScore;
 
   MealDBO(
       {required this.code,
@@ -55,7 +48,11 @@ class MealDBO extends HiveObject {
       required this.servingUnit,
       required this.servingSize,
       required this.nutriments,
-      required this.source});
+      required this.source,
+      this.additivesTags,
+      this.ingredientsText,
+      this.ecoscoreGrade,
+      this.ecoscoreScore});
 
   factory MealDBO.fromMealEntity(MealEntity mealEntity) => MealDBO(
       code: mealEntity.code,
@@ -72,6 +69,10 @@ class MealDBO extends HiveObject {
       nutriments:
           MealNutrimentsDBO.fromProductNutrimentsEntity(mealEntity.nutriments),
       source: MealSourceDBO.fromMealSourceEntity(mealEntity.source),
+      additivesTags: mealEntity.additivesTags,
+      ingredientsText: mealEntity.ingredientsText,
+      ecoscoreGrade: mealEntity.ecoscoreGrade,
+      ecoscoreScore: mealEntity.ecoscoreScore,
   );
 
   factory MealDBO.fromJson(Map<String, dynamic> json) =>
@@ -80,15 +81,10 @@ class MealDBO extends HiveObject {
   Map<String, dynamic> toJson() => _$MealDBOToJson(this);
 }
 
-@HiveType(typeId: 14)
 enum MealSourceDBO {
-  @HiveField(0)
   unknown,
-  @HiveField(1)
   custom,
-  @HiveField(2)
   off,
-  @HiveField(3)
   fdc;
 
   factory MealSourceDBO.fromMealSourceEntity(MealSourceEntity entity) {

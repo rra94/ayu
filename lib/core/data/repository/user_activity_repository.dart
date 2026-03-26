@@ -1,9 +1,9 @@
-import 'package:opennutritracker/core/data/data_source/user_activity_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/user_activity_data_source_ob.dart';
 import 'package:opennutritracker/core/data/data_source/user_activity_dbo.dart';
 import 'package:opennutritracker/core/domain/entity/user_activity_entity.dart';
 
 class UserActivityRepository {
-  final UserActivityDataSource _userActivityDataSource;
+  final UserActivityDataSourceOB _userActivityDataSource;
 
   UserActivityRepository(this._userActivityDataSource);
 

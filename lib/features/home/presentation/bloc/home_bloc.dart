@@ -37,6 +37,16 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
   DateTime currentDay = DateTime.now();
 
+  // Cache daily goals so they don't shift on every reload
+  double? _cachedKcalGoal;
+  double? _cachedCarbsGoal;
+  double? _cachedFatsGoal;
+  double? _cachedProteinsGoal;
+  String? _cachedGoalDay; // "yyyy-mm-dd" to invalidate on day change
+
+  // Prevent parallel loads (midnight cache race guard)
+  static bool _isLoading = false;
+
   HomeBloc(
       this._getConfigUsecase,
       this._addConfigUsecase,
@@ -50,33 +60,46 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       this._getMacroGoalUsecase)
       : super(HomeInitial()) {
     on<LoadItemsEvent>((event, emit) async {
+      if (_isLoading) return;
+      _isLoading = true;
+      try {
       emit(HomeLoadingState());
 
       currentDay = DateTime.now();
-      final configData = await _getConfigUsecase.getConfig();
+
+      // Fire all independent DB reads in parallel
+      final configFuture = _getConfigUsecase.getConfig();
+      final breakfastFuture = _getIntakeUsecase.getTodayBreakfastIntake();
+      final lunchFuture = _getIntakeUsecase.getTodayLunchIntake();
+      final dinnerFuture = _getIntakeUsecase.getTodayDinnerIntake();
+      final snackFuture = _getIntakeUsecase.getTodaySnackIntake();
+      final activityFuture = _getUserActivityUsecase.getTodayUserActivity();
+
+      final configData = await configFuture;
+      final breakfastIntakeList = await breakfastFuture;
+      final lunchIntakeList = await lunchFuture;
+      final dinnerIntakeList = await dinnerFuture;
+      final snackIntakeList = await snackFuture;
+      final userActivities = await activityFuture;
+
       final usesImperialUnits = configData.usesImperialUnits;
       final showDisclaimerDialog = !configData.hasAcceptedDisclaimer;
 
-      final breakfastIntakeList =
-          await _getIntakeUsecase.getTodayBreakfastIntake();
       final totalBreakfastKcal = getTotalKcal(breakfastIntakeList);
       final totalBreakfastCarbs = getTotalCarbs(breakfastIntakeList);
       final totalBreakfastFats = getTotalFats(breakfastIntakeList);
       final totalBreakfastProteins = getTotalProteins(breakfastIntakeList);
 
-      final lunchIntakeList = await _getIntakeUsecase.getTodayLunchIntake();
       final totalLunchKcal = getTotalKcal(lunchIntakeList);
       final totalLunchCarbs = getTotalCarbs(lunchIntakeList);
       final totalLunchFats = getTotalFats(lunchIntakeList);
       final totalLunchProteins = getTotalProteins(lunchIntakeList);
 
-      final dinnerIntakeList = await _getIntakeUsecase.getTodayDinnerIntake();
       final totalDinnerKcal = getTotalKcal(dinnerIntakeList);
       final totalDinnerCarbs = getTotalCarbs(dinnerIntakeList);
       final totalDinnerFats = getTotalFats(dinnerIntakeList);
       final totalDinnerProteins = getTotalProteins(dinnerIntakeList);
 
-      final snackIntakeList = await _getIntakeUsecase.getTodaySnackIntake();
       final totalSnackKcal = getTotalKcal(snackIntakeList);
       final totalSnackCarbs = getTotalCarbs(snackIntakeList);
       final totalSnackFats = getTotalFats(snackIntakeList);
@@ -98,19 +121,24 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           totalLunchProteins +
           totalDinnerProteins +
           totalSnackProteins;
-
-      final userActivities =
-          await _getUserActivityUsecase.getTodayUserActivity();
       final totalKcalActivities =
           userActivities.map((activity) => activity.burnedKcal).toList().sum;
 
-      final totalKcalGoal = await _getKcalGoalUsecase.getKcalGoal();
-      final totalCarbsGoal =
-          await _getMacroGoalUsecase.getCarbsGoal(totalKcalGoal);
-      final totalFatsGoal =
-          await _getMacroGoalUsecase.getFatsGoal(totalKcalGoal);
-      final totalProteinsGoal =
-          await _getMacroGoalUsecase.getProteinsGoal(totalKcalGoal);
+      // Cache goals per day — recompute only on day change, not every reload
+      final todayKey = '${currentDay.year}-${currentDay.month}-${currentDay.day}';
+      if (_cachedGoalDay != todayKey || _cachedKcalGoal == null) {
+        _cachedKcalGoal = await _getKcalGoalUsecase.getKcalGoal();
+        _cachedCarbsGoal = await _getMacroGoalUsecase.getCarbsGoal(_cachedKcalGoal!);
+        _cachedFatsGoal = await _getMacroGoalUsecase.getFatsGoal(_cachedKcalGoal!);
+        _cachedProteinsGoal = await _getMacroGoalUsecase.getProteinsGoal(_cachedKcalGoal!);
+
+        _cachedGoalDay = todayKey;
+      }
+
+      final totalKcalGoal = _cachedKcalGoal!;
+      final totalCarbsGoal = _cachedCarbsGoal!;
+      final totalFatsGoal = _cachedFatsGoal!;
+      final totalProteinsGoal = _cachedProteinsGoal!;
 
       final totalKcalLeft =
           CalorieGoalCalc.getDailyKcalLeft(totalKcalGoal, totalKcalIntake);
@@ -133,6 +161,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           snackIntakeList: snackIntakeList,
           userActivityList: userActivities,
           usesImperialUnits: usesImperialUnits));
+      } finally {
+        _isLoading = false;
+      }
     });
   }
 

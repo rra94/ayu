@@ -45,7 +45,7 @@ class UserDataMaskEntity {
     if (!checkDataProvided()) {
       return null;
     }
-    final userBirthday = birthday ?? DateTime.now(); // TODO
+    final userBirthday = birthday ?? DateTime(2000, 1, 1);
     final userHeight = height ?? 180;
     final userWeight = weight ?? 70;
     UserGenderEntity userGender;

@@ -1,8 +1,16 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logging/logging.dart';
+import 'package:opennutritracker/core/db/data_sources/eco_score_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/search_history_data_source.dart';
+import 'package:opennutritracker/core/db/entities/eco_score_ob.dart';
 import 'package:opennutritracker/core/domain/usecase/get_config_usecase.dart';
+import 'package:opennutritracker/core/domain/usecase/get_intake_usecase.dart';
+import 'package:opennutritracker/core/utils/locator.dart';
+import 'package:opennutritracker/core/data/common_foods_db.dart';
+import 'package:opennutritracker/core/data/government_foods_db.dart';
 import 'package:opennutritracker/features/add_meal/domain/entity/meal_entity.dart';
+import 'package:opennutritracker/features/add_meal/data/data_sources/calorie_ninja_data_source.dart';
 import 'package:opennutritracker/features/add_meal/domain/usecase/search_products_usecase.dart';
 
 part 'products_event.dart';
@@ -24,12 +32,11 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
         _searchString = event.searchString;
         emit(ProductsLoadingState());
         try {
-          final result = await _searchProductUseCase
-              .searchOFFProductsByString(_searchString);
+          final results = await _cascadeSearch(_searchString);
           final config = await _getConfigUsecase.getConfig();
-
+          _cacheEcoScores(results);
           emit(ProductsLoadedState(
-              products: result, usesImperialUnits: config.usesImperialUnits));
+              products: results, usesImperialUnits: config.usesImperialUnits, isOfflineResults: _lastSearchOffline));
         } catch (error) {
           log.severe(error);
           emit(ProductsFailedState());
@@ -39,13 +46,144 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
     on<RefreshProductsEvent>((event, emit) async {
       emit(ProductsLoadingState());
       try {
-        final result = await _searchProductUseCase
-            .searchOFFProductsByString(_searchString);
-        emit(ProductsLoadedState(products: result));
+        final results = await _cascadeSearch(_searchString);
+        final config = await _getConfigUsecase.getConfig();
+        _cacheEcoScores(results);
+        emit(ProductsLoadedState(products: results, usesImperialUnits: config.usesImperialUnits, isOfflineResults: _lastSearchOffline));
       } catch (error) {
         log.severe(error);
         emit(ProductsFailedState());
       }
     });
+  }
+
+  bool _lastSearchOffline = false;
+
+  /// Cascade search: Common foods → OFF → USDA FDC → local history
+  Future<List<MealEntity>> _cascadeSearch(String query) async {
+    if (query.isEmpty) { _lastSearchOffline = false; return []; }
+
+    bool offSucceeded = false;
+    bool fdcSucceeded = false;
+
+    // 0. Check built-in common foods first (instant, no network)
+    final commonMatches = CommonFoodsDB.search(query);
+
+    // 0.5. Check government food databases (CNF, COFID, AUSNUT — bundled assets)
+    try {
+      final govResults = await GovernmentFoodsDB.search(query);
+      final existingNames = commonMatches.map((r) => r.name?.toLowerCase()).toSet();
+      for (final r in govResults) {
+        if (!existingNames.contains(r.name?.toLowerCase())) {
+          commonMatches.add(r);
+        }
+      }
+    } catch (_) {}
+
+    // 0.7. CalorieNinjas API (fast, supports natural language like "2 eggs and toast")
+    try {
+      final ninjaResults = await CalorieNinjaDataSource.search(query);
+      final existingNames = commonMatches.map((r) => r.name?.toLowerCase()).toSet();
+      for (final r in ninjaResults) {
+        if (!existingNames.contains(r.name?.toLowerCase())) {
+          commonMatches.add(r);
+        }
+      }
+    } catch (_) {}
+
+    // 1. Try OFF
+    List<MealEntity> results = [...commonMatches];
+    try {
+      final offResults = await _searchProductUseCase.searchOFFProductsByString(query);
+      final existingNames = results.map((r) => r.name?.toLowerCase()).toSet();
+      for (final r in offResults) {
+        if (!existingNames.contains(r.name?.toLowerCase())) {
+          results.add(r);
+        }
+      }
+      offSucceeded = true;
+    } catch (e) {
+      log.info('OFF search failed, trying FDC: $e');
+    }
+
+    // 2. If OFF returned few results, supplement with USDA FDC
+    if (results.length < 5) {
+      try {
+        final fdcResults = await _searchProductUseCase.searchFDCFoodByString(query);
+        // Deduplicate by name (case-insensitive)
+        final existingNames = results.map((r) => r.name?.toLowerCase()).toSet();
+        for (final fdc in fdcResults) {
+          if (!existingNames.contains(fdc.name?.toLowerCase())) {
+            results.add(fdc);
+          }
+        }
+        fdcSucceeded = true;
+      } catch (e) {
+        log.info('FDC search also failed: $e');
+      }
+    }
+
+    // 3. Search previously logged foods (local history)
+    try {
+      final getIntake = locator<GetIntakeUsecase>();
+      final allIntakes = await getIntake.getAllIntakes();
+      final queryLower = query.toLowerCase();
+      final seen = results.map((r) => r.name?.toLowerCase()).toSet();
+
+      final localMatches = allIntakes
+          .where((i) =>
+              i.meal.name != null &&
+              i.meal.name!.toLowerCase().contains(queryLower) &&
+              !seen.contains(i.meal.name!.toLowerCase()))
+          .map((i) => i.meal)
+          .toSet() // deduplicate by reference
+          .take(5)
+          .toList();
+
+      results.addAll(localMatches);
+    } catch (e) {
+      log.info('Local search failed: $e');
+    }
+
+    // Boost user's preferred choices to top
+    try {
+      final historyDs = locator<SearchHistoryDataSource>();
+      final topChoices = await historyDs.getTopChoices(query);
+      if (topChoices.isNotEmpty) {
+        final topChoiceNames =
+            topChoices.map((c) => c.chosenMealName.toLowerCase()).toSet();
+        results.sort((a, b) {
+          final aIsPreferred =
+              topChoiceNames.contains(a.name?.toLowerCase());
+          final bIsPreferred =
+              topChoiceNames.contains(b.name?.toLowerCase());
+          if (aIsPreferred && !bIsPreferred) return -1;
+          if (!aIsPreferred && bIsPreferred) return 1;
+          return 0;
+        });
+      }
+    } catch (e) {
+      log.info('Search history boost failed: $e');
+    }
+
+    _lastSearchOffline = !offSucceeded && !fdcSucceeded;
+    return results;
+  }
+
+  void _cacheEcoScores(List<MealEntity> products) {
+    final ecoDs = locator<EcoScoreDataSource>();
+    for (final p in products) {
+      if (p.ecoscoreGrade != null && p.ecoscoreScore != null && p.code != null) {
+        ecoDs.upsert(EcoScoreOB(
+          productKey: p.code!,
+          productName: p.name ?? '',
+          grade: p.ecoscoreGrade!,
+          score: p.ecoscoreScore!,
+          source: 'off',
+          highQuality: true,
+          updatedAt: DateTime.now(),
+        ));
+      }
+    }
   }
 }

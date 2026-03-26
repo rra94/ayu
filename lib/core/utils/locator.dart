@@ -1,11 +1,12 @@
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:get_it/get_it.dart';
-import 'package:opennutritracker/core/data/data_source/config_data_source.dart';
-import 'package:opennutritracker/core/data/data_source/intake_data_source.dart';
 import 'package:opennutritracker/core/data/data_source/physical_activity_data_source.dart';
-import 'package:opennutritracker/core/data/data_source/tracked_day_data_source.dart';
-import 'package:opennutritracker/core/data/data_source/user_activity_data_source.dart';
-import 'package:opennutritracker/core/data/data_source/user_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/config_data_source_ob.dart';
+import 'package:opennutritracker/core/db/data_sources/intake_data_source_ob.dart';
+import 'package:opennutritracker/core/db/data_sources/tracked_day_data_source_ob.dart';
+import 'package:opennutritracker/core/db/data_sources/user_activity_data_source_ob.dart';
+import 'package:opennutritracker/core/db/data_sources/user_data_source_ob.dart';
+import 'package:opennutritracker/core/db/objectbox_db_provider.dart';
 import 'package:opennutritracker/core/data/repository/config_repository.dart';
 import 'package:opennutritracker/core/data/repository/intake_repository.dart';
 import 'package:opennutritracker/core/data/repository/physical_activity_repository.dart';
@@ -29,12 +30,7 @@ import 'package:opennutritracker/core/domain/usecase/get_user_activity_usecase.d
 import 'package:opennutritracker/core/domain/usecase/get_user_usecase.dart';
 import 'package:opennutritracker/core/domain/usecase/update_intake_usecase.dart';
 import 'package:opennutritracker/core/utils/env.dart';
-import 'package:opennutritracker/core/utils/hive_db_provider.dart';
 import 'package:opennutritracker/core/utils/ont_image_cache_manager.dart';
-import 'package:opennutritracker/core/utils/secure_app_storage_provider.dart';
-import 'package:opennutritracker/features/activity_detail/presentation/bloc/activity_detail_bloc.dart';
-import 'package:opennutritracker/features/add_activity/presentation/bloc/activities_bloc.dart';
-import 'package:opennutritracker/features/add_activity/presentation/bloc/recent_activities_bloc.dart';
 import 'package:opennutritracker/features/add_meal/data/data_sources/fdc_data_source.dart';
 import 'package:opennutritracker/features/add_meal/data/data_sources/off_data_source.dart';
 import 'package:opennutritracker/features/add_meal/data/data_sources/sp_fdc_data_source.dart';
@@ -57,16 +53,43 @@ import 'package:opennutritracker/features/settings/domain/usecase/export_data_us
 import 'package:opennutritracker/features/settings/domain/usecase/import_data_usecase.dart';
 import 'package:opennutritracker/features/settings/presentation/bloc/export_import_bloc.dart';
 import 'package:opennutritracker/features/settings/presentation/bloc/settings_bloc.dart';
+import 'package:opennutritracker/core/db/data_sources/water_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/habit_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/gut_health_data_source.dart';
+import 'package:opennutritracker/core/services/daily_summary_service.dart';
+import 'package:opennutritracker/core/db/data_sources/biomarker_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/caffeine_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/dexa_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/inventory_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/fasting_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/mindfulness_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/sleep_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/grocery_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/supplement_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/peptide_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/eco_score_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/search_history_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/food_cache_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/stool_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/symptom_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/weight_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/activity_snapshot_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/location_visit_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/pressure_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/saved_location_data_source.dart';
+import 'package:opennutritracker/objectbox.g.dart';
+import 'package:opennutritracker/core/services/gut_health_service.dart';
+import 'package:opennutritracker/core/services/core_motion_service.dart';
+import 'package:opennutritracker/core/services/location_inference_service.dart';
+import 'package:opennutritracker/core/services/barometer_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 final locator = GetIt.instance;
 
 Future<void> initLocator() async {
-  // Init secure storage and Hive database;
-  final secureAppStorageProvider = SecureAppStorageProvider();
-  final hiveDBProvider = HiveDBProvider();
-  await hiveDBProvider
-      .initHiveDB(await secureAppStorageProvider.getHiveEncryptionKey());
+  // Init ObjectBox database
+  final objectBoxProvider = ObjectBoxDBProvider();
+  await objectBoxProvider.init();
 
   // Backend
   await Supabase.initialize(
@@ -100,11 +123,6 @@ Future<void> initLocator() async {
       SettingsBloc(locator(), locator(), locator(), locator(), locator()));
   locator.registerFactory(() => ExportImportBloc(locator(), locator()));
 
-  locator.registerFactory<ActivitiesBloc>(() => ActivitiesBloc(locator()));
-  locator.registerFactory<RecentActivitiesBloc>(
-      () => RecentActivitiesBloc(locator()));
-  locator.registerFactory<ActivityDetailBloc>(() => ActivityDetailBloc(
-      locator(), locator(), locator(), locator(), locator()));
   locator.registerFactory<MealDetailBloc>(
       () => MealDetailBloc(locator(), locator(), locator(), locator()));
   locator.registerFactory<ScannerBloc>(() => ScannerBloc(locator(), locator()));
@@ -171,28 +189,92 @@ Future<void> initLocator() async {
   locator.registerLazySingleton<TrackedDayRepository>(
       () => TrackedDayRepository(locator()));
 
-  // DataSources
-  locator
-      .registerLazySingleton(() => ConfigDataSource(hiveDBProvider.configBox));
-  locator.registerLazySingleton<UserDataSource>(
-      () => UserDataSource(hiveDBProvider.userBox));
-  locator.registerLazySingleton<IntakeDataSource>(
-      () => IntakeDataSource(hiveDBProvider.intakeBox));
-  locator.registerLazySingleton<UserActivityDataSource>(
-      () => UserActivityDataSource(hiveDBProvider.userActivityBox));
+  // DataSources (ObjectBox-backed)
+  locator.registerLazySingleton<ConfigDataSourceOB>(
+      () => ConfigDataSourceOB(objectBoxProvider.configBox));
+  locator.registerLazySingleton<UserDataSourceOB>(
+      () => UserDataSourceOB(objectBoxProvider.userBox));
+  locator.registerLazySingleton<IntakeDataSourceOB>(
+      () => IntakeDataSourceOB(objectBoxProvider.intakeBox));
+  locator.registerLazySingleton<UserActivityDataSourceOB>(
+      () => UserActivityDataSourceOB(objectBoxProvider.userActivityBox));
+  locator.registerLazySingleton<TrackedDayDataSourceOB>(
+      () => TrackedDayDataSourceOB(objectBoxProvider.trackedDayBox));
+
+  // DataSources (non-DB, unchanged)
   locator.registerLazySingleton<PhysicalActivityDataSource>(
       () => PhysicalActivityDataSource());
   locator.registerLazySingleton<OFFDataSource>(() => OFFDataSource());
   locator.registerLazySingleton<FDCDataSource>(() => FDCDataSource());
   locator.registerLazySingleton<SpFdcDataSource>(() => SpFdcDataSource());
-  locator.registerLazySingleton(
-      () => TrackedDayDataSource(hiveDBProvider.trackedDayBox));
 
-  await _initializeConfig(locator());
+  // DataSources (Ayu features)
+  locator.registerLazySingleton<WaterDataSource>(
+      () => WaterDataSource(objectBoxProvider.waterRecordBox));
+  locator.registerLazySingleton<HabitDataSource>(
+      () => HabitDataSource(
+          objectBoxProvider.habitBox, objectBoxProvider.habitLogBox));
+  locator.registerLazySingleton<GutHealthDataSource>(
+      () => GutHealthDataSource(objectBoxProvider.gutHealthItemBox));
+  locator.registerLazySingleton<WeightDataSource>(
+      () => WeightDataSource(objectBoxProvider.weightRecordBox));
+  locator.registerLazySingleton<StoolDataSource>(
+      () => StoolDataSource(objectBoxProvider.stoolLogBox));
+  locator.registerLazySingleton<SymptomDataSource>(
+      () => SymptomDataSource(objectBoxProvider.symptomLogBox));
+  locator.registerLazySingleton<BiomarkerDataSource>(
+      () => BiomarkerDataSource(objectBoxProvider.biomarkerBox));
+  locator.registerLazySingleton<DexaDataSource>(
+      () => DexaDataSource(objectBoxProvider.dexaScanBox));
+  locator.registerLazySingleton<CaffeineDataSource>(
+      () => CaffeineDataSource(objectBoxProvider.caffeineLogBox));
+  locator.registerLazySingleton<InventoryDataSource>(
+      () => InventoryDataSource(objectBoxProvider.inventoryBox));
+  locator.registerLazySingleton<GroceryDataSource>(
+      () => GroceryDataSource(objectBoxProvider.groceryBox));
+  locator.registerLazySingleton<SupplementDataSource>(
+      () => SupplementDataSource(
+          objectBoxProvider.supplementBox, objectBoxProvider.supplementLogBox));
+  locator.registerLazySingleton<FastingDataSource>(
+      () => FastingDataSource(objectBoxProvider.fastingSessionBox));
+  locator.registerLazySingleton<SleepDataSource>(
+      () => SleepDataSource(objectBoxProvider.sleepRecordBox));
+  locator.registerLazySingleton<MindfulnessDataSource>(
+      () => MindfulnessDataSource(objectBoxProvider.mindfulnessSessionBox));
+  locator.registerLazySingleton<ActivitySnapshotDataSource>(
+      () => ActivitySnapshotDataSource(objectBoxProvider.activitySnapshotBox));
+  locator.registerLazySingleton<LocationVisitDataSource>(
+      () => LocationVisitDataSource(objectBoxProvider.locationVisitBox));
+  locator.registerLazySingleton<PressureDataSource>(
+      () => PressureDataSource(objectBoxProvider.pressureReadingBox));
+  locator.registerLazySingleton<SavedLocationDataSource>(
+      () => SavedLocationDataSource(objectBoxProvider.savedLocationBox));
+  locator.registerLazySingleton<PeptideDataSource>(
+      () => PeptideDataSource(
+          objectBoxProvider.peptideBox, objectBoxProvider.peptideLogBox));
+  locator.registerLazySingleton<EcoScoreDataSource>(
+      () => EcoScoreDataSource(objectBoxProvider.ecoScoreBox));
+  locator.registerLazySingleton<SearchHistoryDataSource>(
+      () => SearchHistoryDataSource(objectBoxProvider.searchHistoryBox));
+  locator.registerLazySingleton<FoodCacheDataSource>(
+      () => FoodCacheDataSource(objectBoxProvider.foodCacheBox));
+
+  // Store (for direct box access where needed)
+  locator.registerLazySingleton<Store>(() => objectBoxProvider.store);
+
+  // Services
+  locator.registerLazySingleton<GutHealthService>(() => GutHealthService());
+  locator.registerLazySingleton<DailySummaryService>(() => DailySummaryService());
+  locator.registerLazySingleton<CoreMotionService>(() => CoreMotionService());
+  locator.registerLazySingleton<LocationInferenceService>(() => LocationInferenceService());
+  locator.registerLazySingleton<BarometerService>(() => BarometerService());
+
+  await _initializeConfig(locator<ConfigDataSourceOB>());
+  await locator<HabitDataSource>().initializeDefaultHabits();
 }
 
-Future<void> _initializeConfig(ConfigDataSource configDataSource) async {
+Future<void> _initializeConfig(ConfigDataSourceOB configDataSource) async {
   if (!await configDataSource.configInitialized()) {
-    configDataSource.initializeConfig();
+    await configDataSource.initializeConfig();
   }
 }
