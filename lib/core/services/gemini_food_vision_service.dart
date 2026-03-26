@@ -50,7 +50,7 @@ class GeminiFoodVisionService {
       final base64Image = base64Encode(imageBytes);
 
       final uri = Uri.parse(
-        'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${Env.geminiApiKey}',
+        'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent',
       );
 
       final body = jsonEncode({
@@ -86,7 +86,10 @@ If this is not a food photo, return: {"error": "not_food"}'''
 
       final response = await http.post(
         uri,
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'Content-Type': 'application/json',
+          'x-goog-api-key': Env.geminiApiKey,
+        },
         body: body,
       ).timeout(const Duration(seconds: 15));
 

@@ -38,6 +38,13 @@ class ReconstitutionCalc {
     required double bacWaterMl,
     required double doseUnits,
   }) {
+    if (bacWaterMl <= 0 || peptideMg <= 0 || doseUnits < 0) {
+      return ReconstitutionResult(
+        concentrationMcgPerMl: 0,
+        doseMcg: 0,
+        dosesPerVial: 0,
+      );
+    }
     final concMcgPerMl = (peptideMg * 1000) / bacWaterMl;
     final doseMl = doseUnits / 100; // 100-unit syringe
     final doseMcg = concMcgPerMl * doseMl;

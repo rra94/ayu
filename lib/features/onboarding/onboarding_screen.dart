@@ -387,6 +387,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   Future<void> _onOverviewStartButtonPressed(BuildContext context) async {
+    final height = _onboardingBloc.userSelection.height;
+    final weight = _onboardingBloc.userSelection.weight;
+    if (height == null || height <= 0 || weight == null || weight <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Height and weight must be greater than zero')),
+      );
+      return;
+    }
     final userEntity = _onboardingBloc.userSelection.toUserEntity();
     final hasAcceptedDataCollection =
         _onboardingBloc.userSelection.acceptDataCollection;

@@ -153,7 +153,7 @@ class ReceiptParserService {
     final headerLines = lines.take(3).join(', ');
 
     final uri = Uri.parse(
-      'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${Env.geminiApiKey}',
+      'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent',
     );
 
     final body = jsonEncode({
@@ -208,7 +208,10 @@ If no food items found, return: {"restaurant": null, "type": "$receiptType", "it
 
     final response = await http.post(
       uri,
-      headers: {'Content-Type': 'application/json'},
+      headers: {
+        'Content-Type': 'application/json',
+        'x-goog-api-key': Env.geminiApiKey,
+      },
       body: body,
     ).timeout(const Duration(seconds: 10));
 
