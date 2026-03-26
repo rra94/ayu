@@ -11,7 +11,12 @@ import 'package:opennutritracker/features/diary/presentation/bloc/calendar_day_b
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:opennutritracker/core/db/data_sources/biomarker_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/fasting_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/intake_data_source_ob.dart';
+import 'package:opennutritracker/core/db/data_sources/sleep_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/supplement_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/water_data_source.dart';
 import 'package:opennutritracker/core/services/allergen_service.dart';
 import 'package:opennutritracker/core/services/backup_service.dart';
 import 'package:opennutritracker/core/services/health_condition_service.dart';
@@ -485,12 +490,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _exportCsv(BuildContext context) async {
     try {
-      final ds = locator<IntakeDataSourceOB>();
-      final allOB = await ds.getAllIntakesOB();
-      final csv = CsvExporter.exportIntakes(allOB);
+      final intakeDs = locator<IntakeDataSourceOB>();
+      final bioDs = locator<BiomarkerDataSource>();
+      final sleepDs = locator<SleepDataSource>();
+      final waterDs = locator<WaterDataSource>();
+      final suppDs = locator<SupplementDataSource>();
+      final fastingDs = locator<FastingDataSource>();
+
+      final csv = CsvExporter.exportAll(
+        intakes: await intakeDs.getAllIntakesOB(),
+        biomarkers: await bioDs.getAllRecords(),
+        sleepRecords: await sleepDs.getRecords(limit: 365),
+        waterRecords: [],  // TODO: add getAll() to WaterDataSource
+        supplements: await suppDs.getAllActive(),
+        supplementLogs: [],  // TODO: add getAllLogs()
+        fastingSessions: await fastingDs.getCompletedSessions(limit: 365),
+      );
 
       final dir = await getTemporaryDirectory();
-      final file = File('${dir.path}/ayu_food_log.csv');
+      final file = File('${dir.path}/ayu_health_export.csv');
       await file.writeAsString(csv);
 
       await SharePlus.instance.share(
