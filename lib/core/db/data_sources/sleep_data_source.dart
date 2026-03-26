@@ -40,4 +40,11 @@ class SleepDataSource {
     built.close();
     return result;
   }
+
+  Future<void> pruneOlderThan(DateTime cutoff) async {
+    final query = _box.query(SleepRecordOB_.wakeTime.lessThan(cutoff.millisecondsSinceEpoch)).build();
+    final old = query.find();
+    query.close();
+    if (old.isNotEmpty) _box.removeMany(old.map((e) => e.id).toList());
+  }
 }

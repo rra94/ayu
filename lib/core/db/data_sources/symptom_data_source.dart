@@ -33,4 +33,11 @@ class SymptomDataSource {
     query.close();
     return results;
   }
+
+  Future<void> pruneOlderThan(DateTime cutoff) async {
+    final query = _box.query(SymptomLogOB_.dateTime.lessThan(cutoff.millisecondsSinceEpoch)).build();
+    final old = query.find();
+    query.close();
+    if (old.isNotEmpty) _box.removeMany(old.map((e) => e.id).toList());
+  }
 }

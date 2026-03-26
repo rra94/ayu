@@ -54,6 +54,13 @@ class CaffeineDataSource {
     _box.removeAll();
   }
 
+  Future<void> pruneOlderThan(DateTime cutoff) async {
+    final query = _box.query(CaffeineLogOB_.dateTime.lessThan(cutoff.millisecondsSinceEpoch)).build();
+    final old = query.find();
+    query.close();
+    if (old.isNotEmpty) _box.removeMany(old.map((e) => e.id).toList());
+  }
+
   /// Hours since last caffeine intake
   Future<double?> hoursSinceLastCaffeine() async {
     final last = await getLastCaffeine();

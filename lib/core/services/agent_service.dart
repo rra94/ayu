@@ -54,6 +54,12 @@ class AgentService {
   /// React to app foreground — check all agents and return suggestions.
   /// Observations run FIRST to build shared context, then agents use it.
   static Future<List<AgentSuggestion>> getSuggestions() async {
+    // Reset cache on day change
+    if (_lastRun != null && !_isSameDay(_lastRun!, DateTime.now())) {
+      _lastRun = null;
+      _cachedSuggestions = null;
+    }
+
     if (_lastRun != null &&
         DateTime.now().difference(_lastRun!).inMinutes < 5 &&
         _cachedSuggestions != null) {
@@ -595,6 +601,9 @@ class AgentService {
 
   static String _truncate(String s, int max) =>
       s.length > max ? '${s.substring(0, max)}...' : s;
+
+  static bool _isSameDay(DateTime a, DateTime b) =>
+      a.year == b.year && a.month == b.month && a.day == b.day;
 
   // ── Missed Days Agent ──
 

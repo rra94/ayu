@@ -15,6 +15,17 @@ class _AgentSuggestionsWidgetState extends State<AgentSuggestionsWidget> {
   // Maps dismiss key → time dismissed; suggestions re-appear after 24h.
   static final Map<String, DateTime> _dismissed = {};
 
+  // Tracks how many times each suggestion TYPE has been shown (within 7 days).
+  static final Map<String, List<DateTime>> _seenHistory = {};
+
+  static bool _shouldSuppress(String type) {
+    final history = _seenHistory[type] ?? [];
+    // Remove entries older than 7 days
+    final recent = history.where((d) => DateTime.now().difference(d).inDays < 7).toList();
+    _seenHistory[type] = recent;
+    return recent.length >= 3; // suppress if shown 3+ times this week
+  }
+
   @override
   void initState() {
     super.initState();
@@ -35,6 +46,11 @@ class _AgentSuggestionsWidgetState extends State<AgentSuggestionsWidget> {
       if (dismissedAt != null && DateTime.now().difference(dismissedAt).inHours < 24) {
         continue; // still in cooldown
       }
+      if (_shouldSuppress(s.type)) {
+        continue; // shown 3+ times this week — suppress to avoid fatigue
+      }
+      // Record this display in the seen history
+      _seenHistory.putIfAbsent(s.type, () => []).add(DateTime.now());
       visible.add(s);
     }
 
