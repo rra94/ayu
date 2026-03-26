@@ -386,10 +386,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     });
   }
 
+  bool _saving = false;
+
   Future<void> _onOverviewStartButtonPressed(BuildContext context) async {
+    if (_saving) return; // prevent double-tap
+    _saving = true;
+
     final height = _onboardingBloc.userSelection.height;
     final weight = _onboardingBloc.userSelection.weight;
     if (height == null || height <= 0 || weight == null || weight <= 0) {
+      _saving = false;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Height and weight must be greater than zero')),
       );
@@ -402,8 +408,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     if (userEntity != null) {
       await _onboardingBloc.saveOnboardingData(
           context, userEntity, hasAcceptedDataCollection, usesImperialUnits);
-      Navigator.pushReplacementNamed(context, NavigationOptions.mainRoute);
+      if (context.mounted) {
+        Navigator.pushReplacementNamed(context, NavigationOptions.mainRoute);
+      }
     } else {
+      _saving = false;
       // Error with user input
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(S.of(context).onboardingSaveUserError)));

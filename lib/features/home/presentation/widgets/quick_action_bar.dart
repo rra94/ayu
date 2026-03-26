@@ -115,6 +115,9 @@ class _QuickChip extends StatelessWidget {
   final Color color;
   final VoidCallback onTap;
 
+  // Debounce: prevent rapid double-taps across all chips
+  static DateTime? _lastTapTime;
+
   const _QuickChip({
     required this.icon,
     required this.label,
@@ -131,7 +134,14 @@ class _QuickChip extends StatelessWidget {
         avatar: Icon(icon, size: 16, color: color),
         label: Text(label,
             style: Theme.of(context).textTheme.bodySmall),
-        onPressed: onTap,
+        onPressed: () {
+          final now = DateTime.now();
+          if (_lastTapTime != null && now.difference(_lastTapTime!).inMilliseconds < 500) {
+            return; // debounce: ignore taps within 500ms
+          }
+          _lastTapTime = now;
+          onTap();
+        },
         side: BorderSide(color: color.withValues(alpha: 0.3)),
         backgroundColor: color.withValues(alpha: 0.05),
       ),
