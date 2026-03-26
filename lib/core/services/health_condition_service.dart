@@ -35,6 +35,8 @@ class HealthConditionService {
     'Acne / Skin issues',
     'Dental / Gum health',
     'Eczema / Dermatitis',
+    'Vegetarian',
+    'Vegan',
   ];
 
   /// Rules: condition → nutrient alerts
@@ -132,6 +134,20 @@ class HealthConditionService {
       _Rule('Vitamin B12', 'B12 deficiency causes hair thinning', false),
       _Rule('Omega-3', 'Omega-3 nourishes hair follicles and reduces inflammation', false),
       _Rule('Added Sugar', 'High sugar spikes insulin → increases DHT → accelerates hair loss', true),
+    ],
+    'Vegetarian': [
+      _Rule('Iron', 'Monitor closely — plant iron is 5-15% bioavailable vs 25% from meat', false),
+      _Rule('Vitamin B12', 'Supplement recommended — B12 only in animal products/fortified foods', false),
+      _Rule('Zinc', 'Increase intake — phytates in plant foods reduce absorption', false),
+      _Rule('Omega-3', 'Consider algae-based DHA/EPA supplement', false),
+    ],
+    'Vegan': [
+      _Rule('Iron', 'Monitor closely — plant iron only 5-15% bioavailable', false),
+      _Rule('Vitamin B12', 'Must supplement — no B12 in plant foods', false),
+      _Rule('Calcium', 'Use fortified plant milks or supplement', false),
+      _Rule('Zinc', 'Increase intake — soak/sprout grains to reduce phytates', false),
+      _Rule('Vitamin D', 'Supplement D3 (or D2 from mushrooms)', false),
+      _Rule('Omega-3', 'Algae-based DHA/EPA required — ALA conversion is only 5-10%', false),
     ],
   };
 

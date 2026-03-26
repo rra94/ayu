@@ -70,15 +70,51 @@ class _ScannerScreenState extends State<ScannerScreen> {
             if (_dialogShowing) return;
             _dialogShowing = true;
 
-            // Supplements: skip meal detail, show confirmation
+            // Supplements: give user choice to add as supplement or log as food
             if (state.isSupplement) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(
-                  '${state.product.name ?? "Supplement"} added to your stack!',
-                )),
-              );
-              Navigator.of(context).pop();
-              _dialogShowing = false;
+              showModalBottomSheet(
+                context: context,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                ),
+                builder: (ctx) => SafeArea(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                        child: Text(
+                          state.product.name ?? 'Supplement',
+                          style: Theme.of(ctx).textTheme.titleMedium,
+                        ),
+                      ),
+                      ListTile(
+                        leading: const Icon(Icons.medication),
+                        title: const Text('Add to Supplements'),
+                        subtitle: const Text('Track as daily supplement'),
+                        onTap: () {
+                          Navigator.pop(ctx);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(
+                              '${state.product.name ?? "Supplement"} added to stack!',
+                            )),
+                          );
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                      ListTile(
+                        leading: const Icon(Icons.restaurant),
+                        title: const Text('Log as Food'),
+                        subtitle: const Text('Count toward daily macros/calories'),
+                        onTap: () {
+                          Navigator.pop(ctx);
+                          _showQuickAddDialog(context, state);
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ).whenComplete(() => _dialogShowing = false);
               return;
             }
 

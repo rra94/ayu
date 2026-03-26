@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:opennutritracker/core/db/data_sources/biomarker_data_source.dart';
 import 'package:opennutritracker/core/db/entities/biomarker_record_ob.dart';
+import 'package:opennutritracker/core/services/health_condition_service.dart';
 import 'package:opennutritracker/core/utils/locator.dart';
 
 enum _GlucoseTiming {
@@ -25,6 +26,7 @@ class GlucoseCard extends StatefulWidget {
 class _GlucoseCardState extends State<GlucoseCard> {
   bool _loading = true;
   List<BiomarkerRecordOB> _records = [];
+  bool _hasDiabetes = false;
 
   static const _type = 'glucose';
 
@@ -37,10 +39,14 @@ class _GlucoseCardState extends State<GlucoseCard> {
   Future<void> _load() async {
     final ds = locator<BiomarkerDataSource>();
     final all = await ds.getRecordsByType(_type);
+    final conditions = HealthConditionService.getUserConditions();
+    final hasDiabetes = conditions.any(
+        (c) => c.toLowerCase().contains('diabetes'));
     setState(() {
       // Keep at most last 7, oldest first for chart
       _records =
           all.reversed.toList().take(7).toList().reversed.toList();
+      _hasDiabetes = hasDiabetes;
       _loading = false;
     });
   }
@@ -183,16 +189,16 @@ class _GlucoseCardState extends State<GlucoseCard> {
             ),
           ),
         ],
-        // Reference lines for fasting ranges
+        // Reference lines for fasting ranges (diabetes-aware)
         extraLinesData: ExtraLinesData(horizontalLines: [
           HorizontalLine(
-            y: 100,
+            y: _normalMax,
             color: Colors.orange.withValues(alpha: 0.4),
             strokeWidth: 1,
             dashArray: [4, 4],
           ),
           HorizontalLine(
-            y: 126,
+            y: _highMin,
             color: Colors.red.withValues(alpha: 0.4),
             strokeWidth: 1,
             dashArray: [4, 4],
@@ -229,20 +235,39 @@ class _GlucoseCardState extends State<GlucoseCard> {
   }
 
   Widget _buildLegend(ThemeData theme) {
+    final labelStyle = theme.textTheme.labelSmall?.copyWith(fontSize: 9);
+    if (_hasDiabetes) {
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _legendDot(Colors.green),
+          const SizedBox(width: 3),
+          Text('Controlled (70–130)', style: labelStyle),
+          const SizedBox(width: 8),
+          _legendDot(Colors.orange),
+          const SizedBox(width: 3),
+          Text('Above target', style: labelStyle),
+          const SizedBox(width: 8),
+          _legendDot(Colors.red),
+          const SizedBox(width: 3),
+          Text('High (>180)', style: labelStyle),
+        ],
+      );
+    }
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         _legendDot(Colors.green),
         const SizedBox(width: 3),
-        Text('Normal (70–100)', style: theme.textTheme.labelSmall?.copyWith(fontSize: 9)),
+        Text('Normal (70–100)', style: labelStyle),
         const SizedBox(width: 8),
         _legendDot(Colors.orange),
         const SizedBox(width: 3),
-        Text('Pre-diabetic', style: theme.textTheme.labelSmall?.copyWith(fontSize: 9)),
+        Text('Pre-diabetic', style: labelStyle),
         const SizedBox(width: 8),
         _legendDot(Colors.red),
         const SizedBox(width: 3),
-        Text('High', style: theme.textTheme.labelSmall?.copyWith(fontSize: 9)),
+        Text('High', style: labelStyle),
       ],
     );
   }
@@ -255,13 +280,21 @@ class _GlucoseCardState extends State<GlucoseCard> {
     );
   }
 
+  double get _normalMax => _hasDiabetes ? 130.0 : 100.0;
+  double get _highMin => _hasDiabetes ? 180.0 : 126.0;
+
   Color _glucoseColor(double value) {
-    if (value <= 100) return Colors.green;
-    if (value <= 126) return Colors.orange;
+    if (value <= _normalMax) return Colors.green;
+    if (value <= _highMin) return Colors.orange;
     return Colors.red;
   }
 
   String _glucoseLabel(double value) {
+    if (_hasDiabetes) {
+      if (value <= 130) return 'Controlled';
+      if (value <= 180) return 'Above target';
+      return 'High — consult doctor';
+    }
     if (value <= 100) return 'Normal';
     if (value <= 126) return 'Pre-diabetic';
     return 'High';
