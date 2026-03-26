@@ -428,11 +428,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
           FilledButton(
             onPressed: () async {
               final value = int.tryParse(controller.text);
-              if (value != null && value > 0) {
-                final configDs = locator<ConfigDataSourceOB>();
-                await configDs.setDailyStepGoal(value);
-                setState(() => _stepGoal = value);
+              if (value == null || value <= 0 || value > 100000) {
+                ScaffoldMessenger.of(ctx).showSnackBar(
+                  const SnackBar(content: Text('Enter a value between 1 and 100,000')),
+                );
+                return;
               }
+              final configDs = locator<ConfigDataSourceOB>();
+              await configDs.setDailyStepGoal(value);
+              setState(() => _stepGoal = value);
               if (ctx.mounted) Navigator.of(ctx).pop();
             },
             child: const Text('Save'),

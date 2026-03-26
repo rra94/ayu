@@ -31,6 +31,9 @@ class _InventoryCardState extends State<InventoryCard> {
 
   @override
   Widget build(BuildContext context) {
+    if (_loading) return const SizedBox();
+    if (_products.isEmpty) return const SizedBox.shrink();
+
     final theme = Theme.of(context);
     final lowStock = _products.where((p) => p.isLow).toList();
 
@@ -71,12 +74,7 @@ class _InventoryCardState extends State<InventoryCard> {
                 ),
               ],
             ),
-            if (!_loading && _products.isEmpty)
-              Text('Track products that run out (supplements, skincare, etc.)',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant))
-            else if (!_loading)
-              ..._products.map((p) => _buildProductRow(theme, p)),
+            ..._products.map((p) => _buildProductRow(theme, p)),
           ],
         ),
       ),

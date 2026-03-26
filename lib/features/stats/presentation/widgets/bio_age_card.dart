@@ -67,6 +67,8 @@ class _BioAgeCardState extends State<BioAgeCard> {
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: theme.colorScheme.onSurfaceVariant,
                           )),
+                      const Text('Experimental — based on limited markers',
+                          style: TextStyle(fontSize: 10, color: Colors.orange, fontStyle: FontStyle.italic)),
                     ],
                   ),
                 ),

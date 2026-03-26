@@ -36,6 +36,9 @@ class _GroceryCardState extends State<GroceryCard> {
 
   @override
   Widget build(BuildContext context) {
+    if (_loading) return const SizedBox();
+    if (_items.isEmpty) return const SizedBox.shrink();
+
     final theme = Theme.of(context);
 
     return Card(
@@ -71,30 +74,18 @@ class _GroceryCardState extends State<GroceryCard> {
                     style: theme.textTheme.labelSmall),
               ],
             ),
-            if (!_loading && _items.isEmpty)
-              Padding(
-                padding: const EdgeInsets.only(top: 4),
-                child: Text(
-                  'Scan a receipt to auto-track groceries',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              )
-            else if (!_loading) ...[
-              // Expiring items first
-              if (_expiring.isNotEmpty) ...[
-                const SizedBox(height: 4),
-                ..._expiring.take(3).map((item) => _buildItem(theme, item, isExpiring: true)),
-              ],
-              // Category summary
+            // Expiring items first
+            if (_expiring.isNotEmpty) ...[
               const SizedBox(height: 4),
-              Wrap(
-                spacing: 6,
-                runSpacing: 4,
-                children: _buildCategoryChips(theme),
-              ),
+              ..._expiring.take(3).map((item) => _buildItem(theme, item, isExpiring: true)),
             ],
+            // Category summary
+            const SizedBox(height: 4),
+            Wrap(
+              spacing: 6,
+              runSpacing: 4,
+              children: _buildCategoryChips(theme),
+            ),
           ],
         ),
       ),

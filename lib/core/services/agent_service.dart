@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
 import 'package:opennutritracker/core/db/data_sources/activity_snapshot_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/biomarker_data_source.dart';
@@ -45,9 +46,20 @@ class AgentSuggestion {
 class AgentService {
   static final _log = Logger('AgentService');
 
+  // Rate-limit: max once per 5 minutes
+  static DateTime? _lastRun;
+  static List<AgentSuggestion>? _cachedSuggestions;
+
   /// React to app foreground — check all agents and return suggestions.
   /// Observations run FIRST to build shared context, then agents use it.
   static Future<List<AgentSuggestion>> getSuggestions() async {
+    if (_lastRun != null &&
+        DateTime.now().difference(_lastRun!).inMinutes < 5 &&
+        _cachedSuggestions != null) {
+      return _cachedSuggestions!;
+    }
+    _lastRun = DateTime.now();
+
     final suggestions = <AgentSuggestion>[];
 
     // Phase 1: Observations run first — build shared context
@@ -63,7 +75,7 @@ class AgentService {
         ...await getIntake.getDinnerIntakeByDay(now),
         ...await getIntake.getSnackIntakeByDay(now),
       ];
-    } catch (_) {}
+    } catch (e) { debugPrint('AgentService loadIntakes: $e'); }
 
     // Check current place for context
     try {
@@ -72,35 +84,35 @@ class AgentService {
         ctx.currentPlace = place['category'] as String?;
         ctx.currentPlaceName = place['name'] as String?;
       }
-    } catch (_) {}
+    } catch (e) { debugPrint('AgentService placeDetect: $e'); }
 
     try {
       final obs = await ObservationAgent.observe(ctx);
       suggestions.addAll(obs);
-    } catch (_) {}
+    } catch (e) { debugPrint('observationAgent: $e'); }
 
     // Phase 2: Agents run informed by observation context
     // Stress agent runs early — it sets ctx.lowMood for downstream agents
-    try { suggestions.addAll(await _stressAgent(ctx)); } catch (_) {}
+    try { suggestions.addAll(await _stressAgent(ctx)); } catch (e) { debugPrint('stressAgent: $e'); }
 
     // Skip agents whose topic is already covered by an observation
-    try { if (!ctx.isAlreadyCovered('meal_pattern')) suggestions.addAll(await _mealPatternAgent()); } catch (_) {}
-    try { if (!ctx.isAlreadyCovered('nutrient_gap')) suggestions.addAll(await _nutrientGapAgent(ctx)); } catch (_) {}
-    try { suggestions.addAll(await _fastingAdaptAgent()); } catch (_) {}
-    try { suggestions.addAll(await _supplementTimingAgent()); } catch (_) {}
-    try { suggestions.addAll(await _circadianAgent(ctx)); } catch (_) {}
-    try { suggestions.addAll(await _hydrationAgent(ctx)); } catch (_) {}
-    try { suggestions.addAll(await _biomarkerAgent()); } catch (_) {}
-    try { if (!ctx.isAlreadyCovered('sedentary')) suggestions.addAll(await _sedentaryAgent()); } catch (_) {}
-    try { suggestions.addAll(await _gymFrequencyAgent()); } catch (_) {}
-    try { if (!ctx.isAlreadyCovered('outdoor_time')) suggestions.addAll(await _outdoorTimeAgent()); } catch (_) {}
-    try { suggestions.addAll(await _peptideReminderAgent()); } catch (_) {}
-    try { suggestions.addAll(await _ecoScoreAgent(ctx)); } catch (_) {}
-    try { suggestions.addAll(await _calendarAgent()); } catch (_) {}
-    try { suggestions.addAll(await _missedDaysAgent(ctx)); } catch (_) {}
+    try { if (!ctx.isAlreadyCovered('meal_pattern')) suggestions.addAll(await _mealPatternAgent()); } catch (e) { debugPrint('mealPatternAgent: $e'); }
+    try { if (!ctx.isAlreadyCovered('nutrient_gap')) suggestions.addAll(await _nutrientGapAgent(ctx)); } catch (e) { debugPrint('nutrientGapAgent: $e'); }
+    try { suggestions.addAll(await _fastingAdaptAgent()); } catch (e) { debugPrint('fastingAdaptAgent: $e'); }
+    try { suggestions.addAll(await _supplementTimingAgent()); } catch (e) { debugPrint('supplementTimingAgent: $e'); }
+    try { suggestions.addAll(await _circadianAgent(ctx)); } catch (e) { debugPrint('circadianAgent: $e'); }
+    try { suggestions.addAll(await _hydrationAgent(ctx)); } catch (e) { debugPrint('hydrationAgent: $e'); }
+    try { suggestions.addAll(await _biomarkerAgent()); } catch (e) { debugPrint('biomarkerAgent: $e'); }
+    try { if (!ctx.isAlreadyCovered('sedentary')) suggestions.addAll(await _sedentaryAgent()); } catch (e) { debugPrint('sedentaryAgent: $e'); }
+    try { suggestions.addAll(await _gymFrequencyAgent()); } catch (e) { debugPrint('gymFrequencyAgent: $e'); }
+    try { if (!ctx.isAlreadyCovered('outdoor_time')) suggestions.addAll(await _outdoorTimeAgent()); } catch (e) { debugPrint('outdoorTimeAgent: $e'); }
+    try { suggestions.addAll(await _peptideReminderAgent()); } catch (e) { debugPrint('peptideReminderAgent: $e'); }
+    try { suggestions.addAll(await _ecoScoreAgent(ctx)); } catch (e) { debugPrint('ecoScoreAgent: $e'); }
+    try { suggestions.addAll(await _calendarAgent()); } catch (e) { debugPrint('calendarAgent: $e'); }
+    try { suggestions.addAll(await _missedDaysAgent(ctx)); } catch (e) { debugPrint('missedDaysAgent: $e'); }
 
     // Phase 3: Data Collection Agent — sends targeted notification for missing data
-    try { await DataCollectionAgent.sendDataRequest(ctx); } catch (_) {}
+    try { await DataCollectionAgent.sendDataRequest(ctx); } catch (e) { debugPrint('dataCollectionAgent: $e'); }
 
     // Priority order: observations first, then reminders, then informational
     const typePriority = {
@@ -136,6 +148,7 @@ class AgentService {
     }
 
     _log.info('AgentService generated ${suggestions.length} suggestions');
+    _cachedSuggestions = suggestions;
     return suggestions;
   }
 

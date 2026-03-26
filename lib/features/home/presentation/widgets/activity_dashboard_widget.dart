@@ -164,8 +164,9 @@ class _ActivityDashboardWidgetState extends State<ActivityDashboardWidget> {
     final gold = isLight ? ayuGoldMuted : ayuGoldLight;
     final goldDim = gold.withValues(alpha: 0.6);
 
+    final safeStepGoal = _stepGoal > 0 ? _stepGoal : 10000; // prevent division by zero
     final stepPct =
-        (_stepGoal > 0 ? _steps / _stepGoal : 0.0).clamp(0.0, 1.0);
+        (_steps / safeStepGoal).clamp(0.0, 1.0);
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),

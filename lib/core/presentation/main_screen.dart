@@ -21,6 +21,7 @@ import 'package:opennutritracker/core/utils/locator.dart';
 import 'package:opennutritracker/core/services/notification_action_service.dart';
 import 'package:opennutritracker/core/services/widget_service.dart';
 import 'package:opennutritracker/features/health_connect/services/healthkit_service.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -41,6 +42,11 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    // Request notification permission on first launch (iOS)
+    FlutterLocalNotificationsPlugin()
+        .resolvePlatformSpecificImplementation<
+            IOSFlutterLocalNotificationsPlugin>()
+        ?.requestPermissions(alert: true, badge: true, sound: true);
     NotificationActionService.init();
     WidgetService.init();
     DataRetentionService.pruneOldData().catchError((e) {

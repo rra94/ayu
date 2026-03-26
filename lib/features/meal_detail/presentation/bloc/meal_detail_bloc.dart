@@ -22,6 +22,11 @@ part 'meal_detail_state.dart';
 
 class MealDetailBloc extends Bloc<MealDetailEvent, MealDetailState> {
   final log = Logger('MealDetailBloc');
+
+  // Duplicate meal prevention (rapid double-tap guard)
+  static DateTime? _lastAddTime;
+  static String? _lastAddName;
+
   final AddIntakeUsecase _addIntakeUseCase;
   final AddTrackedDayUsecase _addTrackedDayUsecase;
   final GetKcalGoalUsecase _getKcalGoalUsecase;
@@ -81,6 +86,18 @@ class MealDetailBloc extends Bloc<MealDetailEvent, MealDetailState> {
       String amountText, IntakeTypeEntity type, MealEntity meal,
       DateTime day) async {
     final quantity = double.parse(amountText.replaceAll(',', '.'));
+
+    // Prevent duplicate from rapid taps (same meal within 5 seconds)
+    final now = DateTime.now();
+    if (_lastAddTime != null &&
+        _lastAddName == meal.name &&
+        now.difference(_lastAddTime!).inSeconds < 5) {
+      log.warning('Duplicate meal detected, skipping: ${meal.name}');
+      return IntakeEntity(
+          id: '', unit: unit, amount: quantity, type: type, meal: meal, dateTime: day);
+    }
+    _lastAddTime = now;
+    _lastAddName = meal.name;
 
     final intakeEntity = IntakeEntity(
         id: IdGenerator.getUniqueID(),

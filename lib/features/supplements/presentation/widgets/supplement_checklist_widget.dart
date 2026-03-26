@@ -41,27 +41,7 @@ class _SupplementChecklistWidgetState extends State<SupplementChecklistWidget> {
 
     if (_loading) return const SizedBox();
     if (_supplements.isEmpty) {
-      return Card(
-        
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              Icon(Icons.medication_outlined, color: theme.colorScheme.primary),
-              const SizedBox(width: 8),
-              Text('Supplements',
-                  style: theme.textTheme.titleMedium
-                      ?.copyWith(fontWeight: FontWeight.w600)),
-              const Spacer(),
-              TextButton.icon(
-                onPressed: () => _showAddDialog(context),
-                icon: const Icon(Icons.add, size: 18),
-                label: const Text('Add'),
-              ),
-            ],
-          ),
-        ),
-      );
+      return const SizedBox.shrink();
     }
 
     final takenCount = _takenIds.length;
