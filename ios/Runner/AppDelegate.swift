@@ -22,7 +22,9 @@ import Intents
   ) -> Bool {
     GeneratedPluginRegistrant.register(with: self)
 
-    let controller = window?.rootViewController as! FlutterViewController
+    guard let controller = window?.rootViewController as? FlutterViewController else {
+      return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+    }
 
     // ── Vision OCR channel ─────────────────────────────────────────────────
     let ocrChannel = FlutterMethodChannel(
@@ -231,7 +233,7 @@ import Intents
         }
     }
 
-    try! setExcludeFromiCloudBackup(isExcluded: true)
+    try? setExcludeFromiCloudBackup(isExcluded: true)
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 
@@ -449,19 +451,37 @@ import Intents
       mgr.delegate = self
       self.locationManager = mgr
     }
-    let mgr = self.locationManager!
-
-    // Only request permission if not yet determined
-    let status = mgr.authorizationStatus
-    if status == .notDetermined {
-      mgr.requestWhenInUseAuthorization()
+    guard let mgr = self.locationManager else {
+      result("failed")
+      return
     }
 
-    if status == .authorizedWhenInUse || status == .authorizedAlways {
+    let status = mgr.authorizationStatus
+    switch status {
+    case .notDetermined:
+      // Permission will be handled in locationManagerDidChangeAuthorization
+      mgr.requestWhenInUseAuthorization()
+    case .authorizedWhenInUse, .authorizedAlways:
       mgr.startMonitoringSignificantLocationChanges()
+    case .denied, .restricted:
+      // Permission denied — don't try to monitor
+      break
+    @unknown default:
+      break
     }
     result("started")
   }
+
+  // Called when authorization changes (handles async permission grant)
+  func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+    let status = manager.authorizationStatus
+    if status == .authorizedWhenInUse || status == .authorizedAlways {
+      manager.startMonitoringSignificantLocationChanges()
+    }
+  }
+
+  // Rate-limit place identification (max once per 30 seconds)
+  private var lastPlaceIdentifyTime: Date?
 
   // CLLocationManagerDelegate
   func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
@@ -472,11 +492,18 @@ import Intents
       "lon": loc.coordinate.longitude
     ])
 
+    // Throttle place identification to max once per 30 seconds
+    let now = Date()
+    if let lastTime = lastPlaceIdentifyTime, now.timeIntervalSince(lastTime) < 30 {
+      return
+    }
+    lastPlaceIdentifyTime = now
+
     // Identify nearby place of interest and notify Flutter
-    self.identifyPlace(lat: loc.coordinate.latitude, lon: loc.coordinate.longitude) { place in
+    self.identifyPlace(lat: loc.coordinate.latitude, lon: loc.coordinate.longitude) { [weak self] place in
       if let place = place {
         DispatchQueue.main.async {
-          self.locationChannel?.invokeMethod("onPlaceDetected", arguments: place)
+          self?.locationChannel?.invokeMethod("onPlaceDetected", arguments: place)
         }
       }
     }
@@ -584,7 +611,7 @@ import Intents
 }
 
 private func setExcludeFromiCloudBackup(isExcluded: Bool) throws {
-    var fileOrDirectoryURL = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
+    var fileOrDirectoryURL = try FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
     var values = URLResourceValues()
     values.isExcludedFromBackup = isExcluded
     try fileOrDirectoryURL.setResourceValues(values)
