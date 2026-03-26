@@ -28,7 +28,8 @@ class FastingSessionOB {
 
   double get elapsedHours {
     final end = endTime ?? DateTime.now();
-    return end.difference(startTime).inMinutes / 60.0;
+    final diff = end.difference(startTime).inMinutes / 60.0;
+    return diff < 0 ? 0 : diff; // prevent negative elapsed
   }
 
   double get progress => (elapsedHours / targetHours).clamp(0.0, 1.0);

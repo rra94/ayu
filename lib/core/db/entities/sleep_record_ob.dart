@@ -38,8 +38,10 @@ class SleepRecordOB {
     this.awakeMin,
   });
 
-  double get durationHours =>
-      wakeTime.difference(bedTime).inMinutes / 60.0;
+  double get durationHours {
+    final diff = wakeTime.difference(bedTime).inMinutes / 60.0;
+    return diff < 0 ? 0 : diff; // prevent negative duration
+  }
 
   /// Computed sleep efficiency: (total - awake) / total * 100
   double get sleepEfficiency {
@@ -50,6 +52,7 @@ class SleepRecordOB {
 
   /// Sleep score 0-100 based on duration + stages + efficiency
   double get sleepScore {
+    if (durationHours <= 0) return 0;
     double score = 0;
     // Duration: 7-9h is optimal (max 40 points)
     final hours = durationHours;

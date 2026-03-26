@@ -23,6 +23,7 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
   ScannerBloc(this._searchProductUseCase, this._getConfigUsecase)
       : super(ScannerInitial()) {
     on<ScannerLoadProductEvent>((event, emit) async {
+      if (state is ScannerLoadingState) return; // prevent re-entry during loading
       emit(ScannerLoadingState());
 
       try {

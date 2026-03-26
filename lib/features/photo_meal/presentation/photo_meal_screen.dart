@@ -127,12 +127,15 @@ class _PhotoMealScreenState extends State<PhotoMealScreen> {
     }
 
     // Enrich identified foods with verified nutrition from databases
+    if (!mounted) return;
     setState(() { _statusText = 'Looking up nutrition...'; });
+
+    if (!mounted) return; // guard before async enrichment
     try {
       final enrichedItems =
           await PhotoEnrichmentService.enrichItems(result.items);
 
-      if (!mounted) return;
+      if (!mounted) return; // guard after
 
       result = FoodPhotoResult(
         dishName: result.dishName,

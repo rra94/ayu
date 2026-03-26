@@ -41,16 +41,19 @@ class BiologicalAgeCalc {
     return _simplifiedEstimate(values, chronologicalAge, available, values.keys.toSet());
   }
 
-  static PhenoAgeResult _fullPhenoAge(
+  static PhenoAgeResult? _fullPhenoAge(
     Map<String, double> v,
     double age,
   ) {
     // Levine 2018 mortality score coefficients
     // xb = sum of (coefficient * biomarker_value) + age_component
+    // Clamp log inputs to prevent log(0) or log(negative) → NaN/Infinity
+    final crpVal = (v['crp']! + 1).clamp(0.001, 1001.0);
+    final creatVal = (v['creatinine']!).clamp(0.001, 1000.0);
     final xb = -19.9067
-        + 0.0336 * log(v['crp']! + 1) * 100 // ln(CRP) scaled
+        + 0.0336 * log(crpVal) * 100 // ln(CRP+1) scaled
         + 0.0095 * v['fasting_glucose']!
-        + 0.1953 * log(v['creatinine']!) * 10
+        + 0.1953 * log(creatVal) * 10
         - 0.0120 * v['albumin']! * 10
         + 0.0000 // lymphocyte placeholder (complex transform)
         + 0.0894 * v['alp']! / 10
@@ -62,6 +65,9 @@ class BiologicalAgeCalc {
     // Convert mortality score to phenotypic age
     // Using simplified linear approximation
     final phenoAge = age + (xb - 0.0804 * age) * 2.5;
+
+    // Guard against NaN/Infinity from degenerate inputs
+    if (phenoAge.isNaN || phenoAge.isInfinite) return null;
 
     return PhenoAgeResult(
       phenotypicAge: phenoAge.clamp(0, 150),

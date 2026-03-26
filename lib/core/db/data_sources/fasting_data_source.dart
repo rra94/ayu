@@ -7,6 +7,12 @@ class FastingDataSource {
   FastingDataSource(this._box);
 
   Future<void> saveSession(FastingSessionOB session) async {
+    // Validate endTime >= startTime to prevent invalid sessions
+    if (session.endTime != null &&
+        session.endTime!.isBefore(session.startTime)) {
+      throw ArgumentError(
+          'endTime must not be before startTime for a fasting session');
+    }
     _box.put(session);
   }
 
