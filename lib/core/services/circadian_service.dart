@@ -64,6 +64,20 @@ class CircadianService {
     final avgBed = (totalBedHour / sleepRecords.length) % 24;
     final avgWake = totalWakeHour / sleepRecords.length;
 
+    // Check sleep schedule regularity
+    double variance = 0;
+    for (final s in sleepRecords) {
+      var bedH = s.bedTime.hour + s.bedTime.minute / 60.0;
+      if (bedH < 12) bedH += 24;
+      variance += (bedH - (totalBedHour / sleepRecords.length)).abs();
+    }
+    variance /= sleepRecords.length;
+    if (variance > 3) {
+      _log.info(
+          'Sleep schedule too irregular (variance ${variance.toStringAsFixed(1)}h) — skipping profile');
+      return null;
+    }
+
     // Average first/last meal times from last 7 days
     final now = DateTime.now();
     double totalFirstMeal = 0;

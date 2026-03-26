@@ -15,8 +15,10 @@ import 'package:opennutritracker/core/presentation/widgets/copy_or_delete_dialog
 import 'package:opennutritracker/core/presentation/widgets/copy_dialog.dart';
 import 'package:opennutritracker/core/presentation/widgets/delete_dialog.dart';
 import 'package:opennutritracker/core/utils/custom_icons.dart';
+import 'package:opennutritracker/features/add_meal/presentation/add_meal_screen.dart';
 import 'package:opennutritracker/features/add_meal/presentation/add_meal_type.dart';
 import 'package:opennutritracker/features/home/presentation/widgets/intake_vertical_list.dart';
+import 'package:opennutritracker/core/utils/navigation_options.dart';
 import 'package:opennutritracker/generated/l10n.dart';
 
 class DayInfoWidget extends StatelessWidget {
@@ -62,8 +64,33 @@ class DayInfoWidget extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: Text(DateFormat.yMMMMEEEEd().format(selectedDay),
-              style: Theme.of(context).textTheme.headlineSmall),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(DateFormat.yMMMMEEEEd().format(selectedDay),
+                    style: Theme.of(context).textTheme.headlineSmall),
+              ),
+              IconButton(
+                icon: const Icon(Icons.add_circle_outline),
+                tooltip: 'Add meal for this day',
+                onPressed: () {
+                  final hour = DateTime.now().hour;
+                  final mealType = hour < 11
+                      ? AddMealType.breakfastType
+                      : hour < 15
+                          ? AddMealType.lunchType
+                          : hour < 21
+                              ? AddMealType.dinnerType
+                              : AddMealType.snackType;
+                  Navigator.of(context).pushNamed(
+                    NavigationOptions.addMealRoute,
+                    arguments:
+                        AddMealScreenArguments(mealType, selectedDay),
+                  );
+                },
+              ),
+            ],
+          ),
         ),
         const SizedBox(height: 8.0),
         Column(

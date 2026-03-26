@@ -38,6 +38,10 @@ class PeptideDataSource {
     _logBox.remove(id);
   }
 
+  Future<void> updateLog(PeptideLogOB log) async {
+    _logBox.put(log);
+  }
+
   Future<List<PeptideLogOB>> getLogsForDate(DateTime date) async {
     final startOfDay = DateTime(date.year, date.month, date.day);
     final endOfDay = startOfDay.add(const Duration(days: 1));

@@ -268,6 +268,28 @@ class _BiomarkerCardState extends State<BiomarkerCard> {
                     final value =
                         double.tryParse(valueController.text);
                     if (value != null) {
+                      // Validate against known ranges
+                      if (value < def.normalLow * 0.1 ||
+                          value > def.normalHigh * 5) {
+                        final confirm = await showDialog<bool>(
+                          context: ctx,
+                          builder: (c) => AlertDialog(
+                            title: const Text('Unusual Value'),
+                            content: Text(
+                                'The value ${value.toStringAsFixed(1)} ${def.unit} seems unusual for ${def.name} '
+                                '(normal range: ${def.normalLow}–${def.normalHigh}). Are you sure?'),
+                            actions: [
+                              TextButton(
+                                  onPressed: () => Navigator.of(c).pop(false),
+                                  child: const Text('Cancel')),
+                              FilledButton(
+                                  onPressed: () => Navigator.of(c).pop(true),
+                                  child: const Text('Save Anyway')),
+                            ],
+                          ),
+                        );
+                        if (confirm != true) return;
+                      }
                       final ds = locator<BiomarkerDataSource>();
                       // Re-use same ObjectBox id → upsert (update in place)
                       await ds.addRecord(BiomarkerRecordOB(
@@ -363,6 +385,30 @@ class _BiomarkerCardState extends State<BiomarkerCard> {
                         final def =
                             OptimalRangeCalc.getDefinition(selectedKey!);
                         if (value != null && def != null) {
+                          // Validate against known ranges
+                          if (value < def.normalLow * 0.1 ||
+                              value > def.normalHigh * 5) {
+                            final confirm = await showDialog<bool>(
+                              context: ctx,
+                              builder: (c) => AlertDialog(
+                                title: const Text('Unusual Value'),
+                                content: Text(
+                                    'The value ${value.toStringAsFixed(1)} ${def.unit} seems unusual for ${def.name} '
+                                    '(normal range: ${def.normalLow}–${def.normalHigh}). Are you sure?'),
+                                actions: [
+                                  TextButton(
+                                      onPressed: () =>
+                                          Navigator.of(c).pop(false),
+                                      child: const Text('Cancel')),
+                                  FilledButton(
+                                      onPressed: () =>
+                                          Navigator.of(c).pop(true),
+                                      child: const Text('Save Anyway')),
+                                ],
+                              ),
+                            );
+                            if (confirm != true) return;
+                          }
                           final ds = locator<BiomarkerDataSource>();
                           await ds.addRecord(BiomarkerRecordOB(
                             type: selectedKey!,

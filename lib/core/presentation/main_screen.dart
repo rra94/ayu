@@ -18,6 +18,7 @@ import 'package:opennutritracker/core/db/data_sources/config_data_source_ob.dart
 import 'package:opennutritracker/core/services/data_retention_service.dart';
 import 'package:opennutritracker/core/services/location_inference_service.dart';
 import 'package:opennutritracker/core/utils/locator.dart';
+import 'package:opennutritracker/features/home/presentation/bloc/home_bloc.dart';
 import 'package:opennutritracker/core/services/notification_action_service.dart';
 import 'package:opennutritracker/core/services/widget_service.dart';
 import 'package:opennutritracker/features/health_connect/services/healthkit_service.dart';
@@ -73,6 +74,10 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       try {
         // Day changed — reload all data
         _onAppResumed();
+        // Force home page to refresh via BLoC (resets water tracker etc.)
+        try {
+          locator<HomeBloc>().add(const LoadItemsEvent());
+        } catch (_) {}
       } catch (_) {}
       // Always reschedule next midnight
       _scheduleMidnightRefresh();

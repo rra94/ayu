@@ -418,6 +418,16 @@ class _PeptideStackWidgetState extends State<PeptideStackWidget> {
                     existing.restDays = int.tryParse(restDaysCtrl.text) ?? existing.restDays;
                     existing.route = route;
                     await ds.updatePeptide(existing);
+                    // Update today's logs with new dose
+                    final todayLogs =
+                        await ds.getLogsForDate(DateTime.now());
+                    for (final log in todayLogs) {
+                      if (log.peptideId == existing.id) {
+                        log.doseMcg = existing.doseMcg;
+                        log.doseUnits = existing.doseUnits;
+                        await ds.updateLog(log);
+                      }
+                    }
                   } else {
                     await ds.addPeptide(PeptideOB(
                       name: nameCtrl.text,

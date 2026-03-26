@@ -452,6 +452,14 @@ class _ScannerScreenState extends State<ScannerScreen> {
             child: const Text('Cancel'),
           ),
           FilledButton(
+            onPressed: () async {
+              Navigator.of(ctx).pop();
+              await _quickAdd(context, state);
+            },
+            style: FilledButton.styleFrom(backgroundColor: Colors.orange),
+            child: const Text('Quick Add Anyway'),
+          ),
+          FilledButton(
             onPressed: () {
               Navigator.of(ctx).pop();
               Navigator.of(context).pushReplacementNamed(

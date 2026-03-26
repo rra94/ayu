@@ -164,6 +164,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     final configDs = locator<ConfigDataSourceOB>();
                     await configDs.setShowSustainability(v);
                     setState(() => _showSustainability = v);
+                    _homeBloc.add(LoadItemsEvent());
                   },
                 ),
                 SwitchListTile(
@@ -175,6 +176,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     final configDs = locator<ConfigDataSourceOB>();
                     await configDs.setShowPhotoAnalysis(v);
                     setState(() => _photoAnalysis = v);
+                    _homeBloc.add(LoadItemsEvent());
                   },
                 ),
                 ListTile(
@@ -342,6 +344,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 await AllergenService.setUserAllergens(selected);
                 if (ctx.mounted) Navigator.of(ctx).pop();
                 setState(() {});
+                _homeBloc.add(LoadItemsEvent());
               },
               child: const Text('Save'),
             ),
@@ -396,6 +399,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 HealthConditionService.setUserConditions(selected);
                 Navigator.of(ctx).pop();
                 setState(() {});
+                _homeBloc.add(LoadItemsEvent());
               },
               child: const Text('Save'),
             ),
@@ -437,6 +441,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               final configDs = locator<ConfigDataSourceOB>();
               await configDs.setDailyStepGoal(value);
               setState(() => _stepGoal = value);
+              _homeBloc.add(LoadItemsEvent());
               if (ctx.mounted) Navigator.of(ctx).pop();
             },
             child: const Text('Save'),

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:opennutritracker/core/db/data_sources/supplement_data_source.dart';
 import 'package:opennutritracker/core/db/entities/supplement_ob.dart';
@@ -16,11 +18,23 @@ class _SupplementChecklistWidgetState extends State<SupplementChecklistWidget> {
   List<SupplementOB> _supplements = [];
   Set<int> _takenIds = {};
   bool _loading = true;
+  Timer? _reloadTimer;
 
   @override
   void initState() {
     super.initState();
     _load();
+  }
+
+  @override
+  void dispose() {
+    _reloadTimer?.cancel();
+    super.dispose();
+  }
+
+  void _scheduleReload() {
+    _reloadTimer?.cancel();
+    _reloadTimer = Timer(const Duration(milliseconds: 300), () => _load());
   }
 
   Future<void> _load() async {
@@ -102,7 +116,7 @@ class _SupplementChecklistWidgetState extends State<SupplementChecklistWidget> {
                   if (nowTaken) {
                     IntentDonationService.donateTakeSupplements();
                   }
-                  _load();
+                  _scheduleReload();
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).clearSnackBars();
                     ScaffoldMessenger.of(context).showSnackBar(

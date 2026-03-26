@@ -21,12 +21,33 @@ class BioAgeTrendPoint {
 class BioAgeTrendService {
   static final _log = Logger('BioAgeTrendService');
 
+  static List<BioAgeTrendPoint>? _cachedTrend;
+  static DateTime? _trendCacheTime;
+
+  /// Invalidate the trend cache (call after new biomarker data is added).
+  static void invalidateCache() {
+    _cachedTrend = null;
+    _trendCacheTime = null;
+  }
+
   /// Compute bio age at multiple time points from historical biomarker data.
   /// Groups biomarkers by date clusters (within 7 days = same test session).
+  /// Results are cached for 1 hour.
   static Future<List<BioAgeTrendPoint>> getTrend() async {
+    // Cache for 1 hour
+    if (_cachedTrend != null &&
+        _trendCacheTime != null &&
+        DateTime.now().difference(_trendCacheTime!).inHours < 1) {
+      return _cachedTrend!;
+    }
+
     final bioDs = locator<BiomarkerDataSource>();
     final allRecords = await bioDs.getAllRecords();
-    if (allRecords.isEmpty) return [];
+    if (allRecords.isEmpty) {
+      _cachedTrend = [];
+      _trendCacheTime = DateTime.now();
+      return [];
+    }
 
     // Get the user's actual chronological age
     final user = await locator<GetUserUsecase>().getUserData();
@@ -72,6 +93,8 @@ class BioAgeTrendService {
     }
 
     points.sort((a, b) => a.date.compareTo(b.date));
+    _cachedTrend = points;
+    _trendCacheTime = DateTime.now();
     return points;
   }
 
