@@ -204,7 +204,7 @@ class _WeightChartCardState extends State<WeightChartCard> {
                 if (idx < 0 || idx >= _records.length) return const SizedBox();
                 return Text(
                   DateFormat('d/M').format(_records[idx].dateTime),
-                  style: theme.textTheme.labelSmall?.copyWith(fontSize: 12),
+                  style: theme.textTheme.bodySmall,
                 );
               },
             ),
@@ -247,9 +247,8 @@ class _WeightChartCardState extends State<WeightChartCard> {
                   label: HorizontalLineLabel(
                     show: true,
                     alignment: Alignment.topRight,
-                    style: theme.textTheme.labelSmall?.copyWith(
+                    style: theme.textTheme.bodySmall?.copyWith(
                       color: Colors.green,
-                      fontSize: 12,
                     ),
                     labelResolver: (_) => 'Target',
                   ),

@@ -310,7 +310,6 @@ class _MiniGauge extends StatelessWidget {
         Text(
           label,
           style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              fontSize: 10,
               fontWeight: FontWeight.w600,
               color: Theme.of(context).colorScheme.onSurface),
         ),

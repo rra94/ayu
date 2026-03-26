@@ -73,8 +73,7 @@ class _PeptideLogDialogState extends State<PeptideLogDialog> {
                 return ActionChip(
                   label: Text(
                     displayName,
-                    style: TextStyle(
-                      fontSize: 12,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: isSelected
                           ? Colors.white
                           : isSuggested

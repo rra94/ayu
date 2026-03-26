@@ -263,7 +263,7 @@ class _LegendDot extends StatelessWidget {
           decoration: BoxDecoration(color: color, shape: BoxShape.circle),
         ),
         const SizedBox(width: 3),
-        Text(label, style: const TextStyle(fontSize: 10)),
+        Text(label, style: Theme.of(context).textTheme.labelSmall),
       ],
     );
   }

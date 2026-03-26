@@ -106,8 +106,7 @@ class SustainabilityScoreWidget extends StatelessWidget {
                       child: Center(
                         child: Text(
                           grade.toUpperCase(),
-                          style: TextStyle(
-                            fontSize: 22,
+                          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: gradeColor,
                           ),

@@ -87,8 +87,10 @@ class _MoodEnergyCardState extends State<MoodEnergyCard> {
                       padding: const EdgeInsets.symmetric(horizontal: 4),
                       child: Text(
                         _moodEmoji(val),
-                        style: TextStyle(
-                          fontSize: selected ? 24 : 18,
+                        style: (selected
+                                ? Theme.of(context).textTheme.headlineSmall
+                                : Theme.of(context).textTheme.titleLarge)
+                            ?.copyWith(
                           color: selected ? null : Colors.grey,
                         ),
                       ),
@@ -114,8 +116,10 @@ class _MoodEnergyCardState extends State<MoodEnergyCard> {
                       padding: const EdgeInsets.symmetric(horizontal: 4),
                       child: Text(
                         _energyEmoji(val),
-                        style: TextStyle(
-                          fontSize: selected ? 24 : 18,
+                        style: (selected
+                                ? Theme.of(context).textTheme.headlineSmall
+                                : Theme.of(context).textTheme.titleLarge)
+                            ?.copyWith(
                           color: selected ? null : Colors.grey,
                         ),
                       ),

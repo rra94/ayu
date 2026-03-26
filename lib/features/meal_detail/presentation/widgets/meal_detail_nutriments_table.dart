@@ -267,8 +267,7 @@ class MealDetailNutrimentsTable extends StatelessWidget {
                 const SizedBox(width: 8),
                 Text(
                   giLabel,
-                  style: TextStyle(
-                    fontSize: 13,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: giLabel.contains('High')
                         ? Colors.orange
                         : Colors.green,

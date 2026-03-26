@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:opennutritracker/core/db/entities/gut_health_item_ob.dart';
 
 class _ManualItem {
@@ -103,15 +104,18 @@ class GutHealthPanel extends StatelessWidget {
                 Wrap(
                   spacing: 6,
                   runSpacing: 4,
-                  children: autoItems.map((item) => Chip(
-                    avatar: Icon(_categoryIcon(item.category), size: 16),
-                    label: Text(
-                      '${item.name} — ${_categoryLabel(item.category)}',
-                      style: const TextStyle(fontSize: 12),
+                  children: autoItems.map((item) => Semantics(
+                    label: 'Gut health flag: ${item.name} (${_categoryLabel(item.category)})',
+                    child: Chip(
+                      avatar: Icon(_categoryIcon(item.category), size: 16),
+                      label: Text(
+                        '${item.name} — ${_categoryLabel(item.category)}',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                      visualDensity: VisualDensity.compact,
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      backgroundColor: _chipColor(item.category, theme),
                     ),
-                    visualDensity: VisualDensity.compact,
-                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    backgroundColor: _chipColor(item.category, theme),
                   )).toList(),
                 ),
               ],
@@ -129,14 +133,17 @@ class GutHealthPanel extends StatelessWidget {
                 Wrap(
                   spacing: 6,
                   runSpacing: 4,
-                  children: manualItems.map((item) => Chip(
-                    avatar: Icon(_categoryIcon(item.category), size: 16),
-                    label: Text(item.name, style: const TextStyle(fontSize: 12)),
-                    visualDensity: VisualDensity.compact,
-                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    backgroundColor: _chipColor(item.category, theme),
-                    deleteIcon: readOnly ? null : const Icon(Icons.close, size: 14),
-                    onDeleted: readOnly ? null : () => onDeleteItem(item.id),
+                  children: manualItems.map((item) => Semantics(
+                    label: 'Gut health flag: ${item.name} (${_categoryLabel(item.category)})',
+                    child: Chip(
+                      avatar: Icon(_categoryIcon(item.category), size: 16),
+                      label: Text(item.name, style: Theme.of(context).textTheme.bodySmall),
+                      visualDensity: VisualDensity.compact,
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      backgroundColor: _chipColor(item.category, theme),
+                      deleteIcon: readOnly ? null : const Icon(Icons.close, size: 14),
+                      onDeleted: readOnly ? null : () => onDeleteItem(item.id),
+                    ),
                   )).toList(),
                 ),
               ],
@@ -334,11 +341,10 @@ class GutHealthPanel extends StatelessWidget {
                         final entry = filtered[index];
                         return CheckboxListTile(
                           dense: true,
-                          title: Text(entry.key, style: const TextStyle(fontSize: 14)),
+                          title: Text(entry.key, style: Theme.of(ctx).textTheme.bodyMedium),
                           subtitle: Text(
                             entry.value.description,
-                            style: TextStyle(
-                              fontSize: 11,
+                            style: Theme.of(ctx).textTheme.bodySmall?.copyWith(
                               color: Theme.of(ctx).colorScheme.onSurfaceVariant,
                             ),
                           ),
