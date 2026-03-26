@@ -46,8 +46,10 @@ class OptimalRangeCalc {
     // ── Lipids ──
     BiomarkerDef(key: 'total_cholesterol', name: 'Total Cholesterol', unit: 'mg/dL',
         category: 'Lipids', normalLow: 125, normalHigh: 200, optimalLow: 140, optimalHigh: 180),
+    // optimalLow 50: U-shaped mortality risk — very low LDL (<50) associated with
+    // increased hemorrhagic stroke and hormonal issues. 50-70 balances CVD risk reduction.
     BiomarkerDef(key: 'ldl', name: 'LDL', unit: 'mg/dL',
-        category: 'Lipids', normalLow: 0, normalHigh: 130, optimalLow: 0, optimalHigh: 70),
+        category: 'Lipids', normalLow: 0, normalHigh: 130, optimalLow: 50, optimalHigh: 70),
     BiomarkerDef(key: 'hdl', name: 'HDL', unit: 'mg/dL',
         category: 'Lipids', normalLow: 40, normalHigh: 100, optimalLow: 55, optimalHigh: 100),
     BiomarkerDef(key: 'triglycerides', name: 'Triglycerides', unit: 'mg/dL',

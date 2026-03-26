@@ -410,7 +410,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('${intake.meal.name ?? 'Meal'} removed'),
-          duration: const Duration(seconds: 4),
+          duration: const Duration(seconds: 10),
           action: SnackBarAction(
             label: 'Undo',
             onPressed: () async {

@@ -403,7 +403,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Added $name (${kcal.round()} kcal)'),
-            duration: const Duration(seconds: 4),
+            duration: const Duration(seconds: 10),
             action: SnackBarAction(
               label: 'Undo',
               onPressed: () async {

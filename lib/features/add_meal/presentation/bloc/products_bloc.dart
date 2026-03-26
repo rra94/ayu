@@ -36,7 +36,7 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
           final config = await _getConfigUsecase.getConfig();
           _cacheEcoScores(results);
           emit(ProductsLoadedState(
-              products: results, usesImperialUnits: config.usesImperialUnits));
+              products: results, usesImperialUnits: config.usesImperialUnits, isOfflineResults: _lastSearchOffline));
         } catch (error) {
           log.severe(error);
           emit(ProductsFailedState());
@@ -48,7 +48,7 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
       try {
         final results = await _cascadeSearch(_searchString);
         _cacheEcoScores(results);
-        emit(ProductsLoadedState(products: results));
+        emit(ProductsLoadedState(products: results, isOfflineResults: _lastSearchOffline));
       } catch (error) {
         log.severe(error);
         emit(ProductsFailedState());
@@ -56,9 +56,14 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
     });
   }
 
+  bool _lastSearchOffline = false;
+
   /// Cascade search: Common foods → OFF → USDA FDC → local history
   Future<List<MealEntity>> _cascadeSearch(String query) async {
-    if (query.isEmpty) return [];
+    if (query.isEmpty) { _lastSearchOffline = false; return []; }
+
+    bool offSucceeded = false;
+    bool fdcSucceeded = false;
 
     // 0. Check built-in common foods first (instant, no network)
     final commonMatches = CommonFoodsDB.search(query);
@@ -95,6 +100,7 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
           results.add(r);
         }
       }
+      offSucceeded = true;
     } catch (e) {
       log.info('OFF search failed, trying FDC: $e');
     }
@@ -110,6 +116,7 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
             results.add(fdc);
           }
         }
+        fdcSucceeded = true;
       } catch (e) {
         log.info('FDC search also failed: $e');
       }
@@ -158,6 +165,7 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
       log.info('Search history boost failed: $e');
     }
 
+    _lastSearchOffline = !offSucceeded && !fdcSucceeded;
     return results;
   }
 

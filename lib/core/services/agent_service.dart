@@ -351,9 +351,9 @@ class AgentService {
       return [
         AgentSuggestion(
           type: 'biomarker_stale',
-          title: '${stale.length} biomarker${stale.length > 1 ? 's' : ''} outdated',
+          title: '${stale.length} lab result${stale.length > 1 ? 's' : ''} outdated',
           message: '${stale.take(3).join(', ')}${stale.length > 3 ? '...' : ''}'
-              ' — time to re-measure',
+              ' — time to re-measure for accurate tracking',
         ),
       ];
     }
@@ -641,8 +641,8 @@ class AgentService {
       return [
         AgentSuggestion(
           type: 'stress',
-          title: 'High stress detected',
-          message: 'Your HRV is below baseline — consider: deep breathing, magnesium, reduce caffeine, short walk.',
+          title: 'Stress detected (experimental)',
+          message: 'Your heart rate variability is below your average — this can indicate stress or poor recovery. Consider: deep breathing, magnesium, reduce caffeine, short walk.',
         ),
       ];
     }
@@ -650,8 +650,8 @@ class AgentService {
       return [
         AgentSuggestion(
           type: 'stress',
-          title: 'Moderate stress',
-          message: 'HRV is slightly below your average. Prioritize sleep tonight.',
+          title: 'Moderate stress (experimental)',
+          message: 'Your heart rate variability is slightly below your average — this can indicate stress or poor recovery. Prioritize sleep tonight.',
         ),
       ];
     }
@@ -694,7 +694,7 @@ class AgentService {
         AgentSuggestion(
           type: 'circadian',
           title: 'Late first meal today',
-          message: 'You usually eat by ${CircadianProfile.formatHour(profile.avgFirstMealHour)} — a consistent schedule supports circadian rhythm.',
+          message: 'You usually eat by ${CircadianProfile.formatHour(profile.avgFirstMealHour)} — a consistent eating schedule supports your body\'s natural rhythm and energy levels.',
         ),
       ];
     }

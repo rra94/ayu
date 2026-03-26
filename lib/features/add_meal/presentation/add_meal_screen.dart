@@ -131,17 +131,36 @@ class _AddMealScreenState extends State<AddMealScreen>
                           } else if (state is ProductsLoadedState) {
                             return state.products.isNotEmpty
                                 ? Flexible(
-                                    child: ListView.builder(
-                                        itemCount: state.products.length,
-                                        itemBuilder: (context, index) {
-                                          return MealItemCard(
-                                            day: _day,
-                                            mealEntity: state.products[index],
-                                            addMealType: _mealType,
-                                            usesImperialUnits:
-                                                state.usesImperialUnits,
-                                          );
-                                        }))
+                                    child: Column(
+                                      children: [
+                                        if (state.isOfflineResults)
+                                          Container(
+                                            padding: const EdgeInsets.all(8),
+                                            color: Colors.orange.withValues(alpha: 0.1),
+                                            child: const Row(
+                                              children: [
+                                                Icon(Icons.wifi_off, size: 16, color: Colors.orange),
+                                                SizedBox(width: 8),
+                                                Text('Offline — showing local results only',
+                                                    style: TextStyle(fontSize: 12, color: Colors.orange)),
+                                              ],
+                                            ),
+                                          ),
+                                        Expanded(
+                                          child: ListView.builder(
+                                              itemCount: state.products.length,
+                                              itemBuilder: (context, index) {
+                                                return MealItemCard(
+                                                  day: _day,
+                                                  mealEntity: state.products[index],
+                                                  addMealType: _mealType,
+                                                  usesImperialUnits:
+                                                      state.usesImperialUnits,
+                                                );
+                                              }),
+                                        ),
+                                      ],
+                                    ))
                                 : const NoResultsWidget();
                           } else if (state is ProductsFailedState) {
                             return ErrorDialog(

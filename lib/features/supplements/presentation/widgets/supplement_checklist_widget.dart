@@ -109,7 +109,7 @@ class _SupplementChecklistWidgetState extends State<SupplementChecklistWidget> {
                       SnackBar(
                         content: Text(
                             '${supp.name} marked as ${nowTaken ? "taken" : "skipped"}'),
-                        duration: const Duration(seconds: 4),
+                        duration: const Duration(seconds: 10),
                         action: SnackBarAction(
                           label: 'Undo',
                           onPressed: () async {

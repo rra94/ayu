@@ -18,8 +18,8 @@ class CommonFoodsDB {
     _f('Americano', 2, 0, 0.3, 0, coffee: true),
     _f('Espresso', 2, 0, 0.1, 0, coffee: true),
     _f('Black Coffee', 2, 0, 0.3, 0, coffee: true),
-    _f('Latte', 67, 3.5, 3.4, 5, coffee: true),
-    _f('Cappuccino', 45, 2.3, 2.5, 3.5, coffee: true),
+    _f('Latte', 67, 3.5, 3.4, 5, coffee: true, ingredients: 'milk, espresso, sugar'),
+    _f('Cappuccino', 45, 2.3, 2.5, 3.5, coffee: true, ingredients: 'milk, espresso'),
     _f('Flat White', 54, 3, 2.8, 4, coffee: true),
     _f('Mocha', 80, 3.5, 3, 10, coffee: true),
     _f('Iced Coffee', 2, 0, 0.3, 0, coffee: true),
@@ -37,8 +37,8 @@ class CommonFoodsDB {
     _f('Boiled Egg', 155, 11, 13, 1.1),
     _f('Poached Egg', 143, 10, 12, 0.7),
     _f('Toast with Butter', 313, 14, 7, 42),
-    _f('Pancakes', 227, 10, 6, 28),
-    _f('French Toast', 229, 10, 8, 26),
+    _f('Pancakes', 227, 10, 6, 28, ingredients: 'wheat flour, eggs, milk, butter, sugar'),
+    _f('French Toast', 229, 10, 8, 26, ingredients: 'bread (wheat), eggs, milk, butter, cinnamon'),
     _f('Granola', 471, 20, 10, 61),
     _f('Yogurt Bowl', 59, 0.5, 10, 3.6),
     _f('Avocado Toast', 220, 14, 5, 20),
@@ -48,8 +48,8 @@ class CommonFoodsDB {
     // ── Basics ──
     _f('White Rice', 130, 0.3, 2.7, 28),
     _f('Brown Rice', 123, 1, 2.6, 26),
-    _f('Pasta', 131, 1.1, 5, 25),
-    _f('Bread', 265, 3.2, 9, 49),
+    _f('Pasta', 131, 1.1, 5, 25, ingredients: 'wheat flour (gluten), water'),
+    _f('Bread', 265, 3.2, 9, 49, ingredients: 'wheat flour (gluten), water, yeast, salt'),
     _f('Tortilla', 237, 5, 6, 41),
     _f('Quinoa', 120, 1.9, 4.4, 21),
     _f('Couscous', 112, 0.2, 3.8, 23),
@@ -100,8 +100,8 @@ class CommonFoodsDB {
 
     // ── Snacks ──
     _f('Almonds', 579, 50, 21, 22),
-    _f('Peanut Butter', 588, 50, 25, 20),
-    _f('Trail Mix', 462, 29, 13, 45),
+    _f('Peanut Butter', 588, 50, 25, 20, ingredients: 'peanuts, salt, oil'),
+    _f('Trail Mix', 462, 29, 13, 45, ingredients: 'peanuts, tree nuts, raisins, chocolate'),
     _f('Dark Chocolate', 546, 31, 5, 60),
     _f('Hummus', 166, 10, 8, 14),
     _f('Protein Bar', 350, 12, 20, 40),
@@ -109,22 +109,22 @@ class CommonFoodsDB {
     _f('Popcorn', 387, 4.5, 13, 78),
 
     // ── Common Meals ──
-    _f('Burger', 295, 14, 17, 24),
-    _f('Cheeseburger', 303, 15, 17, 25),
-    _f('Pizza Slice', 266, 10, 11, 33),
+    _f('Burger', 295, 14, 17, 24, ingredients: 'beef, wheat bun, lettuce, tomato'),
+    _f('Cheeseburger', 303, 15, 17, 25, ingredients: 'beef, wheat bun, cheese (dairy), lettuce'),
+    _f('Pizza Slice', 266, 10, 11, 33, ingredients: 'wheat flour, cheese (dairy), tomato sauce'),
     _f('Burrito', 206, 8, 9, 25),
     _f('Taco', 210, 10, 9, 21),
     _f('Sandwich', 250, 10, 12, 28),
     _f('Wrap', 200, 8, 10, 24),
     _f('Sushi Roll', 140, 2, 5, 26),
     _f('Fried Rice', 163, 5, 4, 25),
-    _f('Noodles', 138, 2, 5, 25),
+    _f('Noodles', 138, 2, 5, 25, ingredients: 'wheat flour, eggs, water'),
     _f('Egg Noodles', 138, 2, 5, 25),
     _f('Rice Noodles', 109, 0.2, 1, 25),
     _f('Udon', 99, 0.4, 3, 21),
     _f('Soba', 99, 0.1, 5, 21),
-    _f('Pad Thai', 155, 5, 6, 22),
-    _f('Ramen', 106, 5, 4, 13),
+    _f('Pad Thai', 155, 5, 6, 22, ingredients: 'rice noodles, peanuts, shrimp, egg, soy sauce'),
+    _f('Ramen', 106, 5, 4, 13, ingredients: 'wheat noodles, broth, soy sauce'),
     _f('Pho', 45, 1, 4, 6),
     _f('Chow Mein', 155, 6, 5, 21),
     _f('Lo Mein', 150, 5, 5, 22),
@@ -132,14 +132,14 @@ class CommonFoodsDB {
     _f('Dumplings', 195, 7, 8, 25),
     _f('Spring Roll', 180, 8, 4, 24),
     _f('Wonton Soup', 70, 2, 4, 8),
-    _f('Curry with Rice', 142, 5, 5, 20),
+    _f('Curry with Rice', 142, 5, 5, 20, ingredients: 'rice, coconut milk (dairy alternative), spices, vegetables'),
     _f('Fish and Chips', 230, 12, 13, 18),
-    _f('Grilled Cheese', 366, 21, 14, 29),
+    _f('Grilled Cheese', 366, 21, 14, 29, ingredients: 'bread (wheat), cheese (dairy), butter'),
     _f('Chicken Soup', 36, 1, 3, 3),
     _f('Tomato Soup', 30, 0.4, 1, 6),
     _f('French Fries', 312, 15, 3.4, 41),
     _f('Onion Rings', 332, 18, 4, 39),
-    _f('Mac and Cheese', 164, 8, 6, 17),
+    _f('Mac and Cheese', 164, 8, 6, 17, ingredients: 'wheat pasta, cheese (dairy), butter, milk'),
     _f('Mashed Potatoes', 83, 3, 1.5, 13),
 
     // ── Drinks ──
@@ -163,11 +163,11 @@ class CommonFoodsDB {
     _f('Dal', 104, 1.5, 7, 18),
     _f('Lentil Dal', 104, 1.5, 7, 18),
     _f('Chicken Tikka Masala', 150, 8, 12, 8),
-    _f('Butter Chicken', 147, 9, 11, 6),
+    _f('Butter Chicken', 147, 9, 11, 6, ingredients: 'chicken, butter (dairy), cream (dairy), tomato, spices'),
     _f('Palak Paneer', 130, 9, 7, 5),
     _f('Paneer', 265, 21, 18, 1.2),
     _f('Biryani', 150, 5, 5, 22),
-    _f('Naan', 262, 5, 9, 45),
+    _f('Naan', 262, 5, 9, 45, ingredients: 'wheat flour, yogurt (dairy), butter'),
     _f('Roti', 240, 3.5, 8, 45),
     _f('Chapati', 240, 3.5, 8, 45),
     _f('Paratha', 290, 10, 7, 42),
@@ -230,8 +230,8 @@ class CommonFoodsDB {
     // ── Japanese ──
     _f('Miso Soup', 21, 0.6, 1.3, 2.7),
     _f('Edamame', 121, 5, 12, 9),
-    _f('Gyoza', 185, 7, 8, 22),
-    _f('Tempura', 230, 14, 6, 20),
+    _f('Gyoza', 185, 7, 8, 22, ingredients: 'wheat wrapper, pork, vegetables, soy sauce'),
+    _f('Tempura', 230, 14, 6, 20, ingredients: 'wheat flour, egg, shrimp/vegetables'),
     _f('Teriyaki Chicken', 150, 3, 20, 10),
     _f('Onigiri', 155, 0.5, 3, 35),
     _f('Sashimi', 127, 4, 21, 0),
@@ -347,8 +347,8 @@ class CommonFoodsDB {
     _f('Callaloo', 30, 0.5, 3, 4),
 
     // ── Snacks & Sweets ──
-    _f('Croissant', 406, 21, 8, 46),
-    _f('Muffin', 340, 13, 5, 52),
+    _f('Croissant', 406, 21, 8, 46, ingredients: 'wheat flour, butter (dairy), eggs, sugar'),
+    _f('Muffin', 340, 13, 5, 52, ingredients: 'wheat flour, eggs, milk, butter, sugar'),
     _f('Donut', 403, 22, 5, 47),
     _f('Cinnamon Roll', 350, 14, 5, 50),
     _f('Scone', 362, 14, 7, 52),
@@ -377,7 +377,7 @@ class CommonFoodsDB {
     _f('Jam', 250, 0.1, 0.4, 63),
 
     // ── Supplements & Health Foods ──
-    _f('Whey Protein', 400, 6, 75, 10),
+    _f('Whey Protein', 400, 6, 75, 10, ingredients: 'whey protein (dairy), cocoa, sweetener'),
     _f('Collagen Powder', 360, 0, 90, 0),
     _f('Creatine', 0, 0, 0, 0),
     _f('BCAA', 0, 0, 0, 0),
@@ -391,7 +391,7 @@ class CommonFoodsDB {
   ];
 
   static MealEntity _f(String name, double kcal, double fat, double protein,
-      double carbs, {bool coffee = false}) {
+      double carbs, {bool coffee = false, String? ingredients}) {
     return MealEntity(
       code: null,
       name: name,
@@ -401,6 +401,7 @@ class CommonFoodsDB {
       servingQuantity: coffee ? 240 : null,
       servingUnit: coffee ? 'ml' : null,
       servingSize: coffee ? '1 cup (240ml)' : null,
+      ingredientsText: ingredients,
       source: MealSourceEntity.custom,
       nutriments: MealNutrimentsEntity(
         energyKcal100: kcal,

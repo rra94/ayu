@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:opennutritracker/core/domain/entity/intake_type_entity.dart';
 import 'package:opennutritracker/core/services/gemini_food_vision_service.dart';
 import 'package:opennutritracker/core/services/photo_enrichment_service.dart';
@@ -32,7 +33,6 @@ class _PhotoMealScreenState extends State<PhotoMealScreen> {
   bool _isAnalyzing = false;
   bool _hasFailed = false;
   bool _showManualInput = false;
-  bool _consentShown = false;
   String? _imagePath;
   FoodPhotoResult? _result;
   String _statusText = 'Identifying foods...';
@@ -59,7 +59,11 @@ class _PhotoMealScreenState extends State<PhotoMealScreen> {
 
   Future<void> _takePhoto() async {
     // Show one-time privacy consent before sending photo to Gemini
-    if (!_consentShown) {
+    // Persisted in SharedPreferences so user only sees it once across sessions
+    final prefs = await SharedPreferences.getInstance();
+    final consentGiven = prefs.getBool('photo_consent_given') ?? false;
+
+    if (!consentGiven) {
       final proceed = await showDialog<bool>(
         context: context,
         builder: (ctx) => AlertDialog(
@@ -87,7 +91,7 @@ class _PhotoMealScreenState extends State<PhotoMealScreen> {
         if (mounted) Navigator.of(context).pop();
         return;
       }
-      _consentShown = true;
+      await prefs.setBool('photo_consent_given', true);
     }
 
     final XFile? photo = await _picker.pickImage(
@@ -373,7 +377,7 @@ class _PhotoMealScreenState extends State<PhotoMealScreen> {
               Navigator.of(context).popUntil((route) => route.isFirst);
             },
           ),
-          duration: const Duration(seconds: 4),
+          duration: const Duration(seconds: 10),
         ),
       );
     }

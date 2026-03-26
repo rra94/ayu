@@ -45,10 +45,20 @@ class _LongevityScoreCardState extends State<LongevityScoreCard> {
               children: [
                 Icon(Icons.favorite, color: Colors.red),
                 const SizedBox(width: 8),
-                Text('Longevity Score',
+                Text('Wellness Score',
                     style: theme.textTheme.titleMedium
                         ?.copyWith(fontWeight: FontWeight.w600)),
               ],
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 32),
+              child: Text(
+                'Daily check-in — not a medical assessment',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
             ),
             const SizedBox(height: 12),
             if (_loading)

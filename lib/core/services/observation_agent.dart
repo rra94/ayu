@@ -470,8 +470,8 @@ class ObservationAgent {
           return [
             AgentSuggestion(
               type: 'observation',
-              title: 'HRV declining + low protein',
-              message: 'Your HRV dropped ${((1 - trend.currentHRV / trend.monthAvg) * 100).round()}% and protein averages ${avgProtein.round()}g/day. Protein supports recovery.',
+              title: 'Recovery declining + low protein (experimental)',
+              message: 'Your heart rate variability dropped ${((1 - trend.currentHRV / trend.monthAvg) * 100).round()}% — this suggests your body is recovering more slowly. Protein averages ${avgProtein.round()}g/day, which may not be enough for recovery.',
             ),
           ];
         }
@@ -484,8 +484,8 @@ class ObservationAgent {
         return [
           AgentSuggestion(
             type: 'observation',
-            title: 'HRV declining — check caffeine',
-            message: 'Your HRV trend is down and last caffeine was ${hoursSinceCaffeine.round()}h ago. Try cutting off caffeine earlier.',
+            title: 'Recovery declining — check caffeine (experimental)',
+            message: 'Your heart rate variability trend is down and last caffeine was ${hoursSinceCaffeine.round()}h ago. Try cutting off caffeine earlier for better recovery.',
           ),
         ];
       }
@@ -621,7 +621,7 @@ class ObservationAgent {
           type: 'observation',
           title: 'Unusual meal timing',
           message:
-              'First meal was ${(firstMeal - profile.avgFirstMealHour).abs().toStringAsFixed(1)}h $direction than usual. Consistent timing helps circadian rhythm.',
+              'First meal was ${(firstMeal - profile.avgFirstMealHour).abs().toStringAsFixed(1)}h $direction than usual. A consistent eating schedule supports your body\'s natural rhythm.',
         ),
       ];
     }
