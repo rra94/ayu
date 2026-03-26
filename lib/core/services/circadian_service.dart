@@ -44,8 +44,24 @@ class CircadianProfile {
 class CircadianService {
   static final _log = Logger('CircadianService');
 
-  /// Build circadian profile from last 14 days of sleep + meal data
+  /// Last observed timezone offset (in minutes) — used to detect travel.
+  static int? _lastTimezoneOffset;
+
+  /// Build circadian profile from last 14 days of sleep + meal data.
+  ///
+  /// Note on timezone safety: Dart's DateTime.hour returns local time.
+  /// If the user travels, stored sleep records from the old timezone will
+  /// appear shifted (e.g., NYC 11 PM → LA 8 PM). We detect timezone changes
+  /// and log a warning; the profile self-corrects after a few days of new data.
   static Future<CircadianProfile?> buildProfile() async {
+    final currentOffset = DateTime.now().timeZoneOffset.inMinutes;
+    if (_lastTimezoneOffset != null && _lastTimezoneOffset != currentOffset) {
+      _log.info('Timezone changed (${_lastTimezoneOffset! ~/ 60}h → '
+          '${currentOffset ~/ 60}h) — circadian profile may be inaccurate '
+          'for a few days until new sleep data accumulates');
+    }
+    _lastTimezoneOffset = currentOffset;
+
     final sleepDs = locator<SleepDataSource>();
     final getIntake = locator<GetIntakeUsecase>();
 

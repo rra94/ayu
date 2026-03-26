@@ -3,19 +3,33 @@ import 'package:opennutritracker/core/utils/calc/rda_calc.dart';
 
 void main() {
   group('RDACalc', () {
-    test('returns targets for male', () {
+    test('returns targets for male (default weight)', () {
       final targets = RDACalc.getDailyTargets(gender: 0, age: 30);
       expect(targets['potassium'], 3400);
       expect(targets['iron'], 8);
+      // Default male weight 70 kg * 0.8 = 56 g protein
       expect(targets['protein'], 56);
       expect(targets['calcium'], 1000);
     });
 
-    test('returns targets for female', () {
+    test('returns targets for female (default weight)', () {
       final targets = RDACalc.getDailyTargets(gender: 1, age: 30);
       expect(targets['potassium'], 2600);
       expect(targets['iron'], 18);
+      // Default female weight 57.5 kg * 0.8 = 46 g protein
       expect(targets['protein'], 46);
+    });
+
+    test('protein scales with body weight', () {
+      final targets90 =
+          RDACalc.getDailyTargets(gender: 0, age: 30, weightKg: 90);
+      // 90 * 0.8 = 72
+      expect(targets90['protein'], 72);
+
+      final targets50 =
+          RDACalc.getDailyTargets(gender: 1, age: 30, weightKg: 50);
+      // 50 * 0.8 = 46 (clamped to min 46)
+      expect(targets50['protein'], 46);
     });
 
     test('all expected nutrients are present', () {

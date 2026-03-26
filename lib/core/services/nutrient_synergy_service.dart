@@ -159,7 +159,8 @@ class NutrientSynergyService {
         type: 'inhibitor',
         nutrientA: 'fiber',
         nutrientB: 'iron',
-        message: 'Fiber (phytates) can reduce iron absorption by 50-65%',
+        message:
+            'Fiber (phytates) can reduce iron absorption by 50-65%. Tea/coffee tannins also inhibit iron — wait 1h after iron-rich meals',
         source: 'Hurrell 2003'),
     SynergyTip(
         type: 'inhibitor',

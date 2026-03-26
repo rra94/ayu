@@ -165,6 +165,8 @@ class FDCConst {
 
   static String _getDataTypeParams() => _dataTypeParams.join(",");
 
+  // Note: USDA FDC API requires api_key in URL per their documentation.
+  // This is a free public API key, not a secret. Risk is acceptable.
   static Uri getFDCWordSearchUrl(String searchString, String apiKey) {
     final queryParameters = {
       _fdcQueryTag: searchString,

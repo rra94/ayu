@@ -56,7 +56,15 @@ void _runAppWithSentryReporting(
     bool isUserInitialized, AppThemeEntity savedAppTheme) async {
   await SentryFlutter.init((options) {
     options.dsn = Env.sentryDns;
-    options.tracesSampleRate = 1.0;
+    options.tracesSampleRate = 0.1; // 10% sample — plenty for crash analysis
+    options.beforeSend = (event, hint) {
+      // Strip potential PII from events — never send user info or
+      // breadcrumbs that might contain user data (food names, etc.)
+      return event.copyWith(
+        user: null,
+        breadcrumbs: [],
+      );
+    };
   },
       appRunner: () =>
           runAppWithChangeNotifiers(isUserInitialized, savedAppTheme));

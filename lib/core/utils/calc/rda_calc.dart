@@ -1,10 +1,23 @@
 class RDACalc {
-  /// Returns daily recommended values based on gender and age.
+  /// Returns daily recommended values based on gender, age, and body weight.
   /// Values from NIH Dietary Reference Intakes.
   /// Gender: 0=male, 1=female. Age in years.
-  static Map<String, double> getDailyTargets(
-      {required int gender, required int age}) {
+  /// [weightKg]: body weight for protein scaling (0.8 g/kg RDA).
+  ///   Falls back to reference weight (70 kg male / 57.5 kg female) if null.
+  /// [totalKcalGoal]: daily calorie target for macro scaling. Defaults to 2000.
+  static Map<String, double> getDailyTargets({
+    required int gender,
+    required int age,
+    double? weightKg,
+    double totalKcalGoal = 2000,
+  }) {
     final isMale = gender == 0;
+
+    // Protein: 0.8 g/kg body weight (RDA minimum), clamped to safe range.
+    // Reference weights: 70 kg male, 57.5 kg female (NIH).
+    final effectiveWeight = weightKg ?? (isMale ? 70.0 : 57.5);
+    final proteinTarget = (effectiveWeight * 0.8).clamp(46.0, 200.0);
+
     return {
       'sodium': 2300, // mg
       'potassium': isMale ? 3400 : 2600, // mg
@@ -32,10 +45,10 @@ class RDACalc {
       'addedSugars': 25, // g (WHO recommendation)
       'fiber': isMale ? 38 : 25, // g
       // Macro profiles
-      'fat': 78, // g (based on 2000 kcal, 35%)
-      'saturatedFat': 22, // g (limit, <10% of calories)
-      'carbs': 275, // g (based on 2000 kcal, 55%)
-      'protein': isMale ? 56 : 46, // g
+      'fat': (totalKcalGoal * 0.35 / 9), // g (35% of calories)
+      'saturatedFat': (totalKcalGoal * 0.10 / 9), // g (limit, <10% of calories)
+      'carbs': (totalKcalGoal * 0.55 / 4), // g (55% of calories)
+      'protein': proteinTarget, // g (0.8 g/kg body weight)
     };
   }
 }

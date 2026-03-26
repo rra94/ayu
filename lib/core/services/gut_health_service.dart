@@ -61,7 +61,8 @@ class GutHealthService {
     'en:e954': _AdditiveInfo('Saccharin', 'artificial_sweeteners'),
     'en:e950': _AdditiveInfo('Acesulfame-K', 'artificial_sweeteners'),
     'en:e952': _AdditiveInfo('Cyclamate', 'artificial_sweeteners'),
-    'en:e960': _AdditiveInfo('Stevia', 'artificial_sweeteners'),
+    // E960 (stevia/steviol glycosides) removed — GRAS per FDA/WHO JECFA.
+    // Not associated with gut dysbiosis at normal intake levels.
     'en:e961': _AdditiveInfo('Neotame', 'artificial_sweeteners'),
     'en:e962': _AdditiveInfo('Aspartame-acesulfame', 'artificial_sweeteners'),
 
@@ -97,8 +98,9 @@ class GutHealthService {
     'en:e631': _AdditiveInfo('Disodium inosinate', 'artificial_flavor'),
     'en:e635': _AdditiveInfo('Disodium ribonucleotides', 'artificial_flavor'),
 
-    // ── Trans fats (partially hydrogenated) ──
-    'en:e442': _AdditiveInfo('Ammonium phosphatides', 'trans_fat'),
+    // ── Emulsifiers (continued) ──
+    // E442 is ammonium phosphatides — an emulsifier, not a trans fat source.
+    'en:e442': _AdditiveInfo('Ammonium phosphatides', 'emulsifier'),
   };
 
   /// Scans a list of intakes and returns auto-flagged gut health items.

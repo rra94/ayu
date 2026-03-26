@@ -108,7 +108,7 @@ class NutrientRecommendationService {
       rdaMale: 15,
       rdaFemale: 15,
       absorptionTip:
-          'Fat-soluble — take with a fatty meal. 10-15 min midday sun produces ~250mcg.',
+          'Fat-soluble — take with a fatty meal. 10-15 min midday sun (summer, fair skin) can produce 1,000-4,000 IU (25-100 mcg). Varies by latitude, season, and skin tone.',
       foods: [
         FoodSuggestion(food: 'Salmon', amount: '3 oz', nutrientMg: 14.2, bioavailableMg: 11.4),
         FoodSuggestion(food: 'Sardines', amount: '3 oz', nutrientMg: 4.1, bioavailableMg: 3.3),
