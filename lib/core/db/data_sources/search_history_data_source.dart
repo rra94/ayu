@@ -75,6 +75,29 @@ class SearchHistoryDataSource {
     }).take(limit).toList();
   }
 
+  /// Get globally most-chosen meals across all searches (for the "Recent
+  /// favorites" empty-state section).
+  Future<List<SearchHistoryOB>> getTopOverall({int limit = 5}) async {
+    final query = _box
+        .query()
+        .order(SearchHistoryOB_.count, flags: Order.descending)
+        .build();
+    final all = query.find();
+    query.close();
+
+    // Deduplicate by meal name
+    final seen = <String>{};
+    final deduped = <SearchHistoryOB>[];
+    for (final h in all) {
+      final key = h.chosenMealName.toLowerCase();
+      if (seen.contains(key)) continue;
+      seen.add(key);
+      deduped.add(h);
+      if (deduped.length >= limit) break;
+    }
+    return deduped;
+  }
+
   /// Prune old entries (keep top 500 by count)
   Future<void> prune({int keepTop = 500}) async {
     final query = _box

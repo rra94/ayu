@@ -65,9 +65,23 @@ class HRVAnalysisService {
             monthRecords.length
         : currentHRV;
 
+    // Sparse data guard: need at least 3 week records for a meaningful trend
+    if (weekRecords.length < 3) {
+      _log.info(
+          'HRV sparse data: only ${weekRecords.length} week record(s), '
+          'returning insufficient_data');
+      return HRVTrend(
+        currentHRV: currentHRV,
+        weekAvg: weekAvg,
+        monthAvg: monthAvg,
+        trend: 'insufficient_data',
+        recoveryScore: 50, // neutral
+      );
+    }
+
     // Trend detection: compare most recent 3-day average against monthly baseline
     String trend = 'stable';
-    if (weekRecords.length >= 3) {
+    {
       final recentAvg =
           weekRecords.take(3).map((r) => r.value).reduce((a, b) => a + b) / 3;
       if (recentAvg > monthAvg * 1.05) {

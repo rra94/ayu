@@ -7,6 +7,7 @@ import 'package:opennutritracker/features/add_meal/presentation/add_meal_type.da
 import 'package:opennutritracker/features/add_meal/presentation/bloc/add_meal_bloc.dart';
 import 'package:opennutritracker/features/add_meal/presentation/bloc/food_bloc.dart';
 import 'package:opennutritracker/features/add_meal/presentation/bloc/recent_meal_bloc.dart';
+import 'package:opennutritracker/core/db/data_sources/search_history_data_source.dart';
 import 'package:opennutritracker/features/add_meal/presentation/widgets/default_results_widget.dart';
 import 'package:opennutritracker/features/add_meal/presentation/widgets/favorites_tab.dart';
 import 'package:opennutritracker/features/add_meal/presentation/widgets/meal_search_bar.dart';
@@ -122,7 +123,7 @@ class _AddMealScreenState extends State<AddMealScreen>
                         bloc: _productsBloc,
                         builder: (context, state) {
                           if (state is ProductsInitial) {
-                            return const DefaultsResultsWidget();
+                            return _buildPopularMeals();
                           } else if (state is ProductsLoadingState) {
                             return const Padding(
                               padding: EdgeInsets.only(top: 32),
@@ -266,6 +267,35 @@ class _AddMealScreenState extends State<AddMealScreen>
             ],
           ),
         ));
+  }
+
+  Widget _buildPopularMeals() {
+    return FutureBuilder(
+      future: locator<SearchHistoryDataSource>().getTopOverall(limit: 5),
+      builder: (ctx, snap) {
+        if (!snap.hasData || snap.data!.isEmpty) {
+          return const DefaultsResultsWidget();
+        }
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text(
+                'Recent favorites',
+                style: Theme.of(ctx).textTheme.titleSmall,
+              ),
+            ),
+            ...snap.data!.map((h) => ListTile(
+                  dense: true,
+                  title: Text(h.chosenMealName),
+                  leading: const Icon(Icons.history),
+                  onTap: () => _onSearchSubmit(h.chosenMealName),
+                )),
+          ],
+        );
+      },
+    );
   }
 
   void _onProductsRefreshButtonPressed() {

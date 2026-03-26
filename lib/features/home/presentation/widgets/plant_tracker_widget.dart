@@ -30,6 +30,12 @@ class _PlantTrackerWidgetState extends State<PlantTrackerWidget> {
     'basil', 'oregano', 'thyme', 'rosemary', 'turmeric', 'ginger', 'cinnamon',
     'mushroom', 'olive', 'coconut',
     'salad', 'vegetable', 'fruit', 'veggie',
+    // Indian plant foods
+    'dal', 'chana', 'rajma', 'moong', 'toor', 'urad',
+    'roti', 'chapati', 'paratha',
+    'cumin', 'coriander', 'cardamom', 'fenugreek',
+    'curry', 'masala', 'sabzi',
+    'amla', 'ashwagandha', 'neem', 'moringa',
   ];
 
   List<String> _uniquePlants = [];
@@ -159,6 +165,12 @@ class _PlantTrackerWidgetState extends State<PlantTrackerWidget> {
                             '30 Plants a Week',
                             style: theme.textTheme.titleSmall?.copyWith(
                               fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          Text(
+                            '30+ plant foods/week supports gut microbiome diversity',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
                             ),
                           ),
                           const SizedBox(height: 2),

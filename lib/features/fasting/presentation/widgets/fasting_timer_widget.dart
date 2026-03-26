@@ -120,7 +120,17 @@ class _FastingTimerWidgetState extends State<FastingTimerWidget> {
           ),
         ),
         const SizedBox(height: 12),
-        if (progress >= 1.0)
+        if (session.elapsedHours > session.targetHours * 2)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 4),
+            child: Text(
+              'Forgot to end? This fast is ${session.elapsedHours.round()}h',
+              style: theme.textTheme.bodySmall
+                  ?.copyWith(color: Colors.orange),
+              textAlign: TextAlign.center,
+            ),
+          )
+        else if (progress >= 1.0)
           Text('Target reached!',
               style: theme.textTheme.bodyMedium
                   ?.copyWith(color: Colors.green, fontWeight: FontWeight.w600)),

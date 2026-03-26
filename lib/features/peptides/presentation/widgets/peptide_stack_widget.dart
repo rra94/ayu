@@ -419,6 +419,13 @@ class _PeptideStackWidgetState extends State<PeptideStackWidget> {
             FilledButton(
               onPressed: () async {
                 if (nameCtrl.text.isNotEmpty) {
+                  // Validate required numeric fields are non-empty
+                  if (mgCtrl.text.isEmpty || bacCtrl.text.isEmpty || doseUnitsCtrl.text.isEmpty) {
+                    ScaffoldMessenger.of(ctx).showSnackBar(
+                      const SnackBar(content: Text('Please fill in all dose fields')),
+                    );
+                    return;
+                  }
                   final ds = locator<PeptideDataSource>();
                   if (isEdit) {
                     existing.name = nameCtrl.text;

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:opennutritracker/core/db/data_sources/gut_health_data_source.dart';
 import 'package:opennutritracker/core/db/entities/gut_health_item_ob.dart';
+import 'package:opennutritracker/core/utils/locator.dart';
 
 class _ManualItem {
   final String category;
@@ -7,7 +9,7 @@ class _ManualItem {
   const _ManualItem(this.category, this.description);
 }
 
-class GutHealthPanel extends StatelessWidget {
+class GutHealthPanel extends StatefulWidget {
   final List<GutHealthItemOB> items;
   final void Function(GutHealthItemOB item) onAddManualItem;
   final void Function(int id) onDeleteItem;
@@ -22,11 +24,50 @@ class GutHealthPanel extends StatelessWidget {
   });
 
   @override
+  State<GutHealthPanel> createState() => _GutHealthPanelState();
+}
+
+class _GutHealthPanelState extends State<GutHealthPanel> {
+  int _weeklyCount = 0;
+  int _lastWeekCount = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadWeeklyCounts();
+  }
+
+  Future<void> _loadWeeklyCounts() async {
+    try {
+      final ds = locator<GutHealthDataSource>();
+      final now = DateTime.now();
+      int thisWeek = 0;
+      int lastWeek = 0;
+      for (int d = 0; d < 7; d++) {
+        final day = now.subtract(Duration(days: d));
+        final items = await ds.getItemsByDate(day);
+        thisWeek += items.length;
+      }
+      for (int d = 7; d < 14; d++) {
+        final day = now.subtract(Duration(days: d));
+        final items = await ds.getItemsByDate(day);
+        lastWeek += items.length;
+      }
+      if (mounted) {
+        setState(() {
+          _weeklyCount = thisWeek;
+          _lastWeekCount = lastWeek;
+        });
+      }
+    } catch (_) {}
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final autoItems = items.where((i) => i.isAutoFlagged).toList();
-    final manualItems = items.where((i) => !i.isAutoFlagged).toList();
-    final hasItems = items.isNotEmpty;
+    final autoItems = widget.items.where((i) => i.isAutoFlagged).toList();
+    final manualItems = widget.items.where((i) => !i.isAutoFlagged).toList();
+    final hasItems = widget.items.isNotEmpty;
 
     return Card(
       
@@ -59,7 +100,7 @@ class GutHealthPanel extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      '${items.length} bad',
+                      '${widget.items.length} bad',
                       style: theme.textTheme.labelSmall?.copyWith(
                         fontWeight: FontWeight.w600,
                         color: theme.colorScheme.onErrorContainer,
@@ -68,13 +109,24 @@ class GutHealthPanel extends StatelessWidget {
                   ),
                 ],
                 const Spacer(),
-                if (!readOnly)
+                if (!widget.readOnly)
                   TextButton.icon(
                     onPressed: () => _showLogItemDialog(context),
                     icon: const Icon(Icons.add, size: 18),
                     label: const Text('Log'),
                   ),
               ],
+            ),
+
+            // Subtitle
+            Padding(
+              padding: const EdgeInsets.only(top: 2),
+              child: Text(
+                'Auto-detects additives linked to gut inflammation',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
             ),
 
             // Status message
@@ -140,8 +192,8 @@ class GutHealthPanel extends StatelessWidget {
                       visualDensity: VisualDensity.compact,
                       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       backgroundColor: _chipColor(item.category, theme),
-                      deleteIcon: readOnly ? null : const Icon(Icons.close, size: 14),
-                      onDeleted: readOnly ? null : () => onDeleteItem(item.id),
+                      deleteIcon: widget.readOnly ? null : const Icon(Icons.close, size: 14),
+                      onDeleted: widget.readOnly ? null : () => widget.onDeleteItem(item.id),
                     ),
                   )).toList(),
                 ),
@@ -159,6 +211,19 @@ class GutHealthPanel extends StatelessWidget {
                 child: Text(
                   _buildSummary(autoItems, manualItems),
                   style: theme.textTheme.bodySmall,
+                ),
+              ),
+            ],
+
+            // Weekly summary
+            if (_weeklyCount > 0 || !hasItems) ...[
+              const SizedBox(height: 6),
+              Text(
+                'This week: $_weeklyCount bad items'
+                '${_weeklyCount > _lastWeekCount ? " ↑" : _weeklyCount < _lastWeekCount ? " ↓" : ""}'
+                ' (last week: $_lastWeekCount)',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
                 ),
               ),
             ],
@@ -382,7 +447,7 @@ class GutHealthPanel extends StatelessWidget {
                     ? null
                     : () {
                         for (final name in selected) {
-                          onAddManualItem(GutHealthItemOB(
+                          widget.onAddManualItem(GutHealthItemOB(
                             name: name,
                             category: manualItemOptions[name]!.category,
                             dateTime: DateTime.now(),
