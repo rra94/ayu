@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:opennutritracker/core/db/data_sources/fasting_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/water_data_source.dart';
 import 'package:opennutritracker/core/db/entities/caffeine_log_ob.dart';
@@ -32,10 +33,15 @@ class QuickActionBar extends StatelessWidget {
               label: '+250ml',
               color: gold,
               onTap: () async {
+                HapticFeedback.lightImpact();
                 final ds = locator<WaterDataSource>();
                 await ds.addWaterRecord(250, DateTime.now());
                 IntentDonationService.donateLogWater();
                 onActionComplete();
+                ScaffoldMessenger.of(context).clearSnackBars();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Water +250ml'), duration: Duration(seconds: 2)),
+                );
               },
             ),
             const SizedBox(width: 8),
@@ -56,12 +62,17 @@ class QuickActionBar extends StatelessWidget {
               label: 'Coffee',
               color: gold,
               onTap: () async {
+                HapticFeedback.lightImpact();
                 final ds = locator<CaffeineDataSource>();
                 await ds.addLog(CaffeineLogOB(
                   amountMg: 95, source: 'coffee', dateTime: DateTime.now(),
                 ));
                 IntentDonationService.donateLogCoffee();
                 onActionComplete();
+                ScaffoldMessenger.of(context).clearSnackBars();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Coffee logged (95mg caffeine)'), duration: Duration(seconds: 2)),
+                );
               },
             ),
             const SizedBox(width: 8),
@@ -70,8 +81,12 @@ class QuickActionBar extends StatelessWidget {
               label: 'Fast 16:8',
               color: gold,
               onTap: () async {
+                HapticFeedback.lightImpact();
                 final ds = locator<FastingDataSource>();
                 final active = await ds.getActiveSession();
+                final msg = active != null
+                    ? 'Fast already active'
+                    : 'Fast 16:8 started';
                 if (active == null) {
                   await ds.saveSession(FastingSessionOB(
                     startTime: DateTime.now(),
@@ -81,6 +96,10 @@ class QuickActionBar extends StatelessWidget {
                 }
                 IntentDonationService.donateStartFast();
                 onActionComplete();
+                ScaffoldMessenger.of(context).clearSnackBars();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(msg), duration: const Duration(seconds: 2)),
+                );
               },
             ),
           ],
