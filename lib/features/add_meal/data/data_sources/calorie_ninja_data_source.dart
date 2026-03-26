@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:logging/logging.dart';
 import 'package:opennutritracker/core/db/data_sources/food_cache_data_source.dart';
@@ -34,50 +35,17 @@ class CalorieNinjaDataSource {
         'X-Api-Key': Env.calorieNinjaApiKey,
       }).timeout(const Duration(seconds: 5));
 
+      if (response.statusCode == 429) {
+        _log.warning('CalorieNinjas rate limited (429)');
+        throw Exception('rate_limited');
+      }
       if (response.statusCode != 200) {
         _log.warning('CalorieNinjas returned ${response.statusCode}');
         return [];
       }
 
-      final data = jsonDecode(response.body);
-      final items = data['items'] as List? ?? [];
-
-      final results = items.map((item) {
-        final servingG = (item['serving_size_g'] as num?)?.toDouble() ?? 100;
-        // Normalize to per-100g
-        final factor = servingG > 0 ? 100 / servingG : 1.0;
-
-        return MealEntity(
-          code: null,
-          name: _capitalize(item['name'] as String? ?? query),
-          url: null,
-          mealQuantity: '${servingG.round()}',
-          mealUnit: 'g',
-          servingQuantity: servingG,
-          servingUnit: 'g',
-          servingSize: '${servingG.round()}g',
-          source: MealSourceEntity.custom,
-          nutriments: MealNutrimentsEntity(
-            energyKcal100:
-                ((item['calories'] as num?)?.toDouble() ?? 0) * factor,
-            fat100:
-                ((item['fat_total_g'] as num?)?.toDouble() ?? 0) * factor,
-            saturatedFat100:
-                ((item['fat_saturated_g'] as num?)?.toDouble() ?? 0) * factor,
-            proteins100:
-                ((item['protein_g'] as num?)?.toDouble() ?? 0) * factor,
-            carbohydrates100:
-                ((item['carbohydrates_total_g'] as num?)?.toDouble() ?? 0) *
-                    factor,
-            sugars100:
-                ((item['sugar_g'] as num?)?.toDouble() ?? 0) * factor,
-            fiber100:
-                ((item['fiber_g'] as num?)?.toDouble() ?? 0) * factor,
-            sodium100:
-                ((item['sodium_mg'] as num?)?.toDouble() ?? 0) * factor,
-          ),
-        );
-      }).toList();
+      // Parse JSON off the main thread to avoid jank with large responses
+      final results = await compute(_parseResponse, _ParseArgs(response.body, query));
 
       // Cache the results for future use
       if (results.isNotEmpty) {
@@ -141,4 +109,47 @@ class CalorieNinjaDataSource {
       w.isEmpty ? w : '${w[0].toUpperCase()}${w.substring(1)}'
     ).join(' ');
   }
+}
+
+class _ParseArgs {
+  final String body;
+  final String query;
+  _ParseArgs(this.body, this.query);
+}
+
+List<MealEntity> _parseResponse(_ParseArgs args) {
+  final data = jsonDecode(args.body);
+  final items = data['items'] as List? ?? [];
+
+  return items.map((item) {
+    final servingG = (item['serving_size_g'] as num?)?.toDouble() ?? 100;
+    final factor = servingG > 0 ? 100 / servingG : 1.0;
+    final name = item['name'] as String? ?? args.query;
+    final capitalized = name.isEmpty
+        ? name
+        : name.split(' ').map((w) =>
+            w.isEmpty ? w : '${w[0].toUpperCase()}${w.substring(1)}').join(' ');
+
+    return MealEntity(
+      code: null,
+      name: capitalized,
+      url: null,
+      mealQuantity: '${servingG.round()}',
+      mealUnit: 'g',
+      servingQuantity: servingG,
+      servingUnit: 'g',
+      servingSize: '${servingG.round()}g',
+      source: MealSourceEntity.custom,
+      nutriments: MealNutrimentsEntity(
+        energyKcal100: ((item['calories'] as num?)?.toDouble() ?? 0) * factor,
+        fat100: ((item['fat_total_g'] as num?)?.toDouble() ?? 0) * factor,
+        saturatedFat100: ((item['fat_saturated_g'] as num?)?.toDouble() ?? 0) * factor,
+        proteins100: ((item['protein_g'] as num?)?.toDouble() ?? 0) * factor,
+        carbohydrates100: ((item['carbohydrates_total_g'] as num?)?.toDouble() ?? 0) * factor,
+        sugars100: ((item['sugar_g'] as num?)?.toDouble() ?? 0) * factor,
+        fiber100: ((item['fiber_g'] as num?)?.toDouble() ?? 0) * factor,
+        sodium100: ((item['sodium_mg'] as num?)?.toDouble() ?? 0) * factor,
+      ),
+    );
+  }).toList();
 }

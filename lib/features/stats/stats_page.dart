@@ -24,7 +24,9 @@ class StatsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
+    return SafeArea(
+      top: false,
+      child: ListView(
       padding: const EdgeInsets.symmetric(vertical: 8),
       children: const [
         // Overview — always visible
@@ -88,6 +90,7 @@ class StatsPage extends StatelessWidget {
 
         SizedBox(height: 16),
       ],
+    ),
     );
   }
 }

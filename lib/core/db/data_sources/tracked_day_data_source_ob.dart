@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:logging/logging.dart';
 import 'package:opennutritracker/core/data/dbo/tracked_day_dbo.dart';
 import 'package:opennutritracker/core/db/entities/tracked_day_ob.dart';
@@ -6,6 +7,22 @@ import 'package:opennutritracker/objectbox.g.dart';
 class TrackedDayDataSourceOB {
   final log = Logger('TrackedDayDataSourceOB');
   final Box<TrackedDayOB> _trackedDayBox;
+
+  /// Serializes read-modify-write operations to prevent concurrent overwrites.
+  static Future<void>? _pendingWrite;
+  Future<void> _synchronized(Future<void> Function() fn) async {
+    while (_pendingWrite != null) {
+      await _pendingWrite;
+    }
+    final completer = Completer<void>();
+    _pendingWrite = completer.future;
+    try {
+      await fn();
+    } finally {
+      _pendingWrite = null;
+      completer.complete();
+    }
+  }
 
   TrackedDayDataSourceOB(this._trackedDayBox);
 
@@ -54,54 +71,60 @@ class TrackedDayDataSourceOB {
 
   Future<bool> hasTrackedDay(DateTime day) async => _findByDay(day) != null;
 
-  Future<void> updateDayCalorieGoal(DateTime day, double calorieGoal) async {
+  Future<void> updateDayCalorieGoal(DateTime day, double calorieGoal) =>
+      _synchronized(() async {
     log.fine('Updating tracked day total calories');
     final ob = _findByDay(day);
     if (ob != null) {
       ob.calorieGoal = calorieGoal;
       _trackedDayBox.put(ob);
     }
-  }
+  });
 
-  Future<void> increaseDayCalorieGoal(DateTime day, double amount) async {
+  Future<void> increaseDayCalorieGoal(DateTime day, double amount) =>
+      _synchronized(() async {
     log.fine('Increasing tracked day total calories');
     final ob = _findByDay(day);
     if (ob != null) {
       ob.calorieGoal += amount;
       _trackedDayBox.put(ob);
     }
-  }
+  });
 
-  Future<void> reduceDayCalorieGoal(DateTime day, double amount) async {
+  Future<void> reduceDayCalorieGoal(DateTime day, double amount) =>
+      _synchronized(() async {
     log.fine('Reducing tracked day total calories');
     final ob = _findByDay(day);
     if (ob != null) {
       ob.calorieGoal -= amount;
       _trackedDayBox.put(ob);
     }
-  }
+  });
 
-  Future<void> addDayCaloriesTracked(DateTime day, double addCalories) async {
+  Future<void> addDayCaloriesTracked(DateTime day, double addCalories) =>
+      _synchronized(() async {
     log.fine('Adding new tracked day calories');
     final ob = _findByDay(day);
     if (ob != null) {
       ob.caloriesTracked += addCalories;
       _trackedDayBox.put(ob);
     }
-  }
+  });
 
   Future<void> decreaseDayCaloriesTracked(
-      DateTime day, double addCalories) async {
+      DateTime day, double addCalories) =>
+      _synchronized(() async {
     log.fine('Decreasing tracked day calories');
     final ob = _findByDay(day);
     if (ob != null) {
       ob.caloriesTracked -= addCalories;
       _trackedDayBox.put(ob);
     }
-  }
+  });
 
   Future<void> updateDayMacroGoals(DateTime day,
-      {double? carbsGoal, double? fatGoal, double? proteinGoal}) async {
+      {double? carbsGoal, double? fatGoal, double? proteinGoal}) =>
+      _synchronized(() async {
     log.fine('Updating tracked day macro goals');
     final ob = _findByDay(day);
     if (ob != null) {
@@ -110,10 +133,11 @@ class TrackedDayDataSourceOB {
       if (proteinGoal != null) ob.proteinGoal = proteinGoal;
       _trackedDayBox.put(ob);
     }
-  }
+  });
 
   Future<void> increaseDayMacroGoal(DateTime day,
-      {double? carbsAmount, double? fatAmount, double? proteinAmount}) async {
+      {double? carbsAmount, double? fatAmount, double? proteinAmount}) =>
+      _synchronized(() async {
     log.fine('Increasing tracked day macro goals');
     final ob = _findByDay(day);
     if (ob != null) {
@@ -128,10 +152,11 @@ class TrackedDayDataSourceOB {
       }
       _trackedDayBox.put(ob);
     }
-  }
+  });
 
   Future<void> reduceDayMacroGoal(DateTime day,
-      {double? carbsAmount, double? fatAmount, double? proteinAmount}) async {
+      {double? carbsAmount, double? fatAmount, double? proteinAmount}) =>
+      _synchronized(() async {
     log.fine('Reducing tracked day macro goals');
     final ob = _findByDay(day);
     if (ob != null) {
@@ -146,10 +171,11 @@ class TrackedDayDataSourceOB {
       }
       _trackedDayBox.put(ob);
     }
-  }
+  });
 
   Future<void> addDayMacroTracked(DateTime day,
-      {double? carbsAmount, double? fatAmount, double? proteinAmount}) async {
+      {double? carbsAmount, double? fatAmount, double? proteinAmount}) =>
+      _synchronized(() async {
     log.fine('Adding new tracked day macro');
     final ob = _findByDay(day);
     if (ob != null) {
@@ -164,10 +190,11 @@ class TrackedDayDataSourceOB {
       }
       _trackedDayBox.put(ob);
     }
-  }
+  });
 
   Future<void> removeDayMacroTracked(DateTime day,
-      {double? carbsAmount, double? fatAmount, double? proteinAmount}) async {
+      {double? carbsAmount, double? fatAmount, double? proteinAmount}) =>
+      _synchronized(() async {
     log.fine('Removing tracked day macro');
     final ob = _findByDay(day);
     if (ob != null) {
@@ -182,7 +209,7 @@ class TrackedDayDataSourceOB {
       }
       _trackedDayBox.put(ob);
     }
-  }
+  });
 
   // ---------------------------------------------------------------------------
   // Private helpers

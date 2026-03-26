@@ -46,7 +46,13 @@ class GeminiFoodVisionService {
   /// Returns identified food items with estimated nutrition.
   static Future<FoodPhotoResult?> analyzePhoto(String imagePath) async {
     try {
-      final imageBytes = await File(imagePath).readAsBytes();
+      final imageFile = File(imagePath);
+      final fileSize = await imageFile.length();
+      if (fileSize > 10 * 1024 * 1024) {
+        _log.warning('Image too large (${(fileSize / 1024 / 1024).toStringAsFixed(1)}MB), skipping');
+        return null;
+      }
+      final imageBytes = await imageFile.readAsBytes();
       final base64Image = base64Encode(imageBytes);
 
       final uri = Uri.parse(
@@ -84,17 +90,34 @@ If this is not a food photo, return: {"error": "not_food"}'''
         }
       });
 
-      final response = await http.post(
-        uri,
-        headers: {
-          'Content-Type': 'application/json',
-          'x-goog-api-key': Env.geminiApiKey,
-        },
-        body: body,
-      ).timeout(const Duration(seconds: 15));
+      http.Response? response;
+      for (var attempt = 0; attempt < 3; attempt++) {
+        try {
+          response = await http.post(
+            uri,
+            headers: {
+              'Content-Type': 'application/json',
+              'x-goog-api-key': Env.geminiApiKey,
+            },
+            body: body,
+          ).timeout(const Duration(seconds: 15));
+          if (response.statusCode == 200) break;
+          if (response.statusCode == 429 || response.statusCode >= 500) {
+            _log.info('Gemini attempt ${attempt + 1} returned ${response.statusCode}, retrying...');
+            await Future.delayed(Duration(milliseconds: 1000 * (attempt + 1)));
+            continue;
+          }
+          // Non-retryable error
+          break;
+        } catch (e) {
+          if (attempt == 2) rethrow;
+          _log.info('Gemini attempt ${attempt + 1} failed: $e, retrying...');
+          await Future.delayed(Duration(milliseconds: 1000 * (attempt + 1)));
+        }
+      }
 
-      if (response.statusCode != 200) {
-        _log.warning('Gemini returned ${response.statusCode}: ${response.body}');
+      if (response == null || response.statusCode != 200) {
+        _log.warning('Gemini returned ${response?.statusCode}: ${response?.body}');
         return null;
       }
 

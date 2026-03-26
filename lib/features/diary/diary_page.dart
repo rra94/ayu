@@ -81,7 +81,9 @@ class _DiaryPageState extends State<DiaryPage> with WidgetsBindingObserver {
 
   Widget _getLoadedContent(BuildContext context,
       Map<String, TrackedDayEntity> trackedDaysMap, bool usesImperialUnits) {
-    return ListView(
+    return SafeArea(
+      top: false,
+      child: ListView(
       children: [
         DiaryTableCalendar(
           trackedDaysMap: trackedDaysMap,
@@ -117,6 +119,7 @@ class _DiaryPageState extends State<DiaryPage> with WidgetsBindingObserver {
           },
         )
       ],
+    ),
     );
   }
 
