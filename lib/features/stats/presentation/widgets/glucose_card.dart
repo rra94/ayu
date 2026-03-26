@@ -25,8 +25,10 @@ class GlucoseCard extends StatefulWidget {
 
 class _GlucoseCardState extends State<GlucoseCard> {
   bool _loading = true;
+  List<BiomarkerRecordOB> _allRecords = [];
   List<BiomarkerRecordOB> _records = [];
   bool _hasDiabetes = false;
+  int _periodDays = 7;
 
   static const _type = 'glucose';
 
@@ -43,12 +45,20 @@ class _GlucoseCardState extends State<GlucoseCard> {
     final hasDiabetes = conditions.any(
         (c) => c.toLowerCase().contains('diabetes'));
     setState(() {
-      // Keep at most last 7, oldest first for chart
-      _records =
-          all.reversed.toList().take(7).toList().reversed.toList();
+      _allRecords = all; // store all records
       _hasDiabetes = hasDiabetes;
       _loading = false;
+      _applyPeriodFilter();
     });
+  }
+
+  void _applyPeriodFilter() {
+    final cutoff = DateTime.now().subtract(Duration(days: _periodDays));
+    final filtered = _allRecords
+        .where((r) => r.dateTime.isAfter(cutoff))
+        .toList();
+    // Keep at most last 30, oldest first for chart
+    _records = filtered.reversed.toList().take(30).toList().reversed.toList();
   }
 
   @override
@@ -102,6 +112,39 @@ class _GlucoseCardState extends State<GlucoseCard> {
                 ),
               )
             else ...[
+              const SizedBox(height: 8),
+              // Period selector
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ChoiceChip(
+                    label: const Text('7d'),
+                    selected: _periodDays == 7,
+                    onSelected: (_) => setState(() {
+                      _periodDays = 7;
+                      _applyPeriodFilter();
+                    }),
+                  ),
+                  const SizedBox(width: 8),
+                  ChoiceChip(
+                    label: const Text('30d'),
+                    selected: _periodDays == 30,
+                    onSelected: (_) => setState(() {
+                      _periodDays = 30;
+                      _applyPeriodFilter();
+                    }),
+                  ),
+                  const SizedBox(width: 8),
+                  ChoiceChip(
+                    label: const Text('90d'),
+                    selected: _periodDays == 90,
+                    onSelected: (_) => setState(() {
+                      _periodDays = 90;
+                      _applyPeriodFilter();
+                    }),
+                  ),
+                ],
+              ),
               const SizedBox(height: 4),
               _buildLatestReading(theme),
               if (_records.length > 1) ...[
@@ -146,6 +189,15 @@ class _GlucoseCardState extends State<GlucoseCard> {
             ),
           ),
         ),
+        if (latest.notes != null && latest.notes!.isNotEmpty) ...[
+          const SizedBox(width: 6),
+          Text(
+            latest.notes!,
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ],
         const Spacer(),
         Text(
           _formatDate(latest.dateTime),
@@ -378,6 +430,7 @@ class _GlucoseCardState extends State<GlucoseCard> {
                         unit: 'mg/dL',
                         dateTime: existing?.dateTime ?? DateTime.now(),
                         source: 0,
+                        notes: timing.label,
                       ));
                       if (ctx.mounted) Navigator.of(ctx).pop();
                       _load();

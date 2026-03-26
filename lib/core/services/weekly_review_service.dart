@@ -38,6 +38,23 @@ class WeeklyReviewService {
     final daysWithMeals = thisWeek.where((d) => d.totalCalories != null).length;
     final totalDays = thisWeek.length;
 
+    // Sparse data warning — prepend to improvements when fewer than 4 days logged
+    final daysWithData = thisWeek
+        .where((d) =>
+            d.totalCalories != null ||
+            d.sleepDurationHours != null ||
+            d.weightKG != null)
+        .length;
+    if (daysWithData < 4) {
+      improvements.insert(
+        0,
+        WeeklyReviewItem(
+          text: 'Note: Only $daysWithData days logged this week — trends may be unreliable.',
+          isWin: false,
+        ),
+      );
+    }
+
     // Logging consistency
     if (daysWithMeals >= 5) {
       wins.add(WeeklyReviewItem(

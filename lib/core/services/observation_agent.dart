@@ -84,6 +84,23 @@ class ObservationAgent {
     try { observations.addAll(await _gutBrainCorrelation()); } catch (_) {}
     try { observations.addAll(await _supplementMealTimingConflict()); } catch (_) {}
 
+    // Sparse data fallback: if no observations generated and user has < 10 intakes,
+    // offer onboarding guidance to build their health profile
+    if (observations.isEmpty) {
+      try {
+        final getIntake = locator<GetIntakeUsecase>();
+        final allIntakes = await getIntake.getAllIntakes();
+        if (allIntakes.length < 10) {
+          observations.add(AgentSuggestion(
+            type: 'observation',
+            title: 'Building your health profile',
+            message:
+                'Log meals, sleep, and mood for 3+ days to unlock personalized insights.',
+          ));
+        }
+      } catch (_) {}
+    }
+
     _log.info('ObservationAgent found ${observations.length} cross-domain insights, context: ${ctx.observationTypes}');
     return observations;
   }

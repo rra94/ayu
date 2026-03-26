@@ -19,6 +19,9 @@ class BiomarkerRecordOB {
   /// 0=manual, 1=auto_computed
   int source;
 
+  /// Optional notes (e.g. glucose timing: "Fasting", "1h after meal")
+  String? notes;
+
   BiomarkerRecordOB({
     this.id = 0,
     required this.type,
@@ -26,5 +29,6 @@ class BiomarkerRecordOB {
     required this.unit,
     required this.dateTime,
     this.source = 0,
+    this.notes,
   });
 }

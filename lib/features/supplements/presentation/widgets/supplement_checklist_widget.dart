@@ -121,7 +121,7 @@ class _SupplementChecklistWidgetState extends State<SupplementChecklistWidget> {
                   }
                   _scheduleReload();
                   if (context.mounted) {
-                    ScaffoldMessenger.of(context).clearSnackBars();
+                    // Don't clear previous snackbars — let them queue naturally
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(

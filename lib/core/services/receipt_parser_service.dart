@@ -51,9 +51,22 @@ class ReceiptParserService {
 
   /// Smart receipt parsing using Gemini AI.
   /// Falls back to regex parsing if Gemini fails or is unavailable.
+  /// Non-ASCII text (non-English receipts) skips regex and uses Gemini only.
   static Future<List<ReceiptItem>> parseTextSmart(String rawText) async {
     // Reset restaurant each call
     _lastDetectedRestaurant = null;
+
+    // Heuristic: if text contains non-ASCII characters, skip regex entirely
+    // and rely on Gemini — regex patterns are English-only
+    final hasNonAscii = rawText.codeUnits.any((c) => c > 127);
+    if (hasNonAscii) {
+      _log.info('Non-ASCII text detected — using Gemini parse only');
+      try {
+        final items = await _geminiParse(rawText);
+        if (items.isNotEmpty) return items;
+      } catch (_) {}
+      return []; // regex won't work for non-English
+    }
 
     // Try Gemini first for intelligent parsing
     try {

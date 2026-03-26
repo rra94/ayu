@@ -725,6 +725,19 @@ class AgentService {
 
   // ── Supplement Timing Agent ──
 
+  /// Fuzzy supplement name matcher — checks a name against a list of keywords.
+  static bool _matchesSupplement(String name, List<String> keywords) {
+    final lower = name.toLowerCase();
+    return keywords.any((kw) => lower.contains(kw));
+  }
+
+  // Supplement keyword lists for fuzzy matching (M8)
+  static const _magKeywords = ['magnesium', 'mag ', 'mg glyc', 'mag glyc', 'magnesio'];
+  static const _vitDKeywords = ['vitamin d', 'vit d', 'd3', 'cholecalciferol'];
+  static const _ironKeywords = ['iron', 'ferrous', 'ferro', 'fer '];
+  static const _zincKeywords = ['zinc', 'zn ', 'zinc '];
+  static const _omegaKeywords = ['omega', 'fish oil', 'epa', 'dha', 'krill'];
+
   /// Smart supplement timing based on circadian profile.
   /// Knows when specific supplements are best absorbed and reminds
   /// during the optimal window.
@@ -746,11 +759,12 @@ class AgentService {
     if (profile != null) {
       final timing = profile.optimalSupplementTiming;
 
-      // Check if any supplement names match timing windows
+      // Check if any supplement names match timing windows (M8: fuzzy matching)
       for (final supp in remaining) {
-        final nameLower = supp.name.toLowerCase();
-
-        if (nameLower.contains('magnesium') && currentHour >= profile.avgBedHour - 1.5 && currentHour < profile.avgBedHour) {
+        // M9: use 0.017h (~1 min) epsilon on boundaries to avoid float edge cases
+        if (_matchesSupplement(supp.name, _magKeywords) &&
+            currentHour >= profile.avgBedHour - 1.517 &&
+            currentHour < profile.avgBedHour + 0.017) {
           return [
             AgentSuggestion(
               type: 'supplement_timing',
@@ -759,7 +773,9 @@ class AgentService {
             ),
           ];
         }
-        if (nameLower.contains('vitamin d') && currentHour >= profile.avgFirstMealHour - 0.5 && currentHour < profile.avgFirstMealHour + 1) {
+        if (_matchesSupplement(supp.name, _vitDKeywords) &&
+            currentHour >= profile.avgFirstMealHour - 0.517 &&
+            currentHour < profile.avgFirstMealHour + 1.017) {
           return [
             AgentSuggestion(
               type: 'supplement_timing',
@@ -768,7 +784,9 @@ class AgentService {
             ),
           ];
         }
-        if (nameLower.contains('iron') && currentHour >= profile.avgFirstMealHour - 1.5 && currentHour < profile.avgFirstMealHour) {
+        if (_matchesSupplement(supp.name, _ironKeywords) &&
+            currentHour >= profile.avgFirstMealHour - 1.517 &&
+            currentHour < profile.avgFirstMealHour + 0.017) {
           return [
             AgentSuggestion(
               type: 'supplement_timing',
@@ -777,7 +795,9 @@ class AgentService {
             ),
           ];
         }
-        if (nameLower.contains('zinc') && currentHour >= profile.avgBedHour - 2.5 && currentHour < profile.avgBedHour - 1) {
+        if (_matchesSupplement(supp.name, _zincKeywords) &&
+            currentHour >= profile.avgBedHour - 2.517 &&
+            currentHour < profile.avgBedHour - 0.983) {
           return [
             AgentSuggestion(
               type: 'supplement_timing',
@@ -786,7 +806,9 @@ class AgentService {
             ),
           ];
         }
-        if ((nameLower.contains('omega') || nameLower.contains('fish oil')) && currentHour >= profile.avgLastMealHour - 0.5 && currentHour < profile.avgLastMealHour + 1) {
+        if (_matchesSupplement(supp.name, _omegaKeywords) &&
+            currentHour >= profile.avgLastMealHour - 0.517 &&
+            currentHour < profile.avgLastMealHour + 1.017) {
           return [
             AgentSuggestion(
               type: 'supplement_timing',
