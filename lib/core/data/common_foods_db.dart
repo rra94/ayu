@@ -4,6 +4,42 @@ import 'package:opennutritracker/features/add_meal/domain/entity/meal_nutriments
 /// Built-in database of common generic foods that aren't in OFF/FDC.
 /// Returns MealEntity with typical nutrition per 100g/100ml.
 class CommonFoodsDB {
+  /// Glycemic index classification for common foods
+  /// Sources: University of Sydney GI Database
+  static const _highGiFoods = {
+    'white rice': 73,
+    'bread': 75,
+    'toast': 75,
+    'bagel': 72,
+    'french fries': 75,
+    'mashed potatoes': 83,
+    'baked potato': 78,
+    'cornflakes': 81,
+    'watermelon': 76,
+    'pancakes': 67,
+    'waffle': 76,
+    'donut': 76,
+    'coca cola': 63,
+    'ramen': 73,
+    'instant noodle': 73,
+  };
+
+  static int? getGlycemicIndex(String foodName) {
+    final lower = foodName.toLowerCase();
+    for (final entry in _highGiFoods.entries) {
+      if (lower.contains(entry.key)) return entry.value;
+    }
+    return null;
+  }
+
+  static String? getGiLabel(String foodName) {
+    final gi = getGlycemicIndex(foodName);
+    if (gi == null) return null;
+    if (gi >= 70) return 'High GI ($gi)';
+    if (gi >= 56) return 'Medium GI ($gi)';
+    return 'Low GI ($gi)';
+  }
+
   static List<MealEntity> search(String query) {
     if (query.isEmpty) return [];
     final lower = query.toLowerCase().trim();

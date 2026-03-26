@@ -142,28 +142,31 @@ class _MiniGauge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        SizedBox(
-          width: 36,
-          height: 36,
-          child: CircularProgressIndicator(
-            value: value.clamp(0, 1),
-            strokeWidth: 3,
-            backgroundColor: color.withValues(alpha: 0.15),
-            color: color,
+    return Semantics(
+      label: '$subtitle: $label',
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(
+            width: 36,
+            height: 36,
+            child: CircularProgressIndicator(
+              value: value.clamp(0, 1),
+              strokeWidth: 3,
+              backgroundColor: color.withValues(alpha: 0.15),
+              color: color,
+            ),
           ),
-        ),
-        const SizedBox(height: 2),
-        Text(label,
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                fontSize: 10, fontWeight: FontWeight.w600,
-                color: Theme.of(context).colorScheme.onSurface)),
-        Text(subtitle,
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant)),
-      ],
+          const SizedBox(height: 2),
+          Text(label,
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  fontSize: 10, fontWeight: FontWeight.w600,
+                  color: Theme.of(context).colorScheme.onSurface)),
+          Text(subtitle,
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant)),
+        ],
+      ),
     );
   }
 }

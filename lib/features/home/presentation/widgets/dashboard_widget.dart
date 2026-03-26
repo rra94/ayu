@@ -145,12 +145,15 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                                       Theme.of(context).colorScheme.onSurface)),
                     ],
                   )),
-                  GestureDetector(
-                    onTap: () {
-                      HapticFeedback.lightImpact();
-                      _showNutritionBreakdown(context);
-                    },
-                    child: CircularPercentIndicator(
+                  Semantics(
+                    label: 'Calorie ring. ${kcalLeftLabel.toInt()} calories remaining. Tap for nutrition breakdown.',
+                    button: true,
+                    child: GestureDetector(
+                      onTap: () {
+                        HapticFeedback.lightImpact();
+                        _showNutritionBreakdown(context);
+                      },
+                      child: CircularPercentIndicator(
                       radius: 70.0,
                       lineWidth: 13.0,
                       animation: true,
@@ -193,6 +196,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                         ],
                       ),
                       circularStrokeCap: CircularStrokeCap.round,
+                    ),
                     ),
                   ),
                   Flexible(child: Column(

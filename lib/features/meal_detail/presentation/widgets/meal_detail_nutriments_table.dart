@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:opennutritracker/core/data/common_foods_db.dart';
 import 'package:opennutritracker/core/services/nutrient_synergy_service.dart';
 import 'package:opennutritracker/core/utils/extensions.dart';
 import 'package:opennutritracker/features/add_meal/domain/entity/meal_entity.dart';
@@ -209,6 +210,8 @@ class MealDetailNutrimentsTable extends StatelessWidget {
     );
     final synergyTips = NutrientSynergyService.checkSynergies(presenceMap);
 
+    final giLabel = CommonFoodsDB.getGiLabel(product.name ?? '');
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -242,6 +245,36 @@ class MealDetailNutrimentsTable extends StatelessWidget {
                   Text('(${product.ecoscoreScore!.round()}/100)',
                       style: Theme.of(context).textTheme.bodySmall),
                 ],
+              ],
+            ),
+          ),
+        if (giLabel != null)
+          Container(
+            margin: const EdgeInsets.only(bottom: 12.0),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            color: giLabel.contains('High')
+                ? Colors.orange.withValues(alpha: 0.1)
+                : Colors.green.withValues(alpha: 0.1),
+            child: Row(
+              children: [
+                Icon(
+                  giLabel.contains('High')
+                      ? Icons.trending_up
+                      : Icons.trending_flat,
+                  size: 16,
+                  color: giLabel.contains('High') ? Colors.orange : Colors.green,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  giLabel,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: giLabel.contains('High')
+                        ? Colors.orange
+                        : Colors.green,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ],
             ),
           ),

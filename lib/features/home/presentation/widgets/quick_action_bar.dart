@@ -124,13 +124,17 @@ class _QuickChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ActionChip(
-      avatar: Icon(icon, size: 16, color: color),
-      label: Text(label,
-          style: Theme.of(context).textTheme.bodySmall),
-      onPressed: onTap,
-      side: BorderSide(color: color.withValues(alpha: 0.3)),
-      backgroundColor: color.withValues(alpha: 0.05),
+    return Semantics(
+      label: 'Quick action: $label',
+      button: true,
+      child: ActionChip(
+        avatar: Icon(icon, size: 16, color: color),
+        label: Text(label,
+            style: Theme.of(context).textTheme.bodySmall),
+        onPressed: onTap,
+        side: BorderSide(color: color.withValues(alpha: 0.3)),
+        backgroundColor: color.withValues(alpha: 0.05),
+      ),
     );
   }
 }
