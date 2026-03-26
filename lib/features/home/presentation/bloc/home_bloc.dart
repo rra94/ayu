@@ -44,6 +44,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   double? _cachedProteinsGoal;
   String? _cachedGoalDay; // "yyyy-mm-dd" to invalidate on day change
 
+  // Prevent parallel loads (midnight cache race guard)
+  static bool _isLoading = false;
+
   HomeBloc(
       this._getConfigUsecase,
       this._addConfigUsecase,
@@ -57,6 +60,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       this._getMacroGoalUsecase)
       : super(HomeInitial()) {
     on<LoadItemsEvent>((event, emit) async {
+      if (_isLoading) return;
+      _isLoading = true;
+      try {
       emit(HomeLoadingState());
 
       currentDay = DateTime.now();
@@ -155,6 +161,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           snackIntakeList: snackIntakeList,
           userActivityList: userActivities,
           usesImperialUnits: usesImperialUnits));
+      } finally {
+        _isLoading = false;
+      }
     });
   }
 

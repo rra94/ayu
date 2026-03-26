@@ -100,9 +100,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
           } else if (state is SettingsLoadingState) {
             return const Center(child: CircularProgressIndicator());
           } else if (state is SettingsLoadedState) {
+            final theme = Theme.of(context);
             return ListView(
               children: [
-                const SizedBox(height: 16.0),
+                // ── General ────────────────────────────────────────────────
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+                  child: Text('General',
+                      style: theme.textTheme.labelLarge?.copyWith(
+                          color: theme.colorScheme.primary,
+                          fontWeight: FontWeight.w600)),
+                ),
                 ListTile(
                   leading: const Icon(Icons.account_circle_outlined),
                   title: Text(S.of(context).profileLabel),
@@ -111,7 +119,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     MaterialPageRoute(builder: (_) => const ProfilePage()),
                   ),
                 ),
-                const Divider(),
                 ListTile(
                   leading: const Icon(Icons.ac_unit_outlined),
                   title: Text(S.of(context).settingsUnitsLabel),
@@ -134,10 +141,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   title: Text(S.of(context).settingsThemeLabel),
                   onTap: () => _showThemeDialog(context, state.appTheme),
                 ),
-                ListTile(
-                  leading: const Icon(Icons.import_export),
-                  title: Text(S.of(context).exportImportLabel),
-                  onTap: () => _showExportImportDialog(context),
+                // ── Health ─────────────────────────────────────────────────
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+                  child: Text('Health',
+                      style: theme.textTheme.labelLarge?.copyWith(
+                          color: theme.colorScheme.primary,
+                          fontWeight: FontWeight.w600)),
                 ),
                 ListTile(
                   leading: const Icon(Icons.warning_amber),
@@ -154,6 +164,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ? 'Not configured'
                       : HealthConditionService.getUserConditions().join(', ')),
                   onTap: () => _showHealthConditionsDialog(context),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.directions_walk),
+                  title: const Text('Daily Step Goal'),
+                  subtitle: Text('$_stepGoal steps'),
+                  onTap: () => _showStepGoalDialog(),
+                ),
+                // ── Features ───────────────────────────────────────────────
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+                  child: Text('Features',
+                      style: theme.textTheme.labelLarge?.copyWith(
+                          color: theme.colorScheme.primary,
+                          fontWeight: FontWeight.w600)),
                 ),
                 SwitchListTile(
                   secondary: const Icon(Icons.eco_outlined),
@@ -179,11 +203,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     _homeBloc.add(LoadItemsEvent());
                   },
                 ),
+                // ── Data ───────────────────────────────────────────────────
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+                  child: Text('Data',
+                      style: theme.textTheme.labelLarge?.copyWith(
+                          color: theme.colorScheme.primary,
+                          fontWeight: FontWeight.w600)),
+                ),
                 ListTile(
-                  leading: const Icon(Icons.directions_walk),
-                  title: const Text('Daily Step Goal'),
-                  subtitle: Text('$_stepGoal steps'),
-                  onTap: () => _showStepGoalDialog(),
+                  leading: const Icon(Icons.import_export),
+                  title: Text(S.of(context).exportImportLabel),
+                  onTap: () => _showExportImportDialog(context),
                 ),
                 ListTile(
                   leading: const Icon(Icons.file_download_outlined),
@@ -199,6 +230,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     await BackupService.shareBackup();
                   },
                 ),
+                // ── Support ────────────────────────────────────────────────
                 ListTile(
                   leading: const Icon(Icons.description_outlined),
                   title: Text(S.of(context).settingsDisclaimerLabel),

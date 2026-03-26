@@ -477,6 +477,8 @@ import Intents
     let status = manager.authorizationStatus
     if status == .authorizedWhenInUse || status == .authorizedAlways {
       manager.startMonitoringSignificantLocationChanges()
+    } else if status == .denied || status == .restricted {
+      manager.stopMonitoringSignificantLocationChanges()
     }
   }
 

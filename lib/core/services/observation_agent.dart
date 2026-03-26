@@ -1,6 +1,7 @@
 import 'package:logging/logging.dart';
 import 'package:opennutritracker/core/db/data_sources/biomarker_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/caffeine_data_source.dart';
+import 'package:opennutritracker/core/db/data_sources/fasting_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/location_visit_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/sleep_data_source.dart';
 import 'package:opennutritracker/core/db/data_sources/supplement_data_source.dart';
@@ -11,6 +12,7 @@ import 'package:opennutritracker/core/services/agent_context.dart';
 import 'package:opennutritracker/core/services/agent_service.dart';
 import 'package:opennutritracker/core/services/barometer_service.dart';
 import 'package:opennutritracker/core/services/bio_age_trend_service.dart';
+import 'package:opennutritracker/core/services/calendar_service.dart';
 import 'package:opennutritracker/core/services/circadian_service.dart';
 import 'package:opennutritracker/core/services/hrv_analysis_service.dart';
 import 'package:opennutritracker/core/utils/locator.dart';
@@ -75,6 +77,11 @@ class ObservationAgent {
     if (DateTime.now().weekday == DateTime.monday) {
       try { observations.addAll(await _bioAgeTrendObservation()); } catch (_) {}
     }
+
+    try { observations.addAll(await _fastingWorkoutCorrelation()); } catch (_) {}
+    try { observations.addAll(await _seasonalVitaminD()); } catch (_) {}
+    try { observations.addAll(await _sleepArchitectureAnalysis()); } catch (_) {}
+    try { observations.addAll(await _gutBrainCorrelation()); } catch (_) {}
 
     _log.info('ObservationAgent found ${observations.length} cross-domain insights, context: ${ctx.observationTypes}');
     return observations;
@@ -571,6 +578,214 @@ class ObservationAgent {
         message: projection,
       ),
     ];
+  }
+
+  // ── BH3: Fasting + workout timing correlation ──
+
+  /// Detect if user is exercising during extended fasting (catabolic risk)
+  static Future<List<AgentSuggestion>> _fastingWorkoutCorrelation() async {
+    final fastingDs = locator<FastingDataSource>();
+    final active = await fastingDs.getActiveSession();
+    if (active == null) return [];
+
+    final hoursIntoFast = active.elapsedHours;
+    if (hoursIntoFast < 14) return []; // short fasts are fine for training
+
+    // Check if user has a gym event today or recent workout
+    final bioDs = locator<BiomarkerDataSource>();
+    final workoutRecords = await bioDs.getRecordsByType('workout_hr');
+    final now = DateTime.now();
+    final recentWorkout = workoutRecords.isNotEmpty &&
+        now.difference(workoutRecords.first.dateTime).inHours < 4;
+
+    // Also check calendar for upcoming gym
+    final hasGymToday = await CalendarService.hasExerciseToday();
+
+    if (recentWorkout || hasGymToday) {
+      if (hoursIntoFast >= 20) {
+        return [
+          AgentSuggestion(
+            type: 'observation',
+            title: 'Extended fast + exercise risk',
+            message: 'You\'re ${hoursIntoFast.round()}h into a fast and training. '
+                'Fasts >20h suppress muscle protein synthesis by ~40%. '
+                'Consider BCAAs before workout or breaking fast with protein.',
+          ),
+        ];
+      }
+      return [
+        AgentSuggestion(
+          type: 'observation',
+          title: 'Training while fasting',
+          message: 'You\'re ${hoursIntoFast.round()}h fasted. For best results, '
+              'have 20-40g protein within 1h of training. '
+              'Carbs help if workout is intense (>45min).',
+        ),
+      ];
+    }
+    return [];
+  }
+
+  // ── BH4: Seasonal vitamin D urgency ──
+
+  /// Detect seasonal vitamin D risk based on month
+  static Future<List<AgentSuggestion>> _seasonalVitaminD() async {
+    final now = DateTime.now();
+    final month = now.month;
+    // Northern hemisphere winter: Oct-Mar = low UVB, high deficiency risk
+    final isWinterSeason = month >= 10 || month <= 3;
+    if (!isWinterSeason) return [];
+
+    // Check if user takes vitamin D supplement
+    final suppDs = locator<SupplementDataSource>();
+    final allSupps = await suppDs.getAllActive();
+    final hasVitD = allSupps.any((s) {
+      final lower = s.name.toLowerCase();
+      return lower.contains('vitamin d') || lower.contains('vit d') || lower.contains('d3');
+    });
+
+    if (!hasVitD) {
+      return [
+        AgentSuggestion(
+          type: 'observation',
+          title: 'Winter vitamin D risk',
+          message: 'It\'s ${_monthName(month)} — UVB rays are weak and vitamin D synthesis drops. '
+              'Consider supplementing 2,000-4,000 IU D3 daily with a fatty meal.',
+        ),
+      ];
+    }
+
+    // Has D3 but check if taken today
+    final taken = await suppDs.getTakenIdsForDate(now);
+    final vitDSupp = allSupps.firstWhere((s) {
+      final lower = s.name.toLowerCase();
+      return lower.contains('vitamin d') || lower.contains('vit d') || lower.contains('d3');
+    });
+    if (!taken.contains(vitDSupp.id) && now.hour >= 12) {
+      return [
+        AgentSuggestion(
+          type: 'observation',
+          title: 'Take your vitamin D',
+          message: 'Winter months need consistent D3. You haven\'t taken yours yet today — take with your next fatty meal.',
+        ),
+      ];
+    }
+
+    return [];
+  }
+
+  static String _monthName(int month) {
+    const names = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return names[month - 1];
+  }
+
+  // ── BH7: Sleep architecture integration ──
+
+  /// Analyze sleep architecture quality (deep/REM balance)
+  static Future<List<AgentSuggestion>> _sleepArchitectureAnalysis() async {
+    final sleepDs = locator<SleepDataSource>();
+    final records = await sleepDs.getRecords(limit: 7);
+    if (records.length < 3) return [];
+
+    // Average deep and REM percentages
+    double totalDeepPct = 0;
+    double totalRemPct = 0;
+    int counted = 0;
+
+    for (final s in records) {
+      final totalMin = s.durationHours * 60;
+      if (totalMin <= 0 || s.deepSleepMin == null) continue;
+      totalDeepPct += (s.deepSleepMin! / totalMin) * 100;
+      totalRemPct += (s.remSleepMin ?? 0) / totalMin * 100;
+      counted++;
+    }
+
+    if (counted < 3) return [];
+
+    final avgDeep = totalDeepPct / counted;
+    final avgRem = totalRemPct / counted;
+
+    // Deep sleep should be 15-25% (restorative)
+    if (avgDeep < 12) {
+      return [
+        AgentSuggestion(
+          type: 'observation',
+          title: 'Low deep sleep (${avgDeep.round()}%)',
+          message: 'Deep sleep is below optimal (15-25%). '
+              'Try: exercise earlier, reduce alcohol, magnesium before bed, cool bedroom (65-68°F).',
+        ),
+      ];
+    }
+
+    // REM should be 20-25% (cognitive recovery)
+    if (avgRem < 15 && avgRem > 0) {
+      return [
+        AgentSuggestion(
+          type: 'observation',
+          title: 'Low REM sleep (${avgRem.round()}%)',
+          message: 'REM sleep supports memory and mood. '
+              'Low REM can be caused by: alcohol, THC, antidepressants, or irregular schedule.',
+        ),
+      ];
+    }
+
+    return [];
+  }
+
+  // ── BH8: Gut-brain axis (UPF → mood next day) ──
+
+  /// Detect if high UPF intake yesterday correlates with low mood/energy today
+  static Future<List<AgentSuggestion>> _gutBrainCorrelation() async {
+    final now = DateTime.now();
+    if (now.hour < 10) return []; // wait until morning mood is logged
+
+    // Check yesterday's gut health
+    final getIntake = locator<GetIntakeUsecase>();
+    final yesterday = now.subtract(const Duration(days: 1));
+    final yesterdayIntakes = [
+      ...await getIntake.getBreakfastIntakeByDay(yesterday),
+      ...await getIntake.getLunchIntakeByDay(yesterday),
+      ...await getIntake.getDinnerIntakeByDay(yesterday),
+      ...await getIntake.getSnackIntakeByDay(yesterday),
+    ];
+
+    if (yesterdayIntakes.isEmpty) return [];
+
+    // Count UPF items (items with many additives)
+    int upfCount = 0;
+    for (final intake in yesterdayIntakes) {
+      final additives = intake.meal.additivesTags;
+      if (additives != null && additives.length > 3) upfCount++;
+    }
+
+    if (upfCount < 2) return []; // need significant UPF intake
+
+    // Check today's mood/energy
+    final symptomDs = locator<SymptomDataSource>();
+    final today = DateTime(now.year, now.month, now.day);
+    final tomorrow = today.add(const Duration(days: 1));
+    final todaySymptoms = await symptomDs.getLogsByDateRange(today, tomorrow);
+    final energyLogs = todaySymptoms.where((s) => s.symptom == 3); // energy_crash
+    final moodLogs = todaySymptoms.where((s) => s.symptom == 8); // mood_low
+
+    final lowEnergy = energyLogs.isNotEmpty && energyLogs.first.severity >= 3;
+    final lowMood = moodLogs.isNotEmpty && moodLogs.first.severity >= 3;
+
+    if (lowEnergy || lowMood) {
+      return [
+        AgentSuggestion(
+          type: 'observation',
+          title: 'Yesterday\'s food affecting today?',
+          message: 'You had $upfCount ultra-processed items yesterday and '
+              '${lowMood ? "low mood" : "low energy"} today. '
+              'Research links UPF to gut inflammation → brain fog via the gut-brain axis. '
+              'Try whole foods today.',
+        ),
+      ];
+    }
+
+    return [];
   }
 
   // ── Meal timing inference ──
