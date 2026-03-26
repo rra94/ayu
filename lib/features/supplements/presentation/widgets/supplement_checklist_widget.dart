@@ -107,7 +107,10 @@ class _SupplementChecklistWidgetState extends State<SupplementChecklistWidget> {
             const Divider(),
             ..._supplements.map((supp) {
               final taken = _takenIds.contains(supp.id);
-              return InkWell(
+              return Semantics(
+                label: '${supp.name} ${supp.dosage}${supp.unit}. ${taken ? "Taken" : "Not taken"}. Tap to toggle.',
+                button: true,
+                child: InkWell(
                 onTap: () async {
                   try {
                   final nowTaken = !taken;
@@ -173,6 +176,7 @@ class _SupplementChecklistWidgetState extends State<SupplementChecklistWidget> {
                     ],
                   ),
                 ),
+              ),
               );
               // Original onChanged code removed — now handled in InkWell.onTap above
               // This is a workaround for CheckboxListTile not receiving taps

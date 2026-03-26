@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/semantics.dart';
 import 'package:opennutritracker/core/db/entities/gut_health_item_ob.dart';
 
 class _ManualItem {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logging/logging.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
@@ -33,6 +34,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
   String? _scannedBarcode;
   Rect? _detectedBarcodeRect;
   bool _dialogShowing = false;
+  bool _barcodeAnnounced = false;
   late IntakeTypeEntity _intakeTypeEntity;
   late DateTime _day;
 
@@ -243,6 +245,10 @@ class _ScannerScreenState extends State<ScannerScreen> {
                     }
                     _scannedBarcode = barcodeResult;
                     log.fine('Barcode found: $barcodeResult');
+                    if (!_barcodeAnnounced) {
+                      _barcodeAnnounced = true;
+                      SemanticsService.sendAnnouncement(View.of(context), 'Barcode detected', TextDirection.ltr);
+                    }
                     _scannerBloc
                         .add(ScannerLoadProductEvent(barcode: barcodeResult));
                   }

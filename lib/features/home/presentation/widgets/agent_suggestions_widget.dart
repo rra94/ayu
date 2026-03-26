@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:opennutritracker/core/services/agent_service.dart';
 import 'package:opennutritracker/core/styles/color_schemes.dart';
 
@@ -63,9 +64,14 @@ class _AgentSuggestionsWidgetState extends State<AgentSuggestionsWidget> {
     return Column(
       children: visible.map((s) {
         final dismissKey = '${s.type}_${s.title}';
-        return Dismissible(
+        return Semantics(
+          label: 'Suggestion: ${s.title}. ${s.message}. Swipe to dismiss.',
+          child: Dismissible(
           key: ValueKey(dismissKey),
-          onDismissed: (_) => setState(() => _dismissed[dismissKey] = DateTime.now()),
+          onDismissed: (_) {
+            setState(() => _dismissed[dismissKey] = DateTime.now());
+            SemanticsService.sendAnnouncement(View.of(context), 'Dismissed: ${s.title}', TextDirection.ltr);
+          },
           child: Card(
             color: gold.withValues(alpha: 0.08),
             child: Padding(
@@ -96,6 +102,7 @@ class _AgentSuggestionsWidgetState extends State<AgentSuggestionsWidget> {
               ),
             ),
           ),
+        ),
         );
       }).toList(),
     );

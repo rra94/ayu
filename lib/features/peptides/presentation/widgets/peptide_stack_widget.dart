@@ -121,7 +121,10 @@ class _PeptideStackWidgetState extends State<PeptideStackWidget> {
 
     final dimmed = !isDoseDay;
 
-    return GestureDetector(
+    return Semantics(
+      label: '${p.name} ${p.doseMcg.round()}mcg. ${logged ? "Logged today" : "Not logged"}. Tap to log injection.',
+      button: true,
+      child: GestureDetector(
       onLongPress: () => showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
@@ -200,24 +203,33 @@ class _PeptideStackWidgetState extends State<PeptideStackWidget> {
             // Cycle badge
             _buildCycleBadge(cycleText, isResting, goldColor, theme),
             // Edit button
-            IconButton(
-              icon: Icon(Icons.edit_outlined, size: 18, color: goldColor),
-              tooltip: 'Edit Peptide',
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
-              onPressed: () => _showPeptideDialog(context, existing: p),
+            Semantics(
+              label: 'Edit ${p.name}',
+              button: true,
+              child: IconButton(
+                icon: Icon(Icons.edit_outlined, size: 18, color: goldColor),
+                tooltip: 'Edit Peptide',
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+                onPressed: () => _showPeptideDialog(context, existing: p),
+              ),
             ),
             // Site map button
-            IconButton(
-              icon: Icon(Icons.map_outlined, size: 18, color: goldColor),
-              tooltip: 'Site Map',
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
-              onPressed: () => showInjectionSiteSheet(context, p.id),
+            Semantics(
+              label: 'View injection sites for ${p.name}',
+              button: true,
+              child: IconButton(
+                icon: Icon(Icons.map_outlined, size: 18, color: goldColor),
+                tooltip: 'Site Map',
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+                onPressed: () => showInjectionSiteSheet(context, p.id),
+              ),
             ),
           ],
         ),
       ),
+    ),
     );
   }
 

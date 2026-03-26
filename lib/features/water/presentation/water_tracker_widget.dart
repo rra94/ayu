@@ -103,8 +103,17 @@ class WaterTrackerWidget extends StatelessWidget {
               final value = double.tryParse(controller.text);
               if (value != null && value > 0) {
                 onAddWater(value);
+                Navigator.of(ctx).pop();
+                ScaffoldMessenger.of(context).clearSnackBars();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Added ${value.round()} ml of water'),
+                    duration: const Duration(seconds: 3),
+                  ),
+                );
+              } else {
+                Navigator.of(ctx).pop();
               }
-              Navigator.of(ctx).pop();
             },
             child: const Text('Add'),
           ),
@@ -126,7 +135,7 @@ class _QuickAddButton extends StatelessWidget {
       child: OutlinedButton(
         onPressed: onTap,
         style: OutlinedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(vertical: 8),
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         ),
         child: Text(label, style: const TextStyle(fontSize: 13)),
       ),
