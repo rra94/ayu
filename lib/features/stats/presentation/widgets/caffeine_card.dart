@@ -65,7 +65,7 @@ class _CaffeineCardState extends State<CaffeineCard> {
                             ? 'Over 400mg daily limit'
                             : 'Cut off caffeine 8-10h before bed',
                         style: theme.textTheme.labelSmall?.copyWith(
-                          fontSize: 9,
+                          fontSize: 12,
                           color: _todayMg > 400 ? Colors.red : theme.colorScheme.primary,
                           fontStyle: FontStyle.italic,
                         ),

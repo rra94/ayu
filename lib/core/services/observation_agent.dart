@@ -82,6 +82,7 @@ class ObservationAgent {
     try { observations.addAll(await _seasonalVitaminD()); } catch (_) {}
     try { observations.addAll(await _sleepArchitectureAnalysis()); } catch (_) {}
     try { observations.addAll(await _gutBrainCorrelation()); } catch (_) {}
+    try { observations.addAll(await _supplementMealTimingConflict()); } catch (_) {}
 
     _log.info('ObservationAgent found ${observations.length} cross-domain insights, context: ${ctx.observationTypes}');
     return observations;
@@ -786,6 +787,36 @@ class ObservationAgent {
     }
 
     return [];
+  }
+
+  // ── Supplement-meal timing conflict ──
+
+  /// Detect if iron supplement was taken same day as caffeine (timing conflict)
+  static Future<List<AgentSuggestion>> _supplementMealTimingConflict() async {
+    final suppDs = locator<SupplementDataSource>();
+    final caffeineDs = locator<CaffeineDataSource>();
+    final now = DateTime.now();
+
+    // Check if iron supplement taken today
+    final allSupps = await suppDs.getAllActive();
+    final takenToday = await suppDs.getTakenIdsForDate(now);
+    final ironTaken = allSupps.any((s) =>
+        takenToday.contains(s.id) && s.name.toLowerCase().contains('iron'));
+
+    if (!ironTaken) return [];
+
+    // Check if caffeine logged today
+    final caffeineMg = await caffeineDs.getTodayTotal();
+    if (caffeineMg <= 0) return [];
+
+    return [
+      AgentSuggestion(
+        type: 'observation',
+        title: 'Iron + caffeine today',
+        message: 'You took iron and had ${caffeineMg.round()}mg caffeine today. '
+            'Caffeine reduces iron absorption by 60-90%. Space them 2+ hours apart.',
+      ),
+    ];
   }
 
   // ── Meal timing inference ──

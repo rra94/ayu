@@ -204,7 +204,7 @@ class _WeightChartCardState extends State<WeightChartCard> {
                 if (idx < 0 || idx >= _records.length) return const SizedBox();
                 return Text(
                   DateFormat('d/M').format(_records[idx].dateTime),
-                  style: theme.textTheme.labelSmall?.copyWith(fontSize: 9),
+                  style: theme.textTheme.labelSmall?.copyWith(fontSize: 12),
                 );
               },
             ),
@@ -249,7 +249,7 @@ class _WeightChartCardState extends State<WeightChartCard> {
                     alignment: Alignment.topRight,
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: Colors.green,
-                      fontSize: 10,
+                      fontSize: 12,
                     ),
                     labelResolver: (_) => 'Target',
                   ),

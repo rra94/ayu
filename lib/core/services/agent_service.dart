@@ -21,6 +21,7 @@ import 'package:opennutritracker/core/services/observation_agent.dart';
 import 'package:opennutritracker/core/domain/usecase/get_user_usecase.dart';
 import 'package:opennutritracker/core/utils/calc/optimal_range_calc.dart';
 import 'package:opennutritracker/core/domain/usecase/get_intake_usecase.dart';
+import 'package:opennutritracker/core/services/health_condition_service.dart';
 import 'package:opennutritracker/core/services/nutrient_recommendation_service.dart';
 import 'package:opennutritracker/core/utils/locator.dart';
 
@@ -117,6 +118,8 @@ class AgentService {
     try { suggestions.addAll(await _ecoScoreAgent(ctx).timeout(const Duration(seconds: 5))); } catch (e) { debugPrint('ecoScoreAgent: $e'); }
     try { suggestions.addAll(await _calendarAgent().timeout(const Duration(seconds: 5))); } catch (e) { debugPrint('calendarAgent: $e'); }
     try { suggestions.addAll(await _missedDaysAgent(ctx).timeout(const Duration(seconds: 5))); } catch (e) { debugPrint('missedDaysAgent: $e'); }
+    try { suggestions.addAll(await _workoutProteinAgent(ctx).timeout(const Duration(seconds: 5))); } catch (e) { debugPrint('workoutProteinAgent: $e'); }
+    try { suggestions.addAll(await _diabetesNutritionAgent(ctx).timeout(const Duration(seconds: 5))); } catch (e) { debugPrint('diabetesNutritionAgent: $e'); }
 
     // Phase 3: Data Collection Agent — sends targeted notification for missing data
     try { await DataCollectionAgent.sendDataRequest(ctx).timeout(const Duration(seconds: 5)); } catch (e) { debugPrint('dataCollectionAgent: $e'); }
@@ -127,7 +130,9 @@ class AgentService {
       'observation': 1,
       'calendar': 2,
       'circadian': 3,
+      'workout_nutrition': 3,
       'supplement_timing': 4,
+      'diabetes_nutrition': 4,
       'nutrient_gap': 5,
       'peptide_reminder': 6,
       'supplement_reminder': 7,
@@ -625,14 +630,20 @@ class AgentService {
       daysBack = d;
     }
 
-    if (daysBack >= 2) {
-      return [
-        AgentSuggestion(
+    if (daysBack >= 1) {
+      if (daysBack == 1) {
+        return [AgentSuggestion(
+          type: 'missed_days',
+          title: 'Skipped yesterday',
+          message: 'No meals logged yesterday. Every day counts — start fresh today!',
+        )];
+      } else {
+        return [AgentSuggestion(
           type: 'missed_days',
           title: 'Welcome back!',
-          message: 'You haven\'t logged in $daysBack days. Start fresh today \u2014 every day counts.',
-        ),
-      ];
+          message: 'You haven\'t logged in $daysBack days. Start fresh today — every day counts.',
+        )];
+      }
     }
     return [];
   }
@@ -785,6 +796,106 @@ class AgentService {
           ];
         }
       }
+    }
+
+    return [];
+  }
+
+  // ── Workout Protein Agent ──
+
+  /// Pre/post-workout protein window reminders on gym days.
+  static Future<List<AgentSuggestion>> _workoutProteinAgent(AgentContext ctx) async {
+    // Check if gym today (from calendar or location)
+    final hasGymToday = await CalendarService.hasExerciseToday();
+    final visitDs = locator<LocationVisitDataSource>();
+    final gymVisits = await visitDs.getVisitsByLabel('gym', days: 1);
+    final gymToday = hasGymToday || gymVisits.any((v) =>
+        v.arrivalTime.isAfter(DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day)));
+
+    if (!gymToday) return [];
+
+    final now = DateTime.now();
+    final hour = now.hour;
+
+    // Pre-workout: 1-2h before typical gym time, suggest carbs+protein
+    if (hour >= 6 && hour <= 10 && ctx.todayIntakes.isEmpty) {
+      return [
+        AgentSuggestion(
+          type: 'workout_nutrition',
+          title: 'Pre-workout fuel',
+          message: 'Gym day — have 20-40g protein + carbs 1-2h before training for better performance.',
+        ),
+      ];
+    }
+
+    // Post-workout: within 2h after gym visit, check if protein logged
+    if (gymVisits.isNotEmpty) {
+      final lastGym = gymVisits.first;
+      final hoursSinceGym = now.difference(lastGym.arrivalTime).inMinutes / 60;
+      if (hoursSinceGym > 0.5 && hoursSinceGym < 2) {
+        final proteinSinceGym = ctx.todayIntakes
+            .where((i) => i.dateTime.isAfter(lastGym.arrivalTime))
+            .fold<double>(0, (s, i) => s + i.totalProteinsGram);
+        if (proteinSinceGym < 20) {
+          return [
+            AgentSuggestion(
+              type: 'workout_nutrition',
+              title: 'Post-workout protein window',
+              message: 'You trained ${hoursSinceGym.toStringAsFixed(1)}h ago — have 20-40g protein within 2h for optimal recovery.',
+            ),
+          ];
+        }
+      }
+    }
+
+    return [];
+  }
+
+  // ── Diabetes Nutrition Agent ──
+
+  /// Glucose management and fiber reminders for users with diabetes.
+  static Future<List<AgentSuggestion>> _diabetesNutritionAgent(AgentContext ctx) async {
+    // Only for users with diabetes condition
+    final conditions = HealthConditionService.getUserConditions();
+    final hasDiabetes = conditions.any((c) => c.toLowerCase().contains('diabetes'));
+    if (!hasDiabetes) return [];
+
+    final now = DateTime.now();
+    if (now.hour < 12 || ctx.todayIntakes.isEmpty) return [];
+
+    // Check today's carbs
+    final totalCarbs = ctx.todayCarbs;
+    final totalFiber = ctx.todayIntakes.fold<double>(0, (s, i) {
+      final fiber = i.meal.nutriments.fiber100;
+      return s + (fiber != null ? i.amount * fiber / 100 : 0);
+    });
+
+    // High carbs + low fiber = glucose spike risk
+    if (totalCarbs > 150 && totalFiber < 15) {
+      return [
+        AgentSuggestion(
+          type: 'diabetes_nutrition',
+          title: 'Glucose management',
+          message: 'Carbs are ${totalCarbs.round()}g with only ${totalFiber.round()}g fiber. '
+              'Add fiber-rich foods (beans, vegetables) to slow glucose absorption.',
+        ),
+      ];
+    }
+
+    // Suggest if no vegetables logged
+    final hasVegetables = ctx.todayIntakes.any((i) {
+      final name = i.meal.name?.toLowerCase() ?? '';
+      return name.contains('salad') || name.contains('broccoli') || name.contains('spinach') ||
+          name.contains('vegetable') || name.contains('kale');
+    });
+    if (!hasVegetables && now.hour >= 14) {
+      return [
+        AgentSuggestion(
+          type: 'diabetes_nutrition',
+          title: 'Add vegetables',
+          message: 'No vegetables logged today. Fiber from vegetables helps stabilize blood glucose.',
+        ),
+      ];
     }
 
     return [];

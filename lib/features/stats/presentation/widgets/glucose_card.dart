@@ -222,7 +222,7 @@ class _GlucoseCardState extends State<GlucoseCard> {
                 final d = _records[idx].dateTime;
                 return Text(
                   '${d.month}/${d.day}',
-                  style: const TextStyle(fontSize: 9),
+                  style: const TextStyle(fontSize: 12),
                 );
               },
             ),
@@ -235,7 +235,7 @@ class _GlucoseCardState extends State<GlucoseCard> {
   }
 
   Widget _buildLegend(ThemeData theme) {
-    final labelStyle = theme.textTheme.labelSmall?.copyWith(fontSize: 9);
+    final labelStyle = theme.textTheme.labelSmall?.copyWith(fontSize: 12);
     if (_hasDiabetes) {
       return Row(
         mainAxisSize: MainAxisSize.min,

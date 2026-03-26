@@ -182,7 +182,7 @@ class _NutrientIntelligenceCardState extends State<NutrientIntelligenceCard> {
             padding: const EdgeInsets.only(left: 74),
             child: Text(
               '${a.absorbedMg.toStringAsFixed(1)} of ${a.consumedMg.toStringAsFixed(1)} absorbed',
-              style: theme.textTheme.labelSmall?.copyWith(fontSize: 9,
+              style: theme.textTheme.labelSmall?.copyWith(fontSize: 12,
                   color: theme.colorScheme.onSurfaceVariant),
             ),
           ),
@@ -194,7 +194,7 @@ class _NutrientIntelligenceCardState extends State<NutrientIntelligenceCard> {
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: theme.colorScheme.primary,
                   fontStyle: FontStyle.italic,
-                  fontSize: 10,
+                  fontSize: 12,
                 ),
               ),
             ),
@@ -206,10 +206,10 @@ class _NutrientIntelligenceCardState extends State<NutrientIntelligenceCard> {
                 children: [
                   ...a.enhancers.map((e) => Text('+$e',
                       style: TextStyle(
-                          fontSize: 9, color: Colors.green[700]))),
+                          fontSize: 12, color: Colors.green[700]))),
                   ...a.inhibitors.map((i) => Text('-$i',
                       style: TextStyle(
-                          fontSize: 9, color: Colors.red[400]))),
+                          fontSize: 12, color: Colors.red[400]))),
                 ],
               ),
             ),
@@ -252,7 +252,7 @@ class _NutrientIntelligenceCardState extends State<NutrientIntelligenceCard> {
                       '${s.bioavailableMg.toStringAsFixed(1)} absorbed',
                       style: theme.textTheme.labelSmall?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
-                        fontSize: 9,
+                        fontSize: 12,
                       ),
                     ),
                   ],
@@ -266,7 +266,7 @@ class _NutrientIntelligenceCardState extends State<NutrientIntelligenceCard> {
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: theme.colorScheme.primary,
                   fontStyle: FontStyle.italic,
-                  fontSize: 10,
+                  fontSize: 12,
                 ),
               ),
             ),

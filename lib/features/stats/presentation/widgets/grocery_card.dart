@@ -65,7 +65,7 @@ class _GroceryCardState extends State<GroceryCard> {
                     ),
                     child: Text('${_expiring.length} expiring',
                         style: const TextStyle(
-                            fontSize: 10, color: Colors.orange,
+                            fontSize: 12, color: Colors.orange,
                             fontWeight: FontWeight.w600)),
                   ),
                 ],
@@ -114,7 +114,7 @@ class _GroceryCardState extends State<GroceryCard> {
             Text('${daysLeft}d left',
                 style: theme.textTheme.labelSmall?.copyWith(
                     color: daysLeft <= 2 ? Colors.orange : null,
-                    fontSize: 9)),
+                    fontSize: 12)),
         ],
       ),
     );

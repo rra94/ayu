@@ -142,7 +142,7 @@ class _LongevityScoreCardState extends State<LongevityScoreCard> {
             width: 60,
             child: Text(
               subScore.detail as String,
-              style: theme.textTheme.labelSmall?.copyWith(fontSize: 9),
+              style: theme.textTheme.labelSmall?.copyWith(fontSize: 12),
               textAlign: TextAlign.right,
               overflow: TextOverflow.ellipsis,
             ),

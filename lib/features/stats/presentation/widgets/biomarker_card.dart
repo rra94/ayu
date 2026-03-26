@@ -131,10 +131,10 @@ class _BiomarkerCardState extends State<BiomarkerCard> {
             ),
             const SizedBox(height: 4),
             ...stale.take(3).map((s) => Text(s,
-                style: theme.textTheme.labelSmall?.copyWith(fontSize: 10))),
+                style: theme.textTheme.labelSmall?.copyWith(fontSize: 12))),
             if (stale.length > 3)
               Text('+${stale.length - 3} more',
-                  style: theme.textTheme.labelSmall?.copyWith(fontSize: 9)),
+                  style: theme.textTheme.labelSmall?.copyWith(fontSize: 12)),
           ],
         ),
       ),
@@ -223,7 +223,7 @@ class _BiomarkerCardState extends State<BiomarkerCard> {
                 label,
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: color,
-                  fontSize: 9,
+                  fontSize: 12,
                 ),
               ),
             ),
@@ -349,7 +349,7 @@ class _BiomarkerCardState extends State<BiomarkerCard> {
                                     style: const TextStyle(fontSize: 13)),
                                 subtitle: Text(
                                   'Optimal: ${def.optimalLow}-${def.optimalHigh}',
-                                  style: const TextStyle(fontSize: 10),
+                                  style: const TextStyle(fontSize: 12),
                                 ),
                               )),
                         ];

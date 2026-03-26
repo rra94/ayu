@@ -76,7 +76,7 @@ class _BioavailabilityCardState extends State<BioavailabilityCard> {
                 'Absorption varies with meal context — enhancers/inhibitors shown above.',
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
-                  fontSize: 10,
+                  fontSize: 12,
                 ),
               ),
             ],
@@ -149,7 +149,7 @@ class _BioavailabilityCardState extends State<BioavailabilityCard> {
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: color,
                     fontWeight: FontWeight.w600,
-                    fontSize: 10,
+                    fontSize: 12,
                   ),
                 ),
               ),
@@ -163,7 +163,7 @@ class _BioavailabilityCardState extends State<BioavailabilityCard> {
                 r.tip!,
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: ayuGoldMuted,
-                  fontSize: 10,
+                  fontSize: 12,
                 ),
               ),
             ),
@@ -196,7 +196,7 @@ class _BioavailabilityCardState extends State<BioavailabilityCard> {
       child: Text(
         text,
         style: theme.textTheme.labelSmall
-            ?.copyWith(color: color, fontSize: 9),
+            ?.copyWith(color: color, fontSize: 12),
       ),
     );
   }

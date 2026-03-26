@@ -68,7 +68,7 @@ class _BioAgeCardState extends State<BioAgeCard> {
                             color: theme.colorScheme.onSurfaceVariant,
                           )),
                       const Text('Experimental — based on limited markers',
-                          style: TextStyle(fontSize: 10, color: Colors.orange, fontStyle: FontStyle.italic)),
+                          style: TextStyle(fontSize: 12, color: Colors.orange, fontStyle: FontStyle.italic)),
                     ],
                   ),
                 ),
@@ -114,7 +114,7 @@ class _BioAgeCardState extends State<BioAgeCard> {
               textAlign: TextAlign.center,
               style: theme.textTheme.labelSmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
-                fontSize: 10,
+                fontSize: 12,
               ),
             ),
           ],

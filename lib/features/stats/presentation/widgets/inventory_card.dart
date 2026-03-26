@@ -62,7 +62,7 @@ class _InventoryCardState extends State<InventoryCard> {
                     ),
                     child: Text('${lowStock.length} low',
                         style: const TextStyle(
-                            fontSize: 10,
+                            fontSize: 12,
                             color: Colors.orange,
                             fontWeight: FontWeight.w600)),
                   ),
@@ -101,7 +101,7 @@ class _InventoryCardState extends State<InventoryCard> {
                   '${p.brand ?? ''} · ${p.usesRemaining}/${p.totalUses} left'
                   '${p.estimatedDaysLeft != null ? ' · ~${p.estimatedDaysLeft}d' : ''}',
                   style: theme.textTheme.labelSmall?.copyWith(
-                      color: color, fontSize: 9),
+                      color: color, fontSize: 12),
                 ),
               ],
             ),
