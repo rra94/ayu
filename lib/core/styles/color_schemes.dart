@@ -42,6 +42,52 @@ const lightColorScheme = ColorScheme(
   scrim: Color(0xFF000000),
 );
 
+// ── Semantic status colors ──
+// These adapt to light/dark but keep semantic meaning (green=good, red=bad, etc.)
+extension AyuSemanticColors on ColorScheme {
+  // Status
+  Color get success => brightness == Brightness.light
+      ? const Color(0xFF2E7D32) : const Color(0xFF81C784);
+  Color get successContainer => brightness == Brightness.light
+      ? const Color(0xFFE8F5E9) : const Color(0xFF1B5E20);
+  Color get warning => brightness == Brightness.light
+      ? const Color(0xFFE65100) : const Color(0xFFFFB74D);
+  Color get warningContainer => brightness == Brightness.light
+      ? const Color(0xFFFFF3E0) : const Color(0xFF4E2600);
+  Color get caution => brightness == Brightness.light
+      ? const Color(0xFFF9A825) : const Color(0xFFFFD54F);
+
+  // Charts & data
+  Color get chartGreen => brightness == Brightness.light
+      ? const Color(0xFF43A047) : const Color(0xFF81C784);
+  Color get chartOrange => brightness == Brightness.light
+      ? const Color(0xFFEF6C00) : const Color(0xFFFFB74D);
+  Color get chartRed => brightness == Brightness.light
+      ? const Color(0xFFD32F2F) : const Color(0xFFEF9A9A);
+  Color get chartPurple => brightness == Brightness.light
+      ? const Color(0xFF7B1FA2) : const Color(0xFFCE93D8);
+  Color get chartBrown => brightness == Brightness.light
+      ? const Color(0xFF5D4037) : const Color(0xFFBCAAA4);
+  Color get chartAmber => brightness == Brightness.light
+      ? const Color(0xFFFFA000) : const Color(0xFFFFD54F);
+  Color get chartBlue => brightness == Brightness.light
+      ? const Color(0xFF1565C0) : const Color(0xFF90CAF9);
+  Color get chartTeal => brightness == Brightness.light
+      ? const Color(0xFF00796B) : const Color(0xFF80CBC4);
+  Color get chartDeepOrange => brightness == Brightness.light
+      ? const Color(0xFFBF360C) : const Color(0xFFFF8A65);
+  Color get chartPink => brightness == Brightness.light
+      ? const Color(0xFFC2185B) : const Color(0xFFF48FB1);
+  Color get chartCyan => brightness == Brightness.light
+      ? const Color(0xFF00838F) : const Color(0xFF80DEEA);
+  Color get chartIndigo => brightness == Brightness.light
+      ? const Color(0xFF283593) : const Color(0xFF9FA8DA);
+  Color get chartGrey => brightness == Brightness.light
+      ? const Color(0xFF616161) : const Color(0xFFBDBDBD);
+  Color get chartDeepPurple => brightness == Brightness.light
+      ? const Color(0xFF512DA8) : const Color(0xFFB39DDB);
+}
+
 const darkColorScheme = ColorScheme(
   brightness: Brightness.dark,
   primary: Color(0xFFA8C8F0),

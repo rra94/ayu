@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:opennutritracker/core/db/data_sources/supplement_data_source.dart';
 import 'package:opennutritracker/core/db/entities/supplement_ob.dart';
 import 'package:opennutritracker/core/services/intent_donation_service.dart';
+import 'package:opennutritracker/core/styles/color_schemes.dart';
 import 'package:opennutritracker/core/utils/locator.dart';
+import 'package:opennutritracker/generated/l10n.dart';
 
 class SupplementChecklistWidget extends StatefulWidget {
   const SupplementChecklistWidget({super.key});
@@ -74,7 +76,7 @@ class _SupplementChecklistWidgetState extends State<SupplementChecklistWidget> {
                 Icon(Icons.medication_outlined,
                     color: theme.colorScheme.primary),
                 const SizedBox(width: 8),
-                Text('Supplements',
+                Text(S.of(context).supplementsLabel,
                     style: theme.textTheme.titleMedium
                         ?.copyWith(fontWeight: FontWeight.w600)),
                 const SizedBox(width: 8),
@@ -83,7 +85,7 @@ class _SupplementChecklistWidgetState extends State<SupplementChecklistWidget> {
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                   decoration: BoxDecoration(
                     color: takenCount == totalCount
-                        ? Colors.green.withValues(alpha: 0.2)
+                        ? theme.colorScheme.success.withValues(alpha: 0.2)
                         : theme.colorScheme.primaryContainer,
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -92,14 +94,14 @@ class _SupplementChecklistWidgetState extends State<SupplementChecklistWidget> {
                     style: theme.textTheme.labelSmall?.copyWith(
                       fontWeight: FontWeight.w600,
                       color: takenCount == totalCount
-                          ? Colors.green
+                          ? theme.colorScheme.success
                           : theme.colorScheme.onPrimaryContainer,
                     ),
                   ),
                 ),
                 const Spacer(),
                 IconButton(
-                  icon: const Icon(Icons.add, size: 20),
+                  icon: const Icon(Icons.add),
                   onPressed: () => _showAddDialog(context),
                 ),
               ],
@@ -119,6 +121,7 @@ class _SupplementChecklistWidgetState extends State<SupplementChecklistWidget> {
                   if (nowTaken) {
                     IntentDonationService.donateTakeSupplements();
                   }
+                  if (!mounted) return;
                   _scheduleReload();
                   if (context.mounted) {
                     // Don't clear previous snackbars — let them queue naturally
@@ -128,7 +131,7 @@ class _SupplementChecklistWidgetState extends State<SupplementChecklistWidget> {
                             '${supp.name} marked as ${nowTaken ? "taken" : "skipped"}'),
                         duration: const Duration(seconds: 10),
                         action: SnackBarAction(
-                          label: 'Undo',
+                          label: S.of(context).undoLabel,
                           onPressed: () async {
                             await ds.toggleLog(
                                 supp.id, DateTime.now(), !nowTaken);
@@ -203,13 +206,13 @@ class _SupplementChecklistWidgetState extends State<SupplementChecklistWidget> {
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setDialogState) => AlertDialog(
-          title: const Text('Add Supplement'),
+          title: Text(S.of(context).addSupplementTitle),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: nameCtrl,
-                decoration: const InputDecoration(labelText: 'Name'),
+                decoration: InputDecoration(labelText: S.of(context).nameLabel),
                 autofocus: true,
               ),
               Row(
@@ -219,7 +222,7 @@ class _SupplementChecklistWidgetState extends State<SupplementChecklistWidget> {
                       controller: dosageCtrl,
                       keyboardType: const TextInputType.numberWithOptions(
                           decimal: true),
-                      decoration: const InputDecoration(labelText: 'Dosage'),
+                      decoration: InputDecoration(labelText: S.of(context).dosageLabel),
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -247,14 +250,15 @@ class _SupplementChecklistWidgetState extends State<SupplementChecklistWidget> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(ctx).pop(),
-              child: const Text('Cancel'),
+              child: Text(S.of(context).cancelLabel),
             ),
             FilledButton(
               onPressed: () async {
-                if (nameCtrl.text.isNotEmpty) {
+                final name = nameCtrl.text.trim();
+                if (name.isNotEmpty) {
                   final ds = locator<SupplementDataSource>();
                   await ds.addSupplement(SupplementOB(
-                    name: nameCtrl.text,
+                    name: name,
                     dosage: dosageCtrl.text.isEmpty ? '1' : dosageCtrl.text,
                     unit: unit,
                     category: category,
@@ -263,11 +267,14 @@ class _SupplementChecklistWidgetState extends State<SupplementChecklistWidget> {
                   _load();
                 }
               },
-              child: const Text('Add'),
+              child: Text(S.of(context).addLabel),
             ),
           ],
         ),
       ),
-    );
+    ).then((_) {
+      nameCtrl.dispose();
+      dosageCtrl.dispose();
+    });
   }
 }

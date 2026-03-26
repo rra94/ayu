@@ -51,7 +51,7 @@ class _DexaCardState extends State<DexaCard> {
                         ?.copyWith(fontWeight: FontWeight.w600)),
                 const Spacer(),
                 IconButton(
-                  icon: const Icon(Icons.add, size: 20),
+                  icon: const Icon(Icons.add),
                   onPressed: () => _showAddDialog(context),
                   tooltip: 'Add DEXA scan',
                 ),

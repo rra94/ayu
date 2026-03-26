@@ -29,9 +29,9 @@ class BarometerService {
       now.subtract(const Duration(hours: 6)), now,
     );
     if (readings.length < 2) return 'stable';
-    final first = readings.last.pressureKPa;
-    final last = readings.first.pressureKPa;
-    final delta = last - first;
+    final earliest = readings.first.pressureKPa;
+    final latest = readings.last.pressureKPa;
+    final delta = latest - earliest;
     if (delta > 0.3) return 'rising';
     if (delta < -0.3) return 'falling';
     return 'stable';
@@ -44,6 +44,6 @@ class BarometerService {
       now.subtract(window), now,
     );
     if (readings.length < 2) return null;
-    return readings.first.pressureKPa - readings.last.pressureKPa;
+    return readings.last.pressureKPa - readings.first.pressureKPa;
   }
 }

@@ -207,7 +207,7 @@ class _IntakeVerticalListState extends State<IntakeVerticalList> {
                             color: Theme.of(context).colorScheme.error),
                       ),
                       child: IntakeCard(
-                        key: ValueKey(intakeEntity.meal.code),
+                        key: ValueKey(intakeEntity.id),
                         intake: intakeEntity,
                         onItemLongPressed: widget.onItemLongPressedCallback,
                         onItemTapped: widget.onItemTappedCallback,

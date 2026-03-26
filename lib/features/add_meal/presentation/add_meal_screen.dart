@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:opennutritracker/core/styles/color_schemes.dart';
 import 'package:opennutritracker/core/presentation/widgets/error_dialog.dart';
 import 'package:opennutritracker/core/utils/locator.dart';
 import 'package:opennutritracker/core/utils/navigation_options.dart';
@@ -71,7 +72,7 @@ class _AddMealScreenState extends State<AddMealScreen>
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Add Food'),
+          title: Text(S.of(context).addFoodLabel),
           actions: [
             BlocBuilder<AddMealBloc, AddMealState>(
               bloc: locator<AddMealBloc>()..add(InitializeAddMealEvent()),
@@ -100,7 +101,7 @@ class _AddMealScreenState extends State<AddMealScreen>
               const SizedBox(height: 16.0),
               TabBar(
                   tabs: [
-                    const Tab(text: 'Favorites'),
+                    Tab(text: S.of(context).favoritesLabel),
                     Tab(text: S.of(context).searchProductsPage),
                     Tab(text: S.of(context).searchFoodPage),
                     Tab(text: S.of(context).recentlyAddedLabel)
@@ -137,13 +138,13 @@ class _AddMealScreenState extends State<AddMealScreen>
                                         if (state.isOfflineResults)
                                           Container(
                                             padding: const EdgeInsets.all(8),
-                                            color: Colors.orange.withValues(alpha: 0.1),
-                                            child: const Row(
+                                            color: Theme.of(context).colorScheme.warning.withValues(alpha: 0.1),
+                                            child: Row(
                                               children: [
-                                                Icon(Icons.wifi_off, size: 16, color: Colors.orange),
-                                                SizedBox(width: 8),
-                                                Text('Offline — showing local results only',
-                                                    style: TextStyle(fontSize: 12, color: Colors.orange)),
+                                                Icon(Icons.wifi_off, size: 16, color: Theme.of(context).colorScheme.warning),
+                                                const SizedBox(width: 8),
+                                                Text(S.of(context).offlineLocalResultsOnly,
+                                                    style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.warning)),
                                               ],
                                             ),
                                           ),
@@ -273,7 +274,7 @@ class _AddMealScreenState extends State<AddMealScreen>
     return FutureBuilder(
       future: locator<SearchHistoryDataSource>().getTopOverall(limit: 5),
       builder: (ctx, snap) {
-        if (!snap.hasData || snap.data!.isEmpty) {
+        if (snap.hasError || !snap.hasData || snap.data!.isEmpty) {
           return const DefaultsResultsWidget();
         }
         return Column(
@@ -282,7 +283,7 @@ class _AddMealScreenState extends State<AddMealScreen>
             Padding(
               padding: const EdgeInsets.all(16),
               child: Text(
-                'Recent favorites',
+                S.of(ctx).recentFavoritesLabel,
                 style: Theme.of(ctx).textTheme.titleSmall,
               ),
             ),

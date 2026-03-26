@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:opennutritracker/core/db/data_sources/caffeine_data_source.dart';
 import 'package:opennutritracker/core/db/entities/caffeine_log_ob.dart';
+import 'package:opennutritracker/core/styles/color_schemes.dart';
 import 'package:opennutritracker/core/utils/locator.dart';
+import 'package:opennutritracker/generated/l10n.dart';
 
 class CaffeineCard extends StatefulWidget {
   const CaffeineCard({super.key});
@@ -42,18 +44,18 @@ class _CaffeineCardState extends State<CaffeineCard> {
         padding: const EdgeInsets.all(12),
         child: Row(
           children: [
-            Icon(Icons.coffee, color: Colors.brown, size: 24),
+            Icon(Icons.coffee, color: theme.colorScheme.chartBrown, size: 24),
             const SizedBox(width: 10),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Caffeine',
+                  Text(S.of(context).caffeineLabel,
                       style: theme.textTheme.titleSmall
                           ?.copyWith(fontWeight: FontWeight.w600)),
                   if (!_loading) ...[
                     Text(
-                      '${_todayMg.round()}mg today'
+                      '${S.of(context).caffeineTodayMg(_todayMg.round())}'
                       '${_hoursSinceLast != null ? ' · Last: ${_hoursSinceLast!.toStringAsFixed(1)}h ago' : ''}',
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
@@ -62,11 +64,11 @@ class _CaffeineCardState extends State<CaffeineCard> {
                     if (_hoursSinceLast != null && _hoursSinceLast! < 8)
                       Text(
                         _todayMg > 400
-                            ? 'Over 400mg daily limit'
-                            : 'Cut off caffeine 8-10h before bed',
+                            ? S.of(context).overDailyLimitWarning
+                            : S.of(context).caffeineCutoffTip,
                         style: theme.textTheme.labelSmall?.copyWith(
                           fontSize: 12,
-                          color: _todayMg > 400 ? Colors.red : theme.colorScheme.primary,
+                          color: _todayMg > 400 ? theme.colorScheme.error : theme.colorScheme.primary,
                           fontStyle: FontStyle.italic,
                         ),
                       ),
@@ -75,15 +77,15 @@ class _CaffeineCardState extends State<CaffeineCard> {
               ),
             ),
             IconButton(
-              icon: const Icon(Icons.add, size: 20),
+              icon: const Icon(Icons.add),
               onPressed: () => _showLogDialog(context),
             ),
             if (_todayMg > 0)
               IconButton(
-                icon: Icon(Icons.history, size: 18,
+                icon: Icon(Icons.history,
                     color: theme.colorScheme.onSurfaceVariant),
                 onPressed: () => _showHistoryDialog(context),
-                tooltip: 'View & delete logs',
+                tooltip: S.of(context).viewDeleteLogsTooltip,
               ),
           ],
         ),
@@ -96,14 +98,14 @@ class _CaffeineCardState extends State<CaffeineCard> {
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setDialogState) => AlertDialog(
-          title: const Text('Today\'s Caffeine'),
+          title: Text(S.of(context).todayCaffeineTitle),
           content: SizedBox(
             width: double.maxFinite,
             child: FutureBuilder<List<CaffeineLogOB>>(
               future: locator<CaffeineDataSource>().getTodayLogs(),
               builder: (context, snapshot) {
                 if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return const Text('No logs today');
+                  return Text(S.of(context).noLogsTodayLabel);
                 }
                 return Column(
                   mainAxisSize: MainAxisSize.min,
@@ -129,7 +131,7 @@ class _CaffeineCardState extends State<CaffeineCard> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: const Text('Close'),
+              child: Text(S.of(context).closeLabel),
             ),
             TextButton(
               onPressed: () async {
@@ -137,8 +139,8 @@ class _CaffeineCardState extends State<CaffeineCard> {
                 if (ctx.mounted) Navigator.pop(ctx);
                 _load();
               },
-              style: TextButton.styleFrom(foregroundColor: Colors.red),
-              child: const Text('Clear All'),
+              style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.error),
+              child: Text(S.of(context).clearAllLabel),
             ),
           ],
         ),
@@ -150,7 +152,7 @@ class _CaffeineCardState extends State<CaffeineCard> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Log Caffeine'),
+        title: Text(S.of(context).logCaffeineTitle),
         content: SizedBox(
           width: double.maxFinite,
           child: Column(

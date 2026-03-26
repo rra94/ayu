@@ -1048,7 +1048,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(14, 1034035110825751383),
     name: 'BiomarkerRecordOB',
-    lastPropertyId: const obx_int.IdUid(6, 4387178617261170057),
+    lastPropertyId: const obx_int.IdUid(7, 4298711670153257802),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -1085,6 +1085,12 @@ final _entities = <obx_int.ModelEntity>[
         id: const obx_int.IdUid(6, 4387178617261170057),
         name: 'source',
         type: 6,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(7, 4298711670153257802),
+        name: 'notes',
+        type: 9,
         flags: 0,
       ),
     ],
@@ -3388,13 +3394,17 @@ obx_int.ModelDefinition getObjectBoxModel() {
       objectToFB: (BiomarkerRecordOB object, fb.Builder fbb) {
         final typeOffset = fbb.writeString(object.type);
         final unitOffset = fbb.writeString(object.unit);
-        fbb.startTable(7);
+        final notesOffset = object.notes == null
+            ? null
+            : fbb.writeString(object.notes!);
+        fbb.startTable(8);
         fbb.addInt64(0, object.id);
         fbb.addOffset(1, typeOffset);
         fbb.addFloat64(2, object.value);
         fbb.addOffset(3, unitOffset);
         fbb.addInt64(4, object.dateTime.millisecondsSinceEpoch);
         fbb.addInt64(5, object.source);
+        fbb.addOffset(6, notesOffset);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -3428,6 +3438,9 @@ obx_int.ModelDefinition getObjectBoxModel() {
           14,
           0,
         );
+        final notesParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 16);
         final object = BiomarkerRecordOB(
           id: idParam,
           type: typeParam,
@@ -3435,6 +3448,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           unit: unitParam,
           dateTime: dateTimeParam,
           source: sourceParam,
+          notes: notesParam,
         );
 
         return object;
@@ -5492,6 +5506,11 @@ class BiomarkerRecordOB_ {
   /// See [BiomarkerRecordOB.source].
   static final source = obx.QueryIntegerProperty<BiomarkerRecordOB>(
     _entities[13].properties[5],
+  );
+
+  /// See [BiomarkerRecordOB.notes].
+  static final notes = obx.QueryStringProperty<BiomarkerRecordOB>(
+    _entities[13].properties[6],
   );
 }
 

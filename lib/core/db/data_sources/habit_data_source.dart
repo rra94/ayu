@@ -44,13 +44,12 @@ class HabitDataSource {
   Future<void> toggleHabitLog(
       int habitId, DateTime date, bool completed) async {
     final startOfDay = DateTime(date.year, date.month, date.day);
-    final endOfDay = startOfDay
-        .add(const Duration(days: 1))
-        .subtract(const Duration(milliseconds: 1));
+    final endOfDay = startOfDay.add(const Duration(days: 1));
 
     final query = _habitLogBox
         .query(HabitLogOB_.habitId.equals(habitId).and(
-            HabitLogOB_.dateTime.betweenDate(startOfDay, endOfDay)))
+            HabitLogOB_.dateTime.greaterOrEqualDate(startOfDay)).and(
+            HabitLogOB_.dateTime.lessThanDate(endOfDay)))
         .build();
     final existing = query.findFirst();
     query.close();
@@ -69,12 +68,11 @@ class HabitDataSource {
 
   Future<List<HabitLogOB>> getLogsForDate(DateTime date) async {
     final startOfDay = DateTime(date.year, date.month, date.day);
-    final endOfDay = startOfDay
-        .add(const Duration(days: 1))
-        .subtract(const Duration(milliseconds: 1));
+    final endOfDay = startOfDay.add(const Duration(days: 1));
 
     final query = _habitLogBox
-        .query(HabitLogOB_.dateTime.betweenDate(startOfDay, endOfDay))
+        .query(HabitLogOB_.dateTime.greaterOrEqualDate(startOfDay).and(
+            HabitLogOB_.dateTime.lessThanDate(endOfDay)))
         .build();
     final results = query.find();
     query.close();

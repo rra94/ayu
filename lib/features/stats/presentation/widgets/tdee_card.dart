@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:opennutritracker/core/styles/color_schemes.dart';
 import 'package:opennutritracker/core/domain/entity/user_entity.dart';
+import 'package:opennutritracker/generated/l10n.dart';
 import 'package:opennutritracker/core/domain/usecase/get_intake_usecase.dart';
 import 'package:opennutritracker/core/domain/usecase/get_user_usecase.dart';
 import 'package:opennutritracker/core/utils/calc/bmr_calc.dart';
@@ -28,24 +30,30 @@ class _TdeeCardState extends State<TdeeCard> {
   }
 
   Future<void> _load() async {
-    final user = await locator<GetUserUsecase>().getUserData();
-    final bmr = BMRCalc.getBMRMifflinStJeor1990(user);
-    final pal = PalCalc.getPALValueFromActivityCategory(user);
-    final activityKcal = bmr * (pal - 1);
+    try {
+      final user = await locator<GetUserUsecase>().getUserData();
+      final bmr = BMRCalc.getBMRMifflinStJeor1990(user);
+      final pal = PalCalc.getPALValueFromActivityCategory(user);
+      final activityKcal = bmr * (pal - 1);
 
-    // Calculate TEF from today's macros
-    final tef = await _calculateTEF(user);
+      // Calculate TEF from today's macros
+      final tef = await _calculateTEF(user);
 
-    final tdee = bmr + activityKcal + tef;
+      final tdee = bmr + activityKcal + tef;
 
-    setState(() {
-      _bmr = bmr;
-      _activityFactor = activityKcal;
-      _tef = tef;
-      _tdee = tdee;
-      _showTef = tef > 0;
-      _loading = false;
-    });
+      if (!mounted) return;
+      setState(() {
+        _bmr = bmr;
+        _activityFactor = activityKcal;
+        _tef = tef;
+        _tdee = tdee;
+        _showTef = tef > 0;
+        _loading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() { _loading = false; });
+    }
   }
 
   /// TEF per macro (Westerterp 2004, Halton & Hu 2004):
@@ -98,7 +106,7 @@ class _TdeeCardState extends State<TdeeCard> {
                 Icon(Icons.local_fire_department,
                     color: theme.colorScheme.primary),
                 const SizedBox(width: 8),
-                Text('Energy Expenditure',
+                Text(S.of(context).energyExpenditureLabel,
                     style: theme.textTheme.titleMedium
                         ?.copyWith(fontWeight: FontWeight.w600)),
               ],
@@ -123,31 +131,31 @@ class _TdeeCardState extends State<TdeeCard> {
               // Breakdown bars
               _buildBreakdownRow(
                 theme,
-                'BMR (Mifflin-St Jeor)',
+                S.of(context).bmrMifflinLabel,
                 _bmr,
                 _tdee,
                 theme.colorScheme.primary,
               ),
               _buildBreakdownRow(
                 theme,
-                'Activity',
+                S.of(context).activityBreakdownLabel,
                 _activityFactor,
                 _tdee,
-                Colors.orange,
+                theme.colorScheme.chartOrange,
               ),
               if (_showTef)
                 _buildBreakdownRow(
                   theme,
-                  'TEF (thermic effect)',
+                  S.of(context).tefLabel,
                   _tef,
                   _tdee,
-                  Colors.deepPurple,
+                  theme.colorScheme.chartDeepPurple,
                 ),
               if (!_showTef)
                 Padding(
                   padding: const EdgeInsets.only(top: 4),
                   child: Text(
-                    'TEF will appear after you log meals today',
+                    S.of(context).tefHintLabel,
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
                     ),

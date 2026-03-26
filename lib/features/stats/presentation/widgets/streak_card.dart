@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:opennutritracker/core/domain/usecase/get_intake_usecase.dart';
 import 'package:opennutritracker/core/services/streak_service.dart';
+import 'package:opennutritracker/core/styles/color_schemes.dart';
 import 'package:opennutritracker/core/utils/locator.dart';
+import 'package:opennutritracker/generated/l10n.dart';
 
 class StreakCard extends StatefulWidget {
   const StreakCard({super.key});
@@ -43,9 +45,9 @@ class _StreakCardState extends State<StreakCard> {
           children: [
             Row(
               children: [
-                Icon(Icons.local_fire_department, color: Colors.orange),
+                Icon(Icons.local_fire_department, color: theme.colorScheme.chartOrange),
                 const SizedBox(width: 8),
-                Text('Clean Streak',
+                Text(S.of(context).cleanStreakLabel,
                     style: theme.textTheme.titleMedium
                         ?.copyWith(fontWeight: FontWeight.w600)),
               ],
@@ -58,13 +60,13 @@ class _StreakCardState extends State<StreakCard> {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   _buildStat(theme, '${_result!.currentStreak}',
-                      'Clean', Colors.orange),
+                      S.of(context).cleanLabel, theme.colorScheme.chartOrange),
                   _buildStat(theme, '${_result!.longestStreak}',
-                      'Longest', theme.colorScheme.primary),
+                      S.of(context).longestLabel, theme.colorScheme.primary),
                   _buildStat(theme, '${_result!.fastingDaysThisMonth}',
-                      'Fasts/mo', Colors.purple),
+                      S.of(context).fastsPerMonthLabel, theme.colorScheme.chartPurple),
                   _buildStat(theme, '${_result!.monthlyCheatCount}',
-                      'Cheats', Colors.red),
+                      S.of(context).cheatsLabel, theme.colorScheme.chartRed),
                 ],
               ),
               const SizedBox(height: 8),
@@ -73,7 +75,7 @@ class _StreakCardState extends State<StreakCard> {
                   _result!.motivationalText,
                   style: theme.textTheme.bodySmall?.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: Colors.orange,
+                    color: theme.colorScheme.chartOrange,
                   ),
                 ),
               ),

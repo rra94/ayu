@@ -30,9 +30,9 @@ class DataRetentionService {
 
       // Prune historical logs (keep 1 year)
       final cutoff365 = DateTime.now().subtract(const Duration(days: 365));
-      try { await locator<CaffeineDataSource>().pruneOlderThan(cutoff365); } catch (_) {}
-      try { await locator<SymptomDataSource>().pruneOlderThan(cutoff365); } catch (_) {}
-      try { await locator<SleepDataSource>().pruneOlderThan(cutoff365); } catch (_) {}
+      try { await locator<CaffeineDataSource>().pruneOlderThan(cutoff365); } catch (e) { _log.warning('Caffeine prune failed: $e'); }
+      try { await locator<SymptomDataSource>().pruneOlderThan(cutoff365); } catch (e) { _log.warning('Symptom prune failed: $e'); }
+      try { await locator<SleepDataSource>().pruneOlderThan(cutoff365); } catch (e) { _log.warning('Sleep prune failed: $e'); }
 
       _log.info('Data retention pruning complete');
     } catch (e) {

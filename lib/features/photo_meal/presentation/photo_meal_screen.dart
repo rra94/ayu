@@ -54,7 +54,18 @@ class _PhotoMealScreenState extends State<PhotoMealScreen> {
   @override
   void dispose() {
     _manualController.dispose();
+    _cleanupPhoto();
     super.dispose();
+  }
+
+  void _cleanupPhoto() {
+    if (_imagePath != null) {
+      try {
+        final file = File(_imagePath!);
+        if (file.existsSync()) file.deleteSync();
+      } catch (_) {}
+      _imagePath = null;
+    }
   }
 
   Future<void> _takePhoto() async {
@@ -113,6 +124,7 @@ class _PhotoMealScreenState extends State<PhotoMealScreen> {
       _statusText = 'Identifying foods...';
     });
 
+    if (!mounted) return;
     var result = await GeminiFoodVisionService.analyzePhoto(photo.path);
 
     if (!mounted) return;
@@ -361,6 +373,8 @@ class _PhotoMealScreenState extends State<PhotoMealScreen> {
     locator<HomeBloc>().add(const LoadItemsEvent());
     locator<DiaryBloc>().add(const LoadDiaryYearEvent());
     locator<CalendarDayBloc>().add(RefreshCalendarDayEvent());
+
+    _cleanupPhoto();
 
     if (mounted) {
       final loggedCount = checkedItems.length;
@@ -690,14 +704,14 @@ class _PhotoMealScreenState extends State<PhotoMealScreen> {
                           context,
                           icon: Icons.check_circle_outline,
                           label: 'Verified',
-                          color: Colors.green,
+                          color: theme.colorScheme.success,
                         )
                       else
                         _buildBadge(
                           context,
                           icon: Icons.warning_amber_outlined,
                           label: 'Estimated',
-                          color: Colors.orange,
+                          color: theme.colorScheme.warning,
                         ),
                     ],
                   ),

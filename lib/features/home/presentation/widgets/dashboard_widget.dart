@@ -89,7 +89,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
           LinearProgressIndicator(
             value: (pct / 100).clamp(0, 1),
             backgroundColor: theme.colorScheme.surfaceContainerHighest,
-            color: pct > 100 ? Colors.red : theme.colorScheme.primary,
+            color: pct > 100 ? theme.colorScheme.error : theme.colorScheme.primary,
           ),
         ],
       ),
@@ -160,7 +160,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                       percent: gaugeValue,
                       arcType: ArcType.FULL,
                       progressColor: gaugeValue >= 1.0
-                          ? Colors.red
+                          ? Theme.of(context).colorScheme.error
                           : Theme.of(context).brightness == Brightness.light
                               ? ayuGoldMuted
                               : ayuGoldLight,

@@ -9,6 +9,7 @@ class BMICalc {
   /// BMI = m / l²
   /// m = mass in kg, l = height in m
   static double getBMI(UserEntity user) {
+    if (user.heightCM <= 0) return 0;
     return user.weightKG / pow(user.heightCM / 100, 2);
   }
 

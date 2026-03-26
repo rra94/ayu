@@ -16,11 +16,11 @@ class ActivitySnapshotDataSource {
   Future<List<ActivitySnapshotOB>> getTodaySnapshots() async {
     final today = DateTime.now();
     final startOfDay = DateTime(today.year, today.month, today.day);
-    final endOfDay =
-        startOfDay.add(const Duration(days: 1)).subtract(const Duration(milliseconds: 1));
+    final endOfDay = startOfDay.add(const Duration(days: 1));
 
     final query = _box
-        .query(ActivitySnapshotOB_.dateTime.betweenDate(startOfDay, endOfDay))
+        .query(ActivitySnapshotOB_.dateTime.greaterOrEqualDate(startOfDay).and(
+            ActivitySnapshotOB_.dateTime.lessThanDate(endOfDay)))
         .build();
     final results = query.find();
     query.close();

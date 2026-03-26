@@ -87,7 +87,6 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   }
 
   void updateTrackedDay(DateTime day) async {
-    final day = DateTime.now();
     final totalKcalGoal = await _getKcalGoalUsecase.getKcalGoal();
     final totalCarbsGoal =
         await _getMacroGoalUsecase.getCarbsGoal(totalKcalGoal);

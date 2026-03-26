@@ -63,12 +63,11 @@ class IntakeDataSourceOB {
       IntakeTypeDBO intakeType, DateTime dateTime) async {
     final startOfDay =
         DateTime(dateTime.year, dateTime.month, dateTime.day);
-    final endOfDay = startOfDay
-        .add(const Duration(days: 1))
-        .subtract(const Duration(milliseconds: 1));
+    final endOfDay = startOfDay.add(const Duration(days: 1));
 
     final query = _intakeBox
-        .query(IntakeOB_.dateTime.betweenDate(startOfDay, endOfDay).and(
+        .query(IntakeOB_.dateTime.greaterOrEqualDate(startOfDay).and(
+            IntakeOB_.dateTime.lessThanDate(endOfDay)).and(
             IntakeOB_.intakeType.equals(intakeType.index)))
         .build();
     final results = query.find();

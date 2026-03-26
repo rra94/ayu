@@ -42,12 +42,11 @@ class UserActivityDataSourceOB {
       DateTime dateTime) async {
     final startOfDay =
         DateTime(dateTime.year, dateTime.month, dateTime.day);
-    final endOfDay = startOfDay
-        .add(const Duration(days: 1))
-        .subtract(const Duration(milliseconds: 1));
+    final endOfDay = startOfDay.add(const Duration(days: 1));
 
     final query = _userActivityBox
-        .query(UserActivityOB_.date.betweenDate(startOfDay, endOfDay))
+        .query(UserActivityOB_.date.greaterOrEqualDate(startOfDay).and(
+            UserActivityOB_.date.lessThanDate(endOfDay)))
         .build();
     final results = query.find();
     query.close();

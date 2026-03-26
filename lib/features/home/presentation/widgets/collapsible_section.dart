@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:opennutritracker/core/styles/color_schemes.dart';
+import 'package:opennutritracker/generated/l10n.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CollapsibleSection extends StatefulWidget {
@@ -58,7 +59,7 @@ class _CollapsibleSectionState extends State<CollapsibleSection> {
     return Column(
       children: [
         Semantics(
-          label: '${widget.title} section. ${_expanded ? "Expanded" : "Collapsed"}. Tap to ${_expanded ? "collapse" : "expand"}.',
+          label: '${widget.title} section. ${_expanded ? S.of(context).sectionExpanded : S.of(context).sectionCollapsed}. ${_expanded ? S.of(context).tapToCollapse : S.of(context).tapToExpand}.',
           button: true,
           child: InkWell(
           onTap: () {
@@ -66,7 +67,7 @@ class _CollapsibleSectionState extends State<CollapsibleSection> {
             _saveState(_expanded);
             SemanticsService.sendAnnouncement(
               View.of(context),
-              '${widget.title} ${_expanded ? "expanded" : "collapsed"}',
+              '${widget.title} ${_expanded ? S.of(context).sectionExpanded : S.of(context).sectionCollapsed}',
               TextDirection.ltr,
             );
           },

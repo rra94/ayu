@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:opennutritracker/core/db/data_sources/symptom_data_source.dart';
+import 'package:opennutritracker/core/styles/color_schemes.dart';
+import 'package:opennutritracker/core/styles/color_schemes.dart';
 import 'package:opennutritracker/core/db/entities/symptom_log_ob.dart';
 import 'package:opennutritracker/core/domain/usecase/get_intake_usecase.dart';
 import 'package:opennutritracker/core/services/food_feeling_service.dart';
@@ -60,7 +62,7 @@ class _FoodFeelingCardState extends State<FoodFeelingCard> {
                         ?.copyWith(fontWeight: FontWeight.w600)),
                 const Spacer(),
                 IconButton(
-                  icon: const Icon(Icons.add, size: 20),
+                  icon: const Icon(Icons.add),
                   onPressed: () => _showSymptomDialog(context),
                   tooltip: 'Log symptom',
                 ),
@@ -109,7 +111,7 @@ class _FoodFeelingCardState extends State<FoodFeelingCard> {
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         children: [
-          Icon(Icons.warning_amber, size: 16, color: Colors.orange),
+          Icon(Icons.warning_amber, size: 16, color: theme.colorScheme.warning),
           const SizedBox(width: 8),
           Expanded(
             child: RichText(

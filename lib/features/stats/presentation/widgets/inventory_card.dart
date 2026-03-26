@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:opennutritracker/core/db/data_sources/inventory_data_source.dart';
+import 'package:opennutritracker/core/styles/color_schemes.dart';
 import 'package:opennutritracker/core/db/entities/product_inventory_ob.dart';
 import 'package:opennutritracker/core/utils/locator.dart';
 
@@ -57,19 +58,19 @@ class _InventoryCardState extends State<InventoryCard> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
                     decoration: BoxDecoration(
-                      color: Colors.orange.withValues(alpha: 0.2),
+                      color: theme.colorScheme.warning.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text('${lowStock.length} low',
-                        style: const TextStyle(
+                        style: TextStyle(
                             fontSize: 12,
-                            color: Colors.orange,
+                            color: theme.colorScheme.warning,
                             fontWeight: FontWeight.w600)),
                   ),
                 ],
                 const Spacer(),
                 IconButton(
-                  icon: const Icon(Icons.add, size: 20),
+                  icon: const Icon(Icons.add),
                   onPressed: () => _showAddDialog(context),
                 ),
               ],
@@ -83,10 +84,10 @@ class _InventoryCardState extends State<InventoryCard> {
 
   Widget _buildProductRow(ThemeData theme, ProductInventoryOB p) {
     final color = p.isEmpty
-        ? Colors.red
+        ? theme.colorScheme.error
         : p.isLow
-            ? Colors.orange
-            : Colors.green;
+            ? theme.colorScheme.warning
+            : theme.colorScheme.success;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
@@ -126,7 +127,7 @@ class _InventoryCardState extends State<InventoryCard> {
                 await ds.refill(p.id);
                 _load();
               },
-              child: const Icon(Icons.refresh, size: 16, color: Colors.blue),
+              child: Icon(Icons.refresh, size: 16, color: theme.colorScheme.chartBlue),
             ),
         ],
       ),

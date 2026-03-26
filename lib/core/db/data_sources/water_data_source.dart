@@ -15,12 +15,11 @@ class WaterDataSource {
 
   Future<List<WaterRecordOB>> getWaterByDate(DateTime date) async {
     final startOfDay = DateTime(date.year, date.month, date.day);
-    final endOfDay = startOfDay
-        .add(const Duration(days: 1))
-        .subtract(const Duration(milliseconds: 1));
+    final endOfDay = startOfDay.add(const Duration(days: 1));
 
     final query = _waterBox
-        .query(WaterRecordOB_.dateTime.betweenDate(startOfDay, endOfDay))
+        .query(WaterRecordOB_.dateTime.greaterOrEqualDate(startOfDay).and(
+            WaterRecordOB_.dateTime.lessThanDate(endOfDay)))
         .build();
     final results = query.find();
     query.close();

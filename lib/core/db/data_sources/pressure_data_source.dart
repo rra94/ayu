@@ -16,11 +16,11 @@ class PressureDataSource {
   Future<List<PressureReadingOB>> getTodayReadings() async {
     final today = DateTime.now();
     final startOfDay = DateTime(today.year, today.month, today.day);
-    final endOfDay =
-        startOfDay.add(const Duration(days: 1)).subtract(const Duration(milliseconds: 1));
+    final endOfDay = startOfDay.add(const Duration(days: 1));
 
     final query = _box
-        .query(PressureReadingOB_.dateTime.betweenDate(startOfDay, endOfDay))
+        .query(PressureReadingOB_.dateTime.greaterOrEqualDate(startOfDay).and(
+            PressureReadingOB_.dateTime.lessThanDate(endOfDay)))
         .order(PressureReadingOB_.dateTime, flags: Order.descending)
         .build();
     final results = query.find();

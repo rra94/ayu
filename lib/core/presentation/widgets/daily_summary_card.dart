@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:opennutritracker/core/db/data_sources/symptom_data_source.dart';
 import 'package:opennutritracker/core/db/entities/gut_health_item_ob.dart';
 import 'package:opennutritracker/core/db/entities/symptom_log_ob.dart';
+import 'package:opennutritracker/core/styles/color_schemes.dart';
 import 'package:opennutritracker/core/utils/locator.dart';
+import 'package:opennutritracker/generated/l10n.dart';
 
 class DailySummaryCard extends StatefulWidget {
   final double calorieGoal;
@@ -48,7 +50,7 @@ class _DailySummaryCardState extends State<DailySummaryCard> {
 
     return Card(
       color: allGood
-          ? Colors.green.withValues(alpha: 0.1)
+          ? theme.colorScheme.success.withValues(alpha: 0.1)
           : theme.colorScheme.surfaceContainerHighest,
       child: Padding(
         padding: const EdgeInsets.all(12),
@@ -59,12 +61,12 @@ class _DailySummaryCardState extends State<DailySummaryCard> {
               children: [
                 Icon(
                   allGood ? Icons.emoji_events : Icons.insights,
-                  color: allGood ? Colors.amber : theme.colorScheme.primary,
+                  color: allGood ? theme.colorScheme.chartAmber : theme.colorScheme.primary,
                   size: 22,
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  allGood ? 'Great day!' : 'Daily Summary',
+                  allGood ? S.of(context).greatDayTitle : S.of(context).dailySummaryTitle,
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
@@ -77,9 +79,9 @@ class _DailySummaryCardState extends State<DailySummaryCard> {
               Padding(
                 padding: const EdgeInsets.only(top: 6),
                 child: Text(
-                  'You hit your goals and kept your gut clean. Keep it up!',
+                  S.of(context).greatDayMessage,
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: Colors.green[700],
+                    color: theme.colorScheme.success,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -96,14 +98,14 @@ class _DailySummaryCardState extends State<DailySummaryCard> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text('How was today?', style: theme.textTheme.bodySmall),
+        Text(S.of(context).howWasTodayLabel, style: theme.textTheme.bodySmall),
         const SizedBox(width: 8),
         IconButton(
           icon: Icon(
             _dayRating == true ? Icons.thumb_up : Icons.thumb_up_outlined,
           ),
           onPressed: () => _logDayRating(true),
-          color: _dayRating == true ? Colors.green : Colors.green.shade300,
+          color: _dayRating == true ? theme.colorScheme.success : theme.colorScheme.success.withValues(alpha: 0.7),
           iconSize: 22,
           constraints: const BoxConstraints(),
           padding: const EdgeInsets.all(8),
@@ -114,7 +116,7 @@ class _DailySummaryCardState extends State<DailySummaryCard> {
             _dayRating == false ? Icons.thumb_down : Icons.thumb_down_outlined,
           ),
           onPressed: () => _logDayRating(false),
-          color: _dayRating == false ? Colors.red : Colors.red.shade300,
+          color: _dayRating == false ? theme.colorScheme.error : theme.colorScheme.error.withValues(alpha: 0.7),
           iconSize: 22,
           constraints: const BoxConstraints(),
           padding: const EdgeInsets.all(8),
@@ -145,7 +147,7 @@ class _DailySummaryCardState extends State<DailySummaryCard> {
           Icon(
             check.passed ? Icons.check_circle : Icons.cancel_outlined,
             size: 16,
-            color: check.passed ? Colors.green : theme.colorScheme.error,
+            color: check.passed ? theme.colorScheme.success : theme.colorScheme.error,
           ),
           const SizedBox(width: 8),
           Expanded(
@@ -171,10 +173,10 @@ class _DailySummaryCardState extends State<DailySummaryCard> {
     checks.add(_Check(
       passed: calOnTrack,
       label: calOnTrack
-          ? 'Calories on track ($calPct% of goal)'
+          ? S.of(context).caloriesOnTrack(calPct)
           : calDiff > 0
-              ? 'Over calorie goal by ${calDiff.round()} kcal'
-              : 'Under calorie goal ($calPct%)',
+              ? S.of(context).overCalorieGoal(calDiff.round())
+              : S.of(context).underCalorieGoal(calPct),
     ));
 
     // Protein check: >= 80% of goal
@@ -184,8 +186,8 @@ class _DailySummaryCardState extends State<DailySummaryCard> {
       checks.add(_Check(
         passed: proteinOk,
         label: proteinOk
-            ? 'Protein goal met ($pctProtein%)'
-            : 'Protein low ($pctProtein% of goal)',
+            ? S.of(context).proteinGoalMet(pctProtein)
+            : S.of(context).proteinLow(pctProtein),
       ));
     }
 

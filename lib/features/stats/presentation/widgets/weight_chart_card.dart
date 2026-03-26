@@ -2,6 +2,8 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:opennutritracker/core/db/data_sources/weight_data_source.dart';
+import 'package:opennutritracker/core/styles/color_schemes.dart';
+import 'package:opennutritracker/generated/l10n.dart';
 import 'package:opennutritracker/core/db/entities/config_ob.dart';
 import 'package:opennutritracker/core/db/entities/weight_record_ob.dart';
 import 'package:opennutritracker/core/utils/locator.dart';
@@ -54,19 +56,19 @@ class _WeightChartCardState extends State<WeightChartCard> {
                 Icon(Icons.monitor_weight_outlined,
                     color: theme.colorScheme.primary),
                 const SizedBox(width: 8),
-                Text('Weight',
+                Text(S.of(context).weightLabel,
                     style: theme.textTheme.titleMedium
                         ?.copyWith(fontWeight: FontWeight.w600)),
                 const Spacer(),
                 IconButton(
-                  icon: const Icon(Icons.add, size: 20),
+                  icon: const Icon(Icons.add),
                   onPressed: () => _showAddDialog(context),
-                  tooltip: 'Log weight',
+                  tooltip: S.of(context).logWeightTooltip,
                 ),
                 IconButton(
-                  icon: const Icon(Icons.flag_outlined, size: 20),
+                  icon: const Icon(Icons.flag_outlined),
                   onPressed: () => _showTargetDialog(context),
-                  tooltip: 'Set target',
+                  tooltip: S.of(context).setTargetTooltip,
                 ),
               ],
             ),
@@ -84,7 +86,7 @@ class _WeightChartCardState extends State<WeightChartCard> {
                       Icon(Icons.scale, size: 40,
                           color: theme.colorScheme.onSurfaceVariant),
                       const SizedBox(height: 8),
-                      Text('Log your first weight entry',
+                      Text(S.of(context).logFirstWeightEntry,
                           style: theme.textTheme.bodyMedium?.copyWith(
                               color: theme.colorScheme.onSurfaceVariant)),
                     ],
@@ -95,7 +97,7 @@ class _WeightChartCardState extends State<WeightChartCard> {
               _buildSummary(theme),
               const SizedBox(height: 12),
               SizedBox(
-                height: 200,
+                height: MediaQuery.of(context).size.height * 0.25,
                 child: _buildChart(theme),
               ),
               if (_records.length > 1) ...[
@@ -131,14 +133,14 @@ class _WeightChartCardState extends State<WeightChartCard> {
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
             decoration: BoxDecoration(
               color: change <= 0
-                  ? Colors.green.withValues(alpha: 0.15)
-                  : Colors.orange.withValues(alpha: 0.15),
+                  ? theme.colorScheme.success.withValues(alpha: 0.15)
+                  : theme.colorScheme.warning.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
               '$changeStr kg',
               style: theme.textTheme.labelSmall?.copyWith(
-                color: change <= 0 ? Colors.green : Colors.orange,
+                color: change <= 0 ? theme.colorScheme.success : theme.colorScheme.warning,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -146,7 +148,7 @@ class _WeightChartCardState extends State<WeightChartCard> {
         if (_targetWeight != null) ...[
           const Spacer(),
           Text(
-            'Target: ${_targetWeight!.toStringAsFixed(1)} kg',
+            S.of(context).targetWeightDisplay(_targetWeight!.toStringAsFixed(1)),
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -241,14 +243,14 @@ class _WeightChartCardState extends State<WeightChartCard> {
             ? ExtraLinesData(horizontalLines: [
                 HorizontalLine(
                   y: _targetWeight!,
-                  color: Colors.green,
+                  color: theme.colorScheme.success,
                   strokeWidth: 1.5,
                   dashArray: [8, 4],
                   label: HorizontalLineLabel(
                     show: true,
                     alignment: Alignment.topRight,
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: Colors.green,
+                      color: theme.colorScheme.success,
                     ),
                     labelResolver: (_) => 'Target',
                   ),
@@ -265,13 +267,13 @@ class _WeightChartCardState extends State<WeightChartCard> {
     final diff = (current - _targetWeight!).abs();
     if (diff < 0.5) {
       return Text(
-        'You\'re at your target weight!',
-        style: theme.textTheme.bodySmall?.copyWith(color: Colors.green),
+        S.of(context).atTargetWeight,
+        style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.success),
       );
     }
     final weeksToGoal = (diff / 0.45).ceil(); // ~1 lb/week safe rate
     return Text(
-      'Estimated ${weeksToGoal}w to target (at ~0.45 kg/week)',
+      S.of(context).estimatedWeeksToTarget(weeksToGoal),
       style: theme.textTheme.bodySmall?.copyWith(
         color: theme.colorScheme.onSurfaceVariant,
       ),
@@ -283,20 +285,20 @@ class _WeightChartCardState extends State<WeightChartCard> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Log Weight'),
+        title: Text(S.of(context).logWeightTitle),
         content: TextField(
           controller: controller,
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          decoration: const InputDecoration(
-            labelText: 'Weight (kg)',
-            hintText: 'e.g. 72.5',
+          decoration: InputDecoration(
+            labelText: S.of(context).weightKgLabel,
+            hintText: S.of(context).weightHintEg725,
           ),
           autofocus: true,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancel'),
+            child: Text(S.of(context).cancelLabel),
           ),
           FilledButton(
             onPressed: () async {
@@ -311,7 +313,7 @@ class _WeightChartCardState extends State<WeightChartCard> {
                 _load();
               }
             },
-            child: const Text('Save'),
+            child: Text(S.of(context).saveLabel),
           ),
         ],
       ),
@@ -325,20 +327,20 @@ class _WeightChartCardState extends State<WeightChartCard> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Set Target Weight'),
+        title: Text(S.of(context).setTargetWeightTitle),
         content: TextField(
           controller: controller,
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          decoration: const InputDecoration(
-            labelText: 'Target weight (kg)',
-            hintText: 'e.g. 70.0',
+          decoration: InputDecoration(
+            labelText: S.of(context).targetWeightKgLabel,
+            hintText: S.of(context).targetWeightHint,
           ),
           autofocus: true,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancel'),
+            child: Text(S.of(context).cancelLabel),
           ),
           FilledButton(
             onPressed: () async {
@@ -354,7 +356,7 @@ class _WeightChartCardState extends State<WeightChartCard> {
                 _load();
               }
             },
-            child: const Text('Save'),
+            child: Text(S.of(context).saveLabel),
           ),
         ],
       ),

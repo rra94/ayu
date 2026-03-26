@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
+import 'package:opennutritracker/core/styles/color_schemes.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logging/logging.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
@@ -202,8 +203,8 @@ class _ScannerScreenState extends State<ScannerScreen> {
               builder: (context, state, child) {
                 switch (state.torchState) {
                   case TorchState.off || TorchState.unavailable:
-                    return const Icon(Icons.flash_off_outlined,
-                        color: Colors.grey);
+                    return Icon(Icons.flash_off_outlined,
+                        color: Theme.of(context).colorScheme.outline);
                   case TorchState.on || TorchState.auto:
                     return const Icon(Icons.flash_on_outlined);
                 }
@@ -267,7 +268,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
               height: _detectedBarcodeRect!.height,
               child: Container(
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.green, width: 3),
+                  border: Border.all(color: Theme.of(context).colorScheme.success, width: 3),
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
@@ -280,11 +281,11 @@ class _ScannerScreenState extends State<ScannerScreen> {
   Widget _buildScanOverlay(BuildContext context) {
     return CustomPaint(
       painter: _ScanOverlayPainter(),
-      child: const Align(
-        alignment: Alignment(0, 0.6),
+      child: Align(
+        alignment: const Alignment(0, 0.6),
         child: Text(
           'Point at a barcode',
-          style: TextStyle(color: Colors.white70, fontSize: 14),
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 14),
         ),
       ),
     );
@@ -465,7 +466,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        icon: const Icon(Icons.warning_amber, color: Colors.red, size: 36),
+        icon: Icon(Icons.warning_amber, color: Theme.of(context).colorScheme.error, size: 36),
         title: const Text('Allergen Alert!'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -476,7 +477,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
               padding: const EdgeInsets.symmetric(vertical: 2),
               child: Row(
                 children: [
-                  Icon(Icons.dangerous, size: 16, color: Colors.red),
+                  Icon(Icons.dangerous, size: 16, color: Theme.of(context).colorScheme.error),
                   const SizedBox(width: 8),
                   Text(a.displayName,
                       style: const TextStyle(fontWeight: FontWeight.w600)),
@@ -498,7 +499,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
               Navigator.of(ctx).pop();
               await _quickAdd(context, state);
             },
-            style: FilledButton.styleFrom(backgroundColor: Colors.orange),
+            style: FilledButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.warning),
             child: const Text('Quick Add Anyway'),
           ),
           FilledButton(
@@ -538,7 +539,7 @@ class _ScanOverlayPainter extends CustomPainter {
 
     // Gold corner brackets
     final gold = Paint()
-      ..color = const Color(0xFFD4A843)
+      ..color = ayuGold
       ..strokeWidth = 3
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;

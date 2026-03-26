@@ -75,7 +75,7 @@ class _PeptideStackWidgetState extends State<PeptideStackWidget> {
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                   decoration: BoxDecoration(
                     color: dosedCount == totalCount
-                        ? const Color(0xFF4CAF50).withValues(alpha: 0.2)
+                        ? theme.colorScheme.success.withValues(alpha: 0.2)
                         : goldColor.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -84,7 +84,7 @@ class _PeptideStackWidgetState extends State<PeptideStackWidget> {
                     style: theme.textTheme.labelSmall?.copyWith(
                       fontWeight: FontWeight.w600,
                       color: dosedCount == totalCount
-                          ? const Color(0xFF4CAF50)
+                          ? theme.colorScheme.success
                           : goldColor,
                     ),
                   ),

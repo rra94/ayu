@@ -23,7 +23,7 @@ class ProductsLoadedState extends ProductsState {
       {required this.products, this.usesImperialUnits = false, this.isOfflineResults = false});
 
   @override
-  List<Object?> get props => [products, isOfflineResults];
+  List<Object?> get props => [products, usesImperialUnits, isOfflineResults];
 }
 
 class ProductsFailedState extends ProductsState {

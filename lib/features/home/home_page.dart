@@ -49,6 +49,7 @@ import 'package:opennutritracker/features/home/presentation/widgets/dashboard_wi
 import 'package:opennutritracker/features/home/presentation/widgets/intake_vertical_list.dart';
 import 'package:opennutritracker/core/presentation/widgets/daily_summary_card.dart';
 import 'package:opennutritracker/features/nutrition/presentation/micronutrient_summary_screen.dart';
+import 'package:opennutritracker/core/styles/color_schemes.dart';
 import 'package:opennutritracker/generated/l10n.dart';
 
 /// Home page uses HomeBloc for core nutrition data (kcal, macros, intakes)
@@ -359,7 +360,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              leading: const Icon(Icons.star, color: Colors.amber),
+              leading: Icon(Icons.star, color: Theme.of(ctx).colorScheme.chartAmber),
               title: const Text('Add to Favorites'),
               onTap: () => Navigator.of(ctx).pop('favorite'),
             ),
@@ -443,6 +444,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     return FutureBuilder<double>(
       future: _waterFuture,
       builder: (context, snapshot) {
+        if (snapshot.hasError) return const SizedBox.shrink();
         final currentML = snapshot.data ?? 0;
         return WaterTrackerWidget(
           currentML: currentML,
@@ -461,6 +463,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     return FutureBuilder(
       future: _habitsFuture,
       builder: (context, snapshot) {
+        if (snapshot.hasError) return const SizedBox.shrink();
         if (!snapshot.hasData || snapshot.data!.length < 2) return const SizedBox();
         final habits = snapshot.data![0] as List;
         final logs = snapshot.data![1] as List;
@@ -514,6 +517,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     return FutureBuilder<List<GutHealthItemOB>>(
       future: gutDs.getManualItemsByDate(DateTime.now()),
       builder: (context, snapshot) {
+        if (snapshot.hasError) return const SizedBox.shrink();
         final manualItems = snapshot.data ?? [];
         final allItems = [...autoFlagged, ...manualItems];
         return Column(

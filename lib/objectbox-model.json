@@ -846,7 +846,7 @@
     },
     {
       "id": "14:1034035110825751383",
-      "lastPropertyId": "6:4387178617261170057",
+      "lastPropertyId": "7:4298711670153257802",
       "name": "BiomarkerRecordOB",
       "properties": [
         {
@@ -879,6 +879,11 @@
           "id": "6:4387178617261170057",
           "name": "source",
           "type": 6
+        },
+        {
+          "id": "7:4298711670153257802",
+          "name": "notes",
+          "type": 9
         }
       ],
       "relations": []

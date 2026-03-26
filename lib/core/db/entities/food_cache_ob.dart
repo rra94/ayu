@@ -1,6 +1,7 @@
 import 'package:objectbox/objectbox.dart';
 
-/// Caches food nutrition results from API calls (CalorieNinjas, OFF, FDC).
+/// Caches food nutrition results from API calls (CalorieNinjas, OFF, FDC)
+/// and user receipt preferences.
 /// Avoids repeat network calls for the same query.
 @Entity()
 class FoodCacheOB {

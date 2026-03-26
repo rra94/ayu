@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:opennutritracker/core/styles/color_schemes.dart';
 import 'package:opennutritracker/core/db/data_sources/gut_health_data_source.dart';
 import 'package:opennutritracker/core/db/entities/gut_health_item_ob.dart';
 import 'package:opennutritracker/core/utils/locator.dart';
@@ -82,7 +83,7 @@ class _GutHealthPanelState extends State<GutHealthPanel> {
               children: [
                 Icon(
                   hasItems ? Icons.warning_amber_rounded : Icons.check_circle_outline,
-                  color: hasItems ? theme.colorScheme.error : Colors.green,
+                  color: hasItems ? theme.colorScheme.error : theme.colorScheme.success,
                 ),
                 const SizedBox(width: 8),
                 Text(
@@ -135,7 +136,7 @@ class _GutHealthPanelState extends State<GutHealthPanel> {
                 padding: const EdgeInsets.only(top: 4),
                 child: Text(
                   'No gut-harmful items consumed today',
-                  style: theme.textTheme.bodySmall?.copyWith(color: Colors.green),
+                  style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.success),
                 ),
               ),
 
@@ -299,22 +300,22 @@ class _GutHealthPanelState extends State<GutHealthPanel> {
 
   Color _chipColor(String category, ThemeData theme) {
     switch (category) {
-      case 'high_sugar': return Colors.orange.withValues(alpha: 0.2);
-      case 'low_fiber': return Colors.brown.withValues(alpha: 0.2);
-      case 'artificial_sweeteners': return Colors.purple.withValues(alpha: 0.2);
-      case 'alcohol': return Colors.red.withValues(alpha: 0.2);
-      case 'processed_foods': return Colors.grey.withValues(alpha: 0.2);
-      case 'ultra_processed': return Colors.grey.withValues(alpha: 0.3);
-      case 'nsaids': return Colors.blue.withValues(alpha: 0.2);
-      case 'fried_foods': return Colors.amber.withValues(alpha: 0.2);
-      case 'emulsifier': return Colors.deepOrange.withValues(alpha: 0.2);
-      case 'thickener_gum': return Colors.teal.withValues(alpha: 0.2);
-      case 'preservative': return Colors.indigo.withValues(alpha: 0.2);
-      case 'artificial_coloring': return Colors.pink.withValues(alpha: 0.2);
-      case 'artificial_flavor': return Colors.cyan.withValues(alpha: 0.2);
-      case 'seed_oil': return Colors.yellow.withValues(alpha: 0.3);
-      case 'excess_sodium': return Colors.blueGrey.withValues(alpha: 0.2);
-      case 'trans_fat': return Colors.red.withValues(alpha: 0.3);
+      case 'high_sugar': return theme.colorScheme.chartOrange.withValues(alpha: 0.2);
+      case 'low_fiber': return theme.colorScheme.chartBrown.withValues(alpha: 0.2);
+      case 'artificial_sweeteners': return theme.colorScheme.chartPurple.withValues(alpha: 0.2);
+      case 'alcohol': return theme.colorScheme.chartRed.withValues(alpha: 0.2);
+      case 'processed_foods': return theme.colorScheme.chartGrey.withValues(alpha: 0.2);
+      case 'ultra_processed': return theme.colorScheme.chartGrey.withValues(alpha: 0.3);
+      case 'nsaids': return theme.colorScheme.chartBlue.withValues(alpha: 0.2);
+      case 'fried_foods': return theme.colorScheme.chartAmber.withValues(alpha: 0.2);
+      case 'emulsifier': return theme.colorScheme.chartDeepOrange.withValues(alpha: 0.2);
+      case 'thickener_gum': return theme.colorScheme.chartTeal.withValues(alpha: 0.2);
+      case 'preservative': return theme.colorScheme.chartIndigo.withValues(alpha: 0.2);
+      case 'artificial_coloring': return theme.colorScheme.chartPink.withValues(alpha: 0.2);
+      case 'artificial_flavor': return theme.colorScheme.chartCyan.withValues(alpha: 0.2);
+      case 'seed_oil': return theme.colorScheme.chartAmber.withValues(alpha: 0.3);
+      case 'excess_sodium': return theme.colorScheme.chartGrey.withValues(alpha: 0.2);
+      case 'trans_fat': return theme.colorScheme.chartRed.withValues(alpha: 0.3);
       default: return theme.colorScheme.surfaceContainerHighest;
     }
   }

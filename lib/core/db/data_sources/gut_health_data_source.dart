@@ -15,13 +15,12 @@ class GutHealthDataSource {
 
   Future<List<GutHealthItemOB>> getItemsByDate(DateTime date) async {
     final startOfDay = DateTime(date.year, date.month, date.day);
-    final endOfDay = startOfDay
-        .add(const Duration(days: 1))
-        .subtract(const Duration(milliseconds: 1));
+    final endOfDay = startOfDay.add(const Duration(days: 1));
 
     final query = _gutHealthBox
         .query(
-            GutHealthItemOB_.dateTime.betweenDate(startOfDay, endOfDay))
+            GutHealthItemOB_.dateTime.greaterOrEqualDate(startOfDay).and(
+            GutHealthItemOB_.dateTime.lessThanDate(endOfDay)))
         .build();
     final results = query.find();
     query.close();
@@ -35,13 +34,12 @@ class GutHealthDataSource {
 
   Future<List<GutHealthItemOB>> getManualItemsByDate(DateTime date) async {
     final startOfDay = DateTime(date.year, date.month, date.day);
-    final endOfDay = startOfDay
-        .add(const Duration(days: 1))
-        .subtract(const Duration(milliseconds: 1));
+    final endOfDay = startOfDay.add(const Duration(days: 1));
 
     final query = _gutHealthBox
         .query(GutHealthItemOB_.dateTime
-            .betweenDate(startOfDay, endOfDay)
+            .greaterOrEqualDate(startOfDay).and(
+            GutHealthItemOB_.dateTime.lessThanDate(endOfDay))
             .and(GutHealthItemOB_.isAutoFlagged.equals(false)))
         .build();
     final results = query.find();

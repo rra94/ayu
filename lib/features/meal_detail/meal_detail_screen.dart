@@ -159,6 +159,7 @@ class _MealDetailScreenState extends State<MealDetailScreen> {
       double totalFat,
       double totalProtein,
       String selectedUnit) {
+    final theme = Theme.of(context);
     return CustomScrollView(
       controller: _scrollController,
       slivers: [
@@ -203,17 +204,17 @@ class _MealDetailScreenState extends State<MealDetailScreen> {
         if (_allergenAlerts.isNotEmpty)
           SliverToBoxAdapter(
             child: Container(
-              color: Colors.red.withValues(alpha: 0.1),
+              color: theme.colorScheme.error.withValues(alpha: 0.1),
               padding: const EdgeInsets.all(12),
               child: Row(
                 children: [
-                  const Icon(Icons.warning_amber, color: Colors.red),
+                  Icon(Icons.warning_amber, color: theme.colorScheme.error),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       'Contains: ${_allergenAlerts.map((a) => a.displayName).join(", ")}',
-                      style: const TextStyle(
-                        color: Colors.red,
+                      style: TextStyle(
+                        color: theme.colorScheme.error,
                         fontWeight: FontWeight.w600,
                       ),
                     ),

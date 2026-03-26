@@ -34,41 +34,41 @@ class ObservationAgent {
       final r = await _stressHRContradiction();
       if (r.isNotEmpty) ctx.observationTypes.add('stress_hr');
       observations.addAll(r);
-    } catch (_) {}
+    } catch (e) { _log.warning('Observation failed: $e'); }
     try {
       final r = await _sleepCaffeineCorrelation();
       if (r.isNotEmpty) { ctx.highCaffeine = true; ctx.observationTypes.add('sleep_caffeine'); }
       observations.addAll(r);
-    } catch (_) {}
+    } catch (e) { _log.warning('Observation failed: $e'); }
     try {
       final r = await _moodNutritionLink();
       if (r.isNotEmpty) { ctx.lowMood = true; ctx.observationTypes.add('mood_nutrition'); }
       observations.addAll(r);
-    } catch (_) {}
+    } catch (e) { _log.warning('Observation failed: $e'); }
     try {
       final r = await _sleepEatingWindow();
       if (r.isNotEmpty) { ctx.poorSleep = true; ctx.observationTypes.add('sleep_eating'); }
       observations.addAll(r);
-    } catch (_) {}
+    } catch (e) { _log.warning('Observation failed: $e'); }
     try {
       final r = await _pressureMoodCorrelation();
       if (r.isNotEmpty) { ctx.pressureDrop = true; ctx.lowMood = true; ctx.observationTypes.add('pressure_mood'); }
       observations.addAll(r);
-    } catch (_) {}
+    } catch (e) { _log.warning('Observation failed: $e'); }
     try {
       final r = await _sedentarySleepCorrelation();
       if (r.isNotEmpty) { ctx.sedentaryDay = true; ctx.poorSleep = true; ctx.observationTypes.add('sedentary_sleep'); }
       observations.addAll(r);
-    } catch (_) {}
+    } catch (e) { _log.warning('Observation failed: $e'); }
     try {
       final r = await _gymProteinCorrelation();
       if (r.isNotEmpty) { ctx.gymToday = true; ctx.lowProtein = true; ctx.observationTypes.add('gym_protein'); }
       observations.addAll(r);
-    } catch (_) {}
+    } catch (e) { _log.warning('Observation failed: $e'); }
     try {
       final r = await _hrvNutritionCorrelation();
       observations.addAll(r);
-    } catch (_) {}
+    } catch (e) { _log.warning('Observation failed: $e'); }
     try { observations.addAll(await _weeklyPatternDetection()); } catch (_) {}
     try { observations.addAll(await _supplementTimingOptimization()); } catch (_) {}
     try { observations.addAll(await _mealTimingInference()); } catch (_) {}
@@ -98,7 +98,7 @@ class ObservationAgent {
                 'Log meals, sleep, and mood for 3+ days to unlock personalized insights.',
           ));
         }
-      } catch (_) {}
+      } catch (e) { _log.warning('Observation failed: $e'); }
     }
 
     _log.info('ObservationAgent found ${observations.length} cross-domain insights, context: ${ctx.observationTypes}');
@@ -675,10 +675,12 @@ class ObservationAgent {
 
     // Has D3 but check if taken today
     final taken = await suppDs.getTakenIdsForDate(now);
-    final vitDSupp = allSupps.firstWhere((s) {
+    final vitDIdx = allSupps.indexWhere((s) {
       final lower = s.name.toLowerCase();
       return lower.contains('vitamin d') || lower.contains('vit d') || lower.contains('d3');
     });
+    if (vitDIdx == -1) return [];
+    final vitDSupp = allSupps[vitDIdx];
     if (!taken.contains(vitDSupp.id) && now.hour >= 12) {
       return [
         AgentSuggestion(
@@ -695,7 +697,7 @@ class ObservationAgent {
   static String _monthName(int month) {
     const names = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
         'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    return names[month - 1];
+    return names[(month - 1).clamp(0, 11)];
   }
 
   // ── BH7: Sleep architecture integration ──

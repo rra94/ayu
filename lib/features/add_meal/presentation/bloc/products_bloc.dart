@@ -47,8 +47,9 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
       emit(ProductsLoadingState());
       try {
         final results = await _cascadeSearch(_searchString);
+        final config = await _getConfigUsecase.getConfig();
         _cacheEcoScores(results);
-        emit(ProductsLoadedState(products: results, isOfflineResults: _lastSearchOffline));
+        emit(ProductsLoadedState(products: results, usesImperialUnits: config.usesImperialUnits, isOfflineResults: _lastSearchOffline));
       } catch (error) {
         log.severe(error);
         emit(ProductsFailedState());

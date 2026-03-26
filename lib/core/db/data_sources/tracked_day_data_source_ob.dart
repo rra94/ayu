@@ -191,11 +191,10 @@ class TrackedDayDataSourceOB {
   /// Find the OB entity whose [day] matches the given date (same calendar day).
   TrackedDayOB? _findByDay(DateTime day) {
     final startOfDay = DateTime(day.year, day.month, day.day);
-    final endOfDay = startOfDay
-        .add(const Duration(days: 1))
-        .subtract(const Duration(milliseconds: 1));
+    final endOfDay = startOfDay.add(const Duration(days: 1));
     final query =
-        _trackedDayBox.query(TrackedDayOB_.day.betweenDate(startOfDay, endOfDay)).build();
+        _trackedDayBox.query(TrackedDayOB_.day.greaterOrEqualDate(startOfDay).and(
+            TrackedDayOB_.day.lessThanDate(endOfDay))).build();
     final result = query.findFirst();
     query.close();
     return result;

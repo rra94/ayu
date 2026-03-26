@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:opennutritracker/core/db/data_sources/biomarker_data_source.dart';
 import 'package:opennutritracker/core/db/entities/biomarker_record_ob.dart';
 import 'package:opennutritracker/core/services/health_condition_service.dart';
+import 'package:opennutritracker/core/styles/color_schemes.dart';
 import 'package:opennutritracker/core/utils/locator.dart';
+import 'package:opennutritracker/generated/l10n.dart';
 
 enum _GlucoseTiming {
   fasting('Fasting'),
@@ -78,14 +80,14 @@ class _GlucoseCardState extends State<GlucoseCard> {
                     color: theme.colorScheme.primary),
                 const SizedBox(width: 8),
                 Text(
-                  'Blood Glucose',
+                  S.of(context).bloodGlucoseLabel,
                   style: theme.textTheme.titleMedium
                       ?.copyWith(fontWeight: FontWeight.w600),
                 ),
                 const Spacer(),
                 IconButton(
-                  icon: const Icon(Icons.add, size: 20),
-                  tooltip: 'Add reading',
+                  icon: const Icon(Icons.add),
+                  tooltip: S.of(context).addReadingTooltip,
                   onPressed: () => _showAddDialog(context),
                 ),
               ],
@@ -103,7 +105,7 @@ class _GlucoseCardState extends State<GlucoseCard> {
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 child: Center(
                   child: Text(
-                    'Add a blood glucose reading to start tracking',
+                    S.of(context).addGlucoseReadingEmpty,
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
                     ),
@@ -118,7 +120,7 @@ class _GlucoseCardState extends State<GlucoseCard> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   ChoiceChip(
-                    label: const Text('7d'),
+                    label: Text(S.of(context).glucoseRange7d),
                     selected: _periodDays == 7,
                     onSelected: (_) => setState(() {
                       _periodDays = 7;
@@ -127,7 +129,7 @@ class _GlucoseCardState extends State<GlucoseCard> {
                   ),
                   const SizedBox(width: 8),
                   ChoiceChip(
-                    label: const Text('30d'),
+                    label: Text(S.of(context).glucoseRange30d),
                     selected: _periodDays == 30,
                     onSelected: (_) => setState(() {
                       _periodDays = 30;
@@ -136,7 +138,7 @@ class _GlucoseCardState extends State<GlucoseCard> {
                   ),
                   const SizedBox(width: 8),
                   ChoiceChip(
-                    label: const Text('90d'),
+                    label: Text(S.of(context).glucoseRange90d),
                     selected: _periodDays == 90,
                     onSelected: (_) => setState(() {
                       _periodDays = 90;
@@ -149,7 +151,10 @@ class _GlucoseCardState extends State<GlucoseCard> {
               _buildLatestReading(theme),
               if (_records.length > 1) ...[
                 const SizedBox(height: 12),
-                SizedBox(height: 100, child: _buildChart(theme)),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.15,
+                  child: _buildChart(theme),
+                ),
               ],
               const SizedBox(height: 8),
               _buildLegend(theme),
@@ -245,13 +250,13 @@ class _GlucoseCardState extends State<GlucoseCard> {
         extraLinesData: ExtraLinesData(horizontalLines: [
           HorizontalLine(
             y: _normalMax,
-            color: Colors.orange.withValues(alpha: 0.4),
+            color: theme.colorScheme.chartOrange.withValues(alpha: 0.4),
             strokeWidth: 1,
             dashArray: [4, 4],
           ),
           HorizontalLine(
             y: _highMin,
-            color: Colors.red.withValues(alpha: 0.4),
+            color: theme.colorScheme.chartRed.withValues(alpha: 0.4),
             strokeWidth: 1,
             dashArray: [4, 4],
           ),
@@ -287,39 +292,40 @@ class _GlucoseCardState extends State<GlucoseCard> {
   }
 
   Widget _buildLegend(ThemeData theme) {
+    final cs = theme.colorScheme;
     final labelStyle = theme.textTheme.bodySmall;
     if (_hasDiabetes) {
       return Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _legendDot(Colors.green),
+          _legendDot(cs.chartGreen),
           const SizedBox(width: 3),
-          Text('Controlled (70–130)', style: labelStyle),
+          Text(S.of(context).glucoseControlled, style: labelStyle),
           const SizedBox(width: 8),
-          _legendDot(Colors.orange),
+          _legendDot(cs.chartOrange),
           const SizedBox(width: 3),
-          Text('Above target', style: labelStyle),
+          Text(S.of(context).glucoseAboveTarget, style: labelStyle),
           const SizedBox(width: 8),
-          _legendDot(Colors.red),
+          _legendDot(cs.chartRed),
           const SizedBox(width: 3),
-          Text('High (>180)', style: labelStyle),
+          Text(S.of(context).glucoseHigh, style: labelStyle),
         ],
       );
     }
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        _legendDot(Colors.green),
+        _legendDot(cs.chartGreen),
         const SizedBox(width: 3),
-        Text('Normal (70–100)', style: labelStyle),
+        Text(S.of(context).glucoseNormal, style: labelStyle),
         const SizedBox(width: 8),
-        _legendDot(Colors.orange),
+        _legendDot(cs.chartOrange),
         const SizedBox(width: 3),
-        Text('Pre-diabetic', style: labelStyle),
+        Text(S.of(context).glucosePreDiabetic, style: labelStyle),
         const SizedBox(width: 8),
-        _legendDot(Colors.red),
+        _legendDot(cs.chartRed),
         const SizedBox(width: 3),
-        Text('High', style: labelStyle),
+        Text(S.of(context).glucoseHighShort, style: labelStyle),
       ],
     );
   }
@@ -336,20 +342,21 @@ class _GlucoseCardState extends State<GlucoseCard> {
   double get _highMin => _hasDiabetes ? 180.0 : 126.0;
 
   Color _glucoseColor(double value) {
-    if (value <= _normalMax) return Colors.green;
-    if (value <= _highMin) return Colors.orange;
-    return Colors.red;
+    final cs = Theme.of(context).colorScheme;
+    if (value <= _normalMax) return cs.chartGreen;
+    if (value <= _highMin) return cs.chartOrange;
+    return cs.chartRed;
   }
 
   String _glucoseLabel(double value) {
     if (_hasDiabetes) {
-      if (value <= 130) return 'Controlled';
-      if (value <= 180) return 'Above target';
-      return 'High — consult doctor';
+      if (value <= 130) return S.of(context).glucoseControlledShort;
+      if (value <= 180) return S.of(context).glucoseAboveTarget;
+      return S.of(context).glucoseHighConsultDoctor;
     }
-    if (value <= 100) return 'Normal';
-    if (value <= 126) return 'Pre-diabetic';
-    return 'High';
+    if (value <= 100) return S.of(context).glucoseNormal;
+    if (value <= 126) return S.of(context).glucosePreDiabetic;
+    return S.of(context).glucoseHighShort;
   }
 
   String _formatDate(DateTime dt) {
@@ -367,7 +374,7 @@ class _GlucoseCardState extends State<GlucoseCard> {
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setDialogState) => AlertDialog(
-          title: Text(existing == null ? 'Add Reading' : 'Edit Reading'),
+          title: Text(existing == null ? S.of(context).addReadingTitle : S.of(context).editReadingTitle),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -375,19 +382,19 @@ class _GlucoseCardState extends State<GlucoseCard> {
                 controller: valueController,
                 keyboardType:
                     const TextInputType.numberWithOptions(decimal: true),
-                decoration: const InputDecoration(
-                  labelText: 'Blood glucose (mg/dL)',
-                  hintText: 'e.g. 95',
-                  suffixText: 'mg/dL',
+                decoration: InputDecoration(
+                  labelText: S.of(context).bloodGlucoseMgDl,
+                  hintText: S.of(context).glucoseHintEg95,
+                  suffixText: S.of(context).mgDlUnit,
                 ),
               ),
               const SizedBox(height: 12),
               DropdownButtonFormField<_GlucoseTiming>(
                 initialValue: timing,
-                decoration: const InputDecoration(
-                  labelText: 'Timing',
+                decoration: InputDecoration(
+                  labelText: S.of(context).timingLabel,
                   contentPadding:
-                      EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 ),
                 items: _GlucoseTiming.values
                     .map((t) => DropdownMenuItem(
@@ -402,9 +409,9 @@ class _GlucoseCardState extends State<GlucoseCard> {
               const SizedBox(height: 12),
               TextField(
                 controller: notesController,
-                decoration: const InputDecoration(
-                  labelText: 'Notes (optional)',
-                  hintText: 'e.g. after breakfast',
+                decoration: InputDecoration(
+                  labelText: S.of(context).notesOptionalLabel,
+                  hintText: S.of(context).notesHintAfterBreakfast,
                 ),
                 maxLines: 1,
               ),
@@ -413,7 +420,7 @@ class _GlucoseCardState extends State<GlucoseCard> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(ctx).pop(),
-              child: const Text('Cancel'),
+              child: Text(S.of(context).cancelLabel),
             ),
             FilledButton(
               onPressed: valueController.text.isEmpty
@@ -435,7 +442,7 @@ class _GlucoseCardState extends State<GlucoseCard> {
                       if (ctx.mounted) Navigator.of(ctx).pop();
                       _load();
                     },
-              child: const Text('Save'),
+              child: Text(S.of(context).saveLabel),
             ),
           ],
         ),

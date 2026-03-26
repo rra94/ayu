@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:opennutritracker/core/db/data_sources/biomarker_data_source.dart';
+import 'package:opennutritracker/core/styles/color_schemes.dart';
+import 'package:opennutritracker/generated/l10n.dart';
 import 'package:opennutritracker/core/db/entities/biomarker_record_ob.dart';
 import 'package:opennutritracker/core/utils/calc/optimal_range_calc.dart';
 import 'package:opennutritracker/core/utils/locator.dart';
@@ -45,14 +47,14 @@ class _BiomarkerCardState extends State<BiomarkerCard> {
               children: [
                 Icon(Icons.biotech, color: theme.colorScheme.primary),
                 const SizedBox(width: 8),
-                Text('Biomarkers',
+                Text(S.of(context).biomarkersLabel,
                     style: theme.textTheme.titleMedium
                         ?.copyWith(fontWeight: FontWeight.w600)),
                 const Spacer(),
                 IconButton(
-                  icon: const Icon(Icons.add, size: 20),
+                  icon: const Icon(Icons.add),
                   onPressed: () => _showAddDialog(context),
-                  tooltip: 'Add lab result',
+                  tooltip: S.of(context).addLabResultTooltip,
                 ),
               ],
             ),
@@ -73,7 +75,7 @@ class _BiomarkerCardState extends State<BiomarkerCard> {
                           color: theme.colorScheme.onSurfaceVariant),
                       const SizedBox(height: 8),
                       Text(
-                        'Add your blood work results to track\nbiomarkers against longevity-optimal ranges',
+                        S.of(context).biomarkerEmptyState,
                         textAlign: TextAlign.center,
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: theme.colorScheme.onSurfaceVariant,
@@ -114,7 +116,7 @@ class _BiomarkerCardState extends State<BiomarkerCard> {
         width: double.infinity,
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: Colors.orange.withValues(alpha: 0.1),
+          color: theme.colorScheme.warning.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
@@ -122,11 +124,11 @@ class _BiomarkerCardState extends State<BiomarkerCard> {
           children: [
             Row(
               children: [
-                Icon(Icons.update, size: 16, color: Colors.orange),
+                Icon(Icons.update, size: 16, color: theme.colorScheme.warning),
                 const SizedBox(width: 6),
-                Text('Stale biomarkers — time to re-check:',
+                Text(S.of(context).staleBiomarkersHeader,
                     style: theme.textTheme.labelSmall?.copyWith(
-                        fontWeight: FontWeight.w600, color: Colors.orange)),
+                        fontWeight: FontWeight.w600, color: theme.colorScheme.warning)),
               ],
             ),
             const SizedBox(height: 4),
@@ -176,15 +178,15 @@ class _BiomarkerCardState extends State<BiomarkerCard> {
   Widget _buildMarkerRow(
       ThemeData theme, BiomarkerDef def, double value, int rating) {
     final color = rating == 2
-        ? Colors.green
+        ? theme.colorScheme.success
         : rating == 1
-            ? Colors.orange
-            : Colors.red;
+            ? theme.colorScheme.warning
+            : theme.colorScheme.error;
     final label = rating == 2
-        ? 'Optimal'
+        ? S.of(context).optimalRating
         : rating == 1
-            ? 'Normal'
-            : 'Out of range';
+            ? S.of(context).normalRating
+            : S.of(context).outOfRangeRating;
 
     final record = _latestValues[def.key]!;
 
@@ -245,13 +247,13 @@ class _BiomarkerCardState extends State<BiomarkerCard> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('Edit ${def.name}'),
+        title: Text(S.of(context).editBiomarkerTitle(def.name)),
         content: TextField(
           controller: valueController,
           keyboardType:
               const TextInputType.numberWithOptions(decimal: true),
           decoration: InputDecoration(
-            labelText: 'Value',
+            labelText: S.of(context).valueLabel,
             suffixText: def.unit,
             hintText: 'Optimal: ${def.optimalLow}–${def.optimalHigh}',
           ),
@@ -259,7 +261,7 @@ class _BiomarkerCardState extends State<BiomarkerCard> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancel'),
+            child: Text(S.of(context).cancelLabel),
           ),
           FilledButton(
             onPressed: valueController.text.isEmpty
@@ -274,17 +276,17 @@ class _BiomarkerCardState extends State<BiomarkerCard> {
                         final confirm = await showDialog<bool>(
                           context: ctx,
                           builder: (c) => AlertDialog(
-                            title: const Text('Unusual Value'),
+                            title: Text(S.of(context).unusualValueTitle),
                             content: Text(
                                 'The value ${value.toStringAsFixed(1)} ${def.unit} seems unusual for ${def.name} '
                                 '(normal range: ${def.normalLow}–${def.normalHigh}). Are you sure?'),
                             actions: [
                               TextButton(
                                   onPressed: () => Navigator.of(c).pop(false),
-                                  child: const Text('Cancel')),
+                                  child: Text(S.of(context).cancelLabel)),
                               FilledButton(
                                   onPressed: () => Navigator.of(c).pop(true),
-                                  child: const Text('Save Anyway')),
+                                  child: Text(S.of(context).saveAnywayLabel)),
                             ],
                           ),
                         );
@@ -304,7 +306,7 @@ class _BiomarkerCardState extends State<BiomarkerCard> {
                       _load();
                     }
                   },
-            child: const Text('Update'),
+            child: Text(S.of(context).updateLabel),
           ),
         ],
       ),
@@ -321,7 +323,7 @@ class _BiomarkerCardState extends State<BiomarkerCard> {
         builder: (ctx, setDialogState) {
           final categories = OptimalRangeCalc.getByCategory();
           return AlertDialog(
-            title: const Text('Add Lab Result'),
+            title: Text(S.of(context).addLabResultTitle),
             content: SizedBox(
               width: double.maxFinite,
               height: 400,
@@ -362,7 +364,7 @@ class _BiomarkerCardState extends State<BiomarkerCard> {
                     keyboardType:
                         const TextInputType.numberWithOptions(decimal: true),
                     decoration: InputDecoration(
-                      labelText: 'Value',
+                      labelText: S.of(context).valueLabel,
                       hintText: selectedKey != null
                           ? OptimalRangeCalc.getDefinition(selectedKey!)?.unit
                           : '',
@@ -374,7 +376,7 @@ class _BiomarkerCardState extends State<BiomarkerCard> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(ctx).pop(),
-                child: const Text('Cancel'),
+                child: Text(S.of(context).cancelLabel),
               ),
               FilledButton(
                 onPressed: (selectedKey == null ||
@@ -391,7 +393,7 @@ class _BiomarkerCardState extends State<BiomarkerCard> {
                             final confirm = await showDialog<bool>(
                               context: ctx,
                               builder: (c) => AlertDialog(
-                                title: const Text('Unusual Value'),
+                                title: Text(S.of(context).unusualValueTitle),
                                 content: Text(
                                     'The value ${value.toStringAsFixed(1)} ${def.unit} seems unusual for ${def.name} '
                                     '(normal range: ${def.normalLow}–${def.normalHigh}). Are you sure?'),
@@ -399,11 +401,11 @@ class _BiomarkerCardState extends State<BiomarkerCard> {
                                   TextButton(
                                       onPressed: () =>
                                           Navigator.of(c).pop(false),
-                                      child: const Text('Cancel')),
+                                      child: Text(S.of(context).cancelLabel)),
                                   FilledButton(
                                       onPressed: () =>
                                           Navigator.of(c).pop(true),
-                                      child: const Text('Save Anyway')),
+                                      child: Text(S.of(context).saveAnywayLabel)),
                                 ],
                               ),
                             );
@@ -421,7 +423,7 @@ class _BiomarkerCardState extends State<BiomarkerCard> {
                           _load();
                         }
                       },
-                child: const Text('Save'),
+                child: Text(S.of(context).saveLabel),
               ),
             ],
           );

@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:logging/logging.dart';
@@ -20,6 +21,7 @@ class LocationInferenceService {
 
   Future<void> startMonitoring() async {
     if (_monitoring) return;
+    if (!Platform.isIOS) return;
     try {
       _channel.setMethodCallHandler(_handleLocationCallback);
       await _channel.invokeMethod('startSignificantLocationMonitoring');

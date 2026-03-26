@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:opennutritracker/generated/l10n.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 
 class WaterTrackerWidget extends StatelessWidget {
@@ -57,17 +58,17 @@ class WaterTrackerWidget extends StatelessWidget {
             Row(
               children: [
                 _QuickAddButton(
-                  label: '+250ml',
+                  label: S.of(context).waterPlus250,
                   onTap: () => onAddWater(250),
                 ),
                 const SizedBox(width: 8),
                 _QuickAddButton(
-                  label: '+500ml',
+                  label: S.of(context).waterPlus500,
                   onTap: () => onAddWater(500),
                 ),
                 const SizedBox(width: 8),
                 _QuickAddButton(
-                  label: '+Custom',
+                  label: S.of(context).waterCustom,
                   onTap: () => _showCustomDialog(context),
                 ),
               ],
@@ -83,20 +84,20 @@ class WaterTrackerWidget extends StatelessWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Add Water'),
+        title: Text(S.of(context).addWaterTitle),
         content: TextField(
           controller: controller,
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          decoration: const InputDecoration(
-            labelText: 'Amount (ml)',
-            hintText: 'e.g. 350',
+          decoration: InputDecoration(
+            labelText: S.of(context).amountMlLabel,
+            hintText: S.of(context).waterHintEg350,
           ),
           autofocus: true,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancel'),
+            child: Text(S.of(context).cancelLabel),
           ),
           FilledButton(
             onPressed: () {
@@ -107,7 +108,7 @@ class WaterTrackerWidget extends StatelessWidget {
                 ScaffoldMessenger.of(context).clearSnackBars();
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text('Added ${value.round()} ml of water'),
+                    content: Text(S.of(context).addedWaterSnackbar(value.round())),
                     duration: const Duration(seconds: 3),
                   ),
                 );
@@ -115,7 +116,7 @@ class WaterTrackerWidget extends StatelessWidget {
                 Navigator.of(ctx).pop();
               }
             },
-            child: const Text('Add'),
+            child: Text(S.of(context).addLabel),
           ),
         ],
       ),

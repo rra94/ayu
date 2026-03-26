@@ -7,6 +7,7 @@ import 'package:opennutritracker/core/db/data_sources/caffeine_data_source.dart'
 import 'package:opennutritracker/core/db/entities/fasting_session_ob.dart';
 import 'package:opennutritracker/core/domain/entity/intake_type_entity.dart';
 import 'package:opennutritracker/core/styles/color_schemes.dart';
+import 'package:opennutritracker/generated/l10n.dart';
 import 'package:opennutritracker/core/utils/locator.dart';
 import 'package:opennutritracker/core/utils/navigation_options.dart';
 import 'package:opennutritracker/core/services/intent_donation_service.dart';
@@ -38,9 +39,8 @@ class QuickActionBar extends StatelessWidget {
                 await ds.addWaterRecord(250, DateTime.now());
                 IntentDonationService.donateLogWater();
                 onActionComplete();
-                ScaffoldMessenger.of(context).clearSnackBars();
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Water +250ml'), duration: Duration(seconds: 2)),
+                  SnackBar(content: Text(S.of(context).waterSnackbar), duration: const Duration(seconds: 2)),
                 );
               },
             ),
@@ -59,7 +59,7 @@ class QuickActionBar extends StatelessWidget {
             const SizedBox(width: 8),
             _QuickChip(
               icon: Icons.coffee,
-              label: 'Coffee',
+              label: S.of(context).coffeeChipLabel,
               color: gold,
               onTap: () async {
                 HapticFeedback.lightImpact();
@@ -69,24 +69,23 @@ class QuickActionBar extends StatelessWidget {
                 ));
                 IntentDonationService.donateLogCoffee();
                 onActionComplete();
-                ScaffoldMessenger.of(context).clearSnackBars();
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Coffee logged (95mg caffeine)'), duration: Duration(seconds: 2)),
+                  SnackBar(content: Text(S.of(context).coffeeLoggedSnackbar), duration: const Duration(seconds: 2)),
                 );
               },
             ),
             const SizedBox(width: 8),
             _QuickChip(
               icon: Icons.timer,
-              label: 'Fast 16:8',
+              label: S.of(context).fastChipLabel,
               color: gold,
               onTap: () async {
                 HapticFeedback.lightImpact();
                 final ds = locator<FastingDataSource>();
                 final active = await ds.getActiveSession();
                 final msg = active != null
-                    ? 'Fast already active'
-                    : 'Fast 16:8 started';
+                    ? S.of(context).fastAlreadyActive
+                    : S.of(context).fastStartedSnackbar;
                 if (active == null) {
                   await ds.saveSession(FastingSessionOB(
                     startTime: DateTime.now(),
@@ -96,7 +95,6 @@ class QuickActionBar extends StatelessWidget {
                 }
                 IntentDonationService.donateStartFast();
                 onActionComplete();
-                ScaffoldMessenger.of(context).clearSnackBars();
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text(msg), duration: const Duration(seconds: 2)),
                 );

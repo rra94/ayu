@@ -23,6 +23,7 @@ import 'package:opennutritracker/core/services/notification_action_service.dart'
 import 'package:opennutritracker/core/services/widget_service.dart';
 import 'package:opennutritracker/features/health_connect/services/healthkit_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -93,9 +94,9 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
   Future<void> _onAppResumed() async {
     // Record sensor data on each foreground
-    try { await locator<CoreMotionService>().recordSnapshot(); } catch (e) { debugPrint('CoreMotion: $e'); }
-    try { await locator<BarometerService>().recordReading(); } catch (e) { debugPrint('Barometer: $e'); }
-    try { await locator<LocationInferenceService>().startMonitoring(); } catch (e) { debugPrint('LocationInference: $e'); }
+    try { await locator<CoreMotionService>().recordSnapshot(); } catch (e, st) { debugPrint('CoreMotion: $e'); Sentry.captureException(e, stackTrace: st); }
+    try { await locator<BarometerService>().recordReading(); } catch (e, st) { debugPrint('Barometer: $e'); Sentry.captureException(e, stackTrace: st); }
+    try { await locator<LocationInferenceService>().startMonitoring(); } catch (e, st) { debugPrint('LocationInference: $e'); Sentry.captureException(e, stackTrace: st); }
     // Auto-sync HealthKit data on each foreground (lightweight, just last day)
     try {
       if (await HealthKitService.hasPermissions()) {
@@ -120,8 +121,8 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     _appbarPages = [
       const HomeAppbar(),
       MainAppbar(title: S.of(context).diaryLabel, iconData: Icons.book),
-      MainAppbar(title: 'Charts', iconData: Icons.show_chart),
-      MainAppbar(title: 'Stats', iconData: Icons.bar_chart),
+      MainAppbar(title: S.of(context).chartsLabel, iconData: Icons.show_chart),
+      MainAppbar(title: S.of(context).statsLabel, iconData: Icons.bar_chart),
     ];
     super.didChangeDependencies();
   }
@@ -135,7 +136,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
           ? FloatingActionButton(
               heroTag: 'add',
               onPressed: () => _showAddOptions(context),
-              tooltip: 'Add',
+              tooltip: S.of(context).addLabel,
               child: const Icon(Icons.add),
             )
           : null,
@@ -157,12 +158,12 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
               icon: _selectedPageIndex == 2
                   ? const Icon(Icons.show_chart)
                   : const Icon(Icons.show_chart),
-              label: 'Charts'),
+              label: S.of(context).chartsLabel),
           NavigationDestination(
               icon: _selectedPageIndex == 3
                   ? const Icon(Icons.bar_chart)
                   : const Icon(Icons.bar_chart_outlined),
-              label: 'Stats'),
+              label: S.of(context).statsLabel),
         ],
       ),
     );
@@ -200,8 +201,8 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
           children: [
             ListTile(
               leading: const Icon(Icons.search),
-              title: const Text('Search Food'),
-              subtitle: const Text('Look up by name'),
+              title: Text(S.of(context).searchFoodTitle),
+              subtitle: Text(S.of(context).searchFoodSubtitle),
               onTap: () {
                 Navigator.pop(ctx);
                 Navigator.of(context).pushNamed(
@@ -212,8 +213,8 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
             ),
             ListTile(
               leading: const Icon(Icons.qr_code_scanner),
-              title: const Text('Scan Barcode'),
-              subtitle: const Text('Scan a product barcode'),
+              title: Text(S.of(context).scanBarcodeTitle),
+              subtitle: Text(S.of(context).scanBarcodeSubtitle),
               onTap: () {
                 Navigator.pop(ctx);
                 Navigator.of(context).pushNamed(
@@ -224,8 +225,8 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
             ),
             ListTile(
               leading: const Icon(Icons.receipt_long),
-              title: const Text('Scan Receipt'),
-              subtitle: const Text('Photo of grocery or restaurant receipt'),
+              title: Text(S.of(context).scanReceiptTitle),
+              subtitle: Text(S.of(context).scanReceiptSubtitle),
               onTap: () {
                 Navigator.pop(ctx);
                 Navigator.of(context).pushNamed(
@@ -235,10 +236,10 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
             ),
             ListTile(
               leading: const Icon(Icons.restaurant),
-              title: const Text('Photo Meal'),
+              title: Text(S.of(context).photoMealTitle),
               subtitle: Text(_photoAnalysisEnabled
-                  ? 'Take a photo — AI identifies food & calories'
-                  : 'Enable in Settings to use AI photo analysis'),
+                  ? S.of(context).photoMealSubtitleEnabled
+                  : S.of(context).photoMealSubtitleDisabled),
               onTap: () {
                 Navigator.pop(ctx);
                 if (_photoAnalysisEnabled) {
@@ -254,8 +255,8 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
             ),
             ListTile(
               leading: const Icon(Icons.edit_note),
-              title: const Text('Describe Meal'),
-              subtitle: const Text('Type what you ate — we look up nutrition'),
+              title: Text(S.of(context).describeMealTitle),
+              subtitle: Text(S.of(context).describeMealSubtitle),
               onTap: () {
                 Navigator.pop(ctx);
                 Navigator.of(context).pushNamed(

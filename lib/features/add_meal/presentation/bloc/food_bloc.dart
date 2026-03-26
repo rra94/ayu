@@ -41,7 +41,8 @@ class FoodBloc extends Bloc<FoodEvent, FoodState> {
       try {
         final result =
             await _searchProductUseCase.searchFDCFoodByString(_searchString);
-        emit(FoodLoadedState(food: result));
+        final config = await _getConfigUsecase.getConfig();
+        emit(FoodLoadedState(food: result, usesImperialUnits: config.usesImperialUnits));
       } catch (error) {
         log.severe(error);
         emit(FoodFailedState());

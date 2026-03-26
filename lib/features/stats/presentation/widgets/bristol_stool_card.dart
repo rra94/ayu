@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:opennutritracker/core/db/data_sources/stool_data_source.dart';
+import 'package:opennutritracker/core/styles/color_schemes.dart';
 import 'package:opennutritracker/core/db/entities/stool_log_ob.dart';
 import 'package:opennutritracker/core/utils/locator.dart';
 
@@ -71,7 +72,7 @@ class _BristolStoolCardState extends State<BristolStoolCard> {
                         ?.copyWith(fontWeight: FontWeight.w600)),
                 const Spacer(),
                 IconButton(
-                  icon: const Icon(Icons.add, size: 20),
+                  icon: const Icon(Icons.add),
                   onPressed: () => _showLogDialog(context),
                   tooltip: 'Log stool',
                 ),
@@ -133,7 +134,7 @@ class _BristolStoolCardState extends State<BristolStoolCard> {
                 BarChartRodData(
                   toY: counts[i].toDouble(),
                   color: isIdeal
-                      ? Colors.green
+                      ? theme.colorScheme.success
                       : theme.colorScheme.primary.withValues(alpha: 0.5),
                   width: 20,
                   borderRadius: const BorderRadius.vertical(
@@ -186,7 +187,7 @@ class _BristolStoolCardState extends State<BristolStoolCard> {
                 Text(
                   'Type ${log.type} — ${_typeDescriptions[log.type]}',
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: isIdeal ? Colors.green : null,
+                    color: isIdeal ? theme.colorScheme.success : null,
                   ),
                 ),
                 const Spacer(),
@@ -233,7 +234,7 @@ class _BristolStoolCardState extends State<BristolStoolCard> {
                     '${_typeIcons[type]} Type $type — ${_typeDescriptions[type]}',
                     style: TextStyle(
                       fontSize: 14,
-                      color: isIdeal ? Colors.green : null,
+                      color: isIdeal ? Theme.of(context).colorScheme.success : null,
                       fontWeight: isIdeal ? FontWeight.w600 : null,
                     ),
                   ),

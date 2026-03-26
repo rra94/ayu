@@ -111,7 +111,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 // ── General ────────────────────────────────────────────────
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
-                  child: Text('General',
+                  child: Text(S.of(context).generalSectionLabel,
                       style: theme.textTheme.labelLarge?.copyWith(
                           color: theme.colorScheme.primary,
                           fontWeight: FontWeight.w600)),
@@ -119,7 +119,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ListTile(
                   leading: const Icon(Icons.account_circle_outlined),
                   title: Text(S.of(context).profileLabel),
-                  subtitle: const Text('Weight, height, age, activity level'),
+                  subtitle: Text(S.of(context).profileSubtitle),
                   onTap: () => Navigator.of(context).push(
                     MaterialPageRoute(builder: (_) => const ProfilePage()),
                   ),
@@ -137,8 +137,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 ListTile(
                   leading: const Icon(Icons.flag_outlined),
-                  title: const Text('Weight & Macro Goals'),
-                  subtitle: const Text('Target weight, deficit, macro ratios'),
+                  title: Text(S.of(context).weightMacroGoalsTitle),
+                  subtitle: Text(S.of(context).weightMacroGoalsSubtitle),
                   onTap: () => _showGoalSettingsDialog(context),
                 ),
                 ListTile(
@@ -149,45 +149,45 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 // ── Health ─────────────────────────────────────────────────
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
-                  child: Text('Health',
+                  child: Text(S.of(context).healthSectionLabel,
                       style: theme.textTheme.labelLarge?.copyWith(
                           color: theme.colorScheme.primary,
                           fontWeight: FontWeight.w600)),
                 ),
                 ListTile(
                   leading: const Icon(Icons.warning_amber),
-                  title: const Text('Food Allergens'),
+                  title: Text(S.of(context).foodAllergensTitle),
                   subtitle: Text(AllergenService.userAllergens.isEmpty
-                      ? 'Not configured'
+                      ? S.of(context).notConfiguredLabel
                       : AllergenService.userAllergens.join(', ')),
                   onTap: () => _showAllergenDialog(context),
                 ),
                 ListTile(
                   leading: const Icon(Icons.medical_information_outlined),
-                  title: const Text('Health Conditions'),
+                  title: Text(S.of(context).healthConditionsTitle),
                   subtitle: Text(HealthConditionService.getUserConditions().isEmpty
-                      ? 'Not configured'
+                      ? S.of(context).notConfiguredLabel
                       : HealthConditionService.getUserConditions().join(', ')),
                   onTap: () => _showHealthConditionsDialog(context),
                 ),
                 ListTile(
                   leading: const Icon(Icons.directions_walk),
-                  title: const Text('Daily Step Goal'),
+                  title: Text(S.of(context).dailyStepGoalTitle),
                   subtitle: Text('$_stepGoal steps'),
                   onTap: () => _showStepGoalDialog(),
                 ),
                 // ── Features ───────────────────────────────────────────────
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
-                  child: Text('Features',
+                  child: Text(S.of(context).featuresSectionLabel,
                       style: theme.textTheme.labelLarge?.copyWith(
                           color: theme.colorScheme.primary,
                           fontWeight: FontWeight.w600)),
                 ),
                 SwitchListTile(
                   secondary: const Icon(Icons.eco_outlined),
-                  title: const Text('Sustainability Score'),
-                  subtitle: const Text('Show daily eco-score from Open Food Facts'),
+                  title: Text(S.of(context).sustainabilityScoreTitle),
+                  subtitle: Text(S.of(context).sustainabilityScoreSubtitle),
                   value: _showSustainability,
                   onChanged: (v) async {
                     final configDs = locator<ConfigDataSourceOB>();
@@ -198,8 +198,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 SwitchListTile(
                   secondary: const Icon(Icons.photo_camera_outlined),
-                  title: const Text('Photo Meal Analysis'),
-                  subtitle: const Text('Uses Google Gemini (photo sent to cloud)'),
+                  title: Text(S.of(context).photoMealAnalysisTitle),
+                  subtitle: Text(S.of(context).photoMealAnalysisSubtitle),
                   value: _photoAnalysis,
                   onChanged: (v) async {
                     final configDs = locator<ConfigDataSourceOB>();
@@ -211,7 +211,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 // ── Data ───────────────────────────────────────────────────
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
-                  child: Text('Data',
+                  child: Text(S.of(context).dataSectionLabel,
                       style: theme.textTheme.labelLarge?.copyWith(
                           color: theme.colorScheme.primary,
                           fontWeight: FontWeight.w600)),
@@ -223,14 +223,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 ListTile(
                   leading: const Icon(Icons.file_download_outlined),
-                  title: const Text('Export CSV'),
-                  subtitle: const Text('Share your food log as spreadsheet'),
+                  title: Text(S.of(context).exportCsvTitle),
+                  subtitle: Text(S.of(context).exportCsvSubtitle),
                   onTap: () => _exportCsv(context),
                 ),
                 ListTile(
                   leading: const Icon(Icons.backup_outlined),
-                  title: const Text('Backup Data'),
-                  subtitle: const Text('Export all settings as JSON'),
+                  title: Text(S.of(context).backupDataTitle),
+                  subtitle: Text(S.of(context).backupDataSubtitle),
                   onTap: () async {
                     await BackupService.shareBackup();
                   },
@@ -348,7 +348,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setDialogState) => AlertDialog(
-          title: const Text('My Allergens'),
+          title: Text(S.of(context).myAllergensTitle),
           content: SizedBox(
             width: double.maxFinite,
             height: 400,
@@ -374,7 +374,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(ctx).pop(),
-              child: const Text('Cancel'),
+              child: Text(S.of(context).cancelLabel),
             ),
             FilledButton(
               onPressed: () async {
@@ -383,7 +383,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 setState(() {});
                 _homeBloc.add(LoadItemsEvent());
               },
-              child: const Text('Save'),
+              child: Text(S.of(context).saveLabel),
             ),
           ],
         ),
@@ -397,13 +397,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setDialogState) => AlertDialog(
-          title: const Text('Health Conditions'),
+          title: Text(S.of(context).healthConditionsDialogTitle),
           content: SizedBox(
             width: double.maxFinite,
             height: 400,
             child: Column(
               children: [
-                Text('Select any conditions — Ayu will tailor nutrition advice accordingly.',
+                Text(S.of(context).healthConditionsInstructions,
                     style: Theme.of(ctx).textTheme.bodySmall),
                 const SizedBox(height: 8),
                 Expanded(
@@ -429,7 +429,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(ctx).pop(),
-              child: const Text('Cancel'),
+              child: Text(S.of(context).cancelLabel),
             ),
             FilledButton(
               onPressed: () {
@@ -438,7 +438,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 setState(() {});
                 _homeBloc.add(LoadItemsEvent());
               },
-              child: const Text('Save'),
+              child: Text(S.of(context).saveLabel),
             ),
           ],
         ),
@@ -451,27 +451,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Daily Step Goal'),
+        title: Text(S.of(context).dailyStepGoalDialogTitle),
         content: TextField(
           controller: controller,
           keyboardType: TextInputType.number,
-          decoration: const InputDecoration(
-            labelText: 'Steps',
-            hintText: '10000',
+          decoration: InputDecoration(
+            labelText: S.of(context).stepsLabel,
+            hintText: S.of(context).stepGoalHint,
           ),
           autofocus: true,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancel'),
+            child: Text(S.of(context).cancelLabel),
           ),
           FilledButton(
             onPressed: () async {
               final value = int.tryParse(controller.text);
               if (value == null || value <= 0 || value > 100000) {
                 ScaffoldMessenger.of(ctx).showSnackBar(
-                  const SnackBar(content: Text('Enter a value between 1 and 100,000')),
+                  SnackBar(content: Text(S.of(context).stepGoalValidationError)),
                 );
                 return;
               }
@@ -481,7 +481,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               _homeBloc.add(LoadItemsEvent());
               if (ctx.mounted) Navigator.of(ctx).pop();
             },
-            child: const Text('Save'),
+            child: Text(S.of(context).saveLabel),
           ),
         ],
       ),
