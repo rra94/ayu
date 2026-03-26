@@ -151,15 +151,35 @@ class _ActivityDashboardWidgetState extends State<ActivityDashboardWidget> {
   Widget build(BuildContext context) {
     if (!_loaded) return const SizedBox();
 
+    final theme = Theme.of(context);
+
     // Hide entirely when there is no sensor data at all (first-time user or
     // HealthKit / CoreMotion not yet seeded).
     final hasNoData = _steps == 0 &&
         (_activity == 'unknown' || _activity.isEmpty) &&
         _gymCount == 0 &&
         !_hasHrData;
-    if (hasNoData) return const SizedBox.shrink();
-
-    final theme = Theme.of(context);
+    if (hasNoData) {
+      return Card(
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            children: [
+              Icon(Icons.directions_run,
+                  color: theme.colorScheme.onSurfaceVariant),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Grant HealthKit access to see activity data',
+                  style: theme.textTheme.bodySmall,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
     final isLight = theme.brightness == Brightness.light;
     final gold = isLight ? ayuGoldMuted : ayuGoldLight;
     final goldDim = gold.withValues(alpha: 0.6);
@@ -289,13 +309,14 @@ class _MiniGauge extends StatelessWidget {
         const SizedBox(height: 2),
         Text(
           label,
-          style: TextStyle(
-              fontSize: 10, fontWeight: FontWeight.w600, color: color),
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).colorScheme.onSurface),
         ),
         Text(
           subtitle,
-          style: TextStyle(
-              fontSize: 8,
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(
               color: Theme.of(context).colorScheme.onSurfaceVariant),
         ),
       ],
@@ -319,15 +340,22 @@ class _MiniStat extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
+        // Small accent dot — gold for indicator/icon use, NOT text
+        Container(
+          width: 6,
+          height: 6,
+          margin: const EdgeInsets.only(bottom: 2),
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        ),
         Text(
           value,
-          style: TextStyle(
-              fontSize: 16, fontWeight: FontWeight.bold, color: color),
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).colorScheme.onSurface),
         ),
         Text(
           subtitle,
-          style: TextStyle(
-              fontSize: 8,
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(
               color: Theme.of(context).colorScheme.onSurfaceVariant),
         ),
       ],
@@ -355,8 +383,7 @@ class _MiniIconStat extends StatelessWidget {
         const SizedBox(height: 2),
         Text(
           subtitle,
-          style: TextStyle(
-              fontSize: 8,
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(
               color: Theme.of(context).colorScheme.onSurfaceVariant),
         ),
       ],

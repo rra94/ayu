@@ -75,7 +75,7 @@ class _PeptideStackWidgetState extends State<PeptideStackWidget> {
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                   decoration: BoxDecoration(
                     color: dosedCount == totalCount
-                        ? Colors.green.withValues(alpha: 0.2)
+                        ? const Color(0xFF4CAF50).withValues(alpha: 0.2)
                         : goldColor.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -84,7 +84,7 @@ class _PeptideStackWidgetState extends State<PeptideStackWidget> {
                     style: theme.textTheme.labelSmall?.copyWith(
                       fontWeight: FontWeight.w600,
                       color: dosedCount == totalCount
-                          ? Colors.green
+                          ? const Color(0xFF4CAF50)
                           : goldColor,
                     ),
                   ),
@@ -204,7 +204,7 @@ class _PeptideStackWidgetState extends State<PeptideStackWidget> {
               icon: Icon(Icons.edit_outlined, size: 18, color: goldColor),
               tooltip: 'Edit Peptide',
               padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+              constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
               onPressed: () => _showPeptideDialog(context, existing: p),
             ),
             // Site map button
@@ -212,7 +212,7 @@ class _PeptideStackWidgetState extends State<PeptideStackWidget> {
               icon: Icon(Icons.map_outlined, size: 18, color: goldColor),
               tooltip: 'Site Map',
               padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+              constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
               onPressed: () => showInjectionSiteSheet(context, p.id),
             ),
           ],
@@ -227,7 +227,7 @@ class _PeptideStackWidgetState extends State<PeptideStackWidget> {
       padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
       decoration: BoxDecoration(
         color: isResting
-            ? Colors.red.withValues(alpha: 0.15)
+            ? theme.colorScheme.error.withValues(alpha: 0.15)
             : goldColor.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(8),
       ),
@@ -235,7 +235,7 @@ class _PeptideStackWidgetState extends State<PeptideStackWidget> {
         text,
         style: theme.textTheme.labelSmall?.copyWith(
           fontWeight: FontWeight.w700,
-          color: isResting ? Colors.red : goldColor,
+          color: isResting ? theme.colorScheme.error : goldColor,
         ),
       ),
     );

@@ -60,7 +60,26 @@ class SustainabilityScoreWidget extends StatelessWidget {
         final scores = snapshot.data ?? [];
 
         if (scores.isEmpty) {
-          return const SizedBox.shrink();
+          final theme = Theme.of(context);
+          return Card(
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Row(
+                children: [
+                  Icon(Icons.eco,
+                      color: theme.colorScheme.onSurfaceVariant),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Scan foods to see sustainability scores',
+                      style: theme.textTheme.bodySmall,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
         }
 
         final avgScore =

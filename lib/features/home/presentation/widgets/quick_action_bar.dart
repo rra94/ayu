@@ -126,7 +126,8 @@ class _QuickChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return ActionChip(
       avatar: Icon(icon, size: 16, color: color),
-      label: Text(label, style: TextStyle(fontSize: 12, color: color)),
+      label: Text(label,
+          style: Theme.of(context).textTheme.bodySmall),
       onPressed: onTap,
       side: BorderSide(color: color.withValues(alpha: 0.3)),
       backgroundColor: color.withValues(alpha: 0.05),

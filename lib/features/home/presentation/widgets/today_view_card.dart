@@ -94,7 +94,7 @@ class _TodayViewCardState extends State<TodayViewCard> {
               value: calPct,
               label: '${widget.caloriesConsumed.round()}',
               subtitle: 'kcal',
-              color: calPct > 1 ? Colors.red : gold,
+              color: calPct > 1 ? theme.colorScheme.error : gold,
             ),
             _MiniGauge(
               value: _waterPct,
@@ -157,10 +157,11 @@ class _MiniGauge extends StatelessWidget {
         ),
         const SizedBox(height: 2),
         Text(label,
-            style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600,
-                color: color)),
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                fontSize: 10, fontWeight: FontWeight.w600,
+                color: Theme.of(context).colorScheme.onSurface)),
         Text(subtitle,
-            style: TextStyle(fontSize: 8,
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant)),
       ],
     );
@@ -183,11 +184,19 @@ class _MiniStat extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
+        // Small accent dot uses gold for icon/indicator — NOT as text color
+        Container(
+          width: 6,
+          height: 6,
+          margin: const EdgeInsets.only(bottom: 2),
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        ),
         Text(value,
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold,
-                color: color)),
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.onSurface)),
         Text(subtitle,
-            style: TextStyle(fontSize: 8,
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant)),
       ],
     );
